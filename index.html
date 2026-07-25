@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Market Board</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#e7ecf1; --panel:#ffffff; --chrome:#0f2137; --chrome-2:#16304d;
+    --ink:#1b2a3a; --muted:#6a7889; --label:#93a1b0; --line:#e2e8ee;
+    --pos:#12924e; --neg:#d6423d; --flat:#8a97a5; --accent:#d6423d;
+    --pill-good-bg:#dbf1e3; --pill-good-ink:#177a44;
+    --pill-bad-bg:#fbe1e1; --pill-bad-ink:#c1352f;
+    --pill-warn-bg:#fbeecd; --pill-warn-ink:#9a6a10;
+    --pill-neut-bg:#e7edf3; --pill-neut-ink:#5b6b7c;
+    --sans:'Inter',system-ui,-apple-system,sans-serif;
+    --mono:'IBM Plex Mono',ui-monospace,'SF Mono',Menlo,monospace;
+  }
+  [data-theme="dark"]{
+    --bg:#0a1522; --panel:#0f1f31; --chrome:#0b1728; --chrome-2:#14283f;
+    --ink:#e6edf4; --muted:#8697a8; --label:#5f7387; --line:#1d3147;
+    --pill-good-bg:#123a26; --pill-good-ink:#4cd08a;
+    --pill-bad-bg:#3d1a1a; --pill-bad-ink:#e8746f;
+    --pill-warn-bg:#3a2f12; --pill-warn-ink:#e0b049;
+    --pill-neut-bg:#1a2c3f; --pill-neut-ink:#93a6b8;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:13px;line-height:1.3;
+    -webkit-font-smoothing:antialiased;padding-bottom:40px;transition:background .2s}
+  .mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+  .pos{color:var(--pos)} .neg{color:var(--neg)} .flat{color:var(--flat)}
+
+  /* ---------- top chrome ---------- */
+  header{background:var(--chrome);color:#cdd9e6;position:sticky;top:0;z-index:10}
+  .bar{display:flex;align-items:center;gap:18px;padding:12px 20px;flex-wrap:wrap}
+  .logo{display:flex;align-items:center;gap:12px}
+  .logo .mark{background:#2f6df6;color:#fff;font-family:var(--mono);font-weight:700;font-size:12px;
+    padding:6px 8px;border-radius:5px;letter-spacing:.5px}
+  .logo .title{font-weight:700;font-size:14px;letter-spacing:.4px;color:#fff}
+  .logo .sub{font-family:var(--mono);font-size:10.5px;color:#6f8299;letter-spacing:.3px}
+  nav{display:flex;gap:4px;flex-wrap:wrap;flex:1;justify-content:center}
+  nav a{color:#8195ab;font-size:11px;font-weight:600;letter-spacing:.6px;text-transform:uppercase;
+    padding:7px 11px;border-radius:6px;text-decoration:none;white-space:nowrap}
+  nav a.active{color:#fff;border:1px solid #3f6da8;background:#132a44}
+  nav a:hover:not(.active):not(.disabled){color:#cdd9e6;background:#132a44}
+  nav a.disabled{opacity:.38;cursor:not-allowed}
+  .ctrls button.on{color:#4cd08a;border-color:#2f7d55}
+  .ctrls{display:flex;align-items:center;gap:8px}
+  .ctrls button{font-family:var(--mono);font-size:10.5px;letter-spacing:.5px;color:#9fb0c2;
+    background:#132a44;border:1px solid #24425f;padding:7px 10px;border-radius:6px;cursor:pointer}
+  .ctrls button:hover{color:#fff;border-color:#3f6da8}
+  .ctrls .date{font-family:var(--mono);font-size:11px;color:#7f93a8}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--pos);display:inline-block;margin-right:6px}
+
+  /* ---------- layout ---------- */
+  main{max-width:1840px;margin:0 auto;padding:16px 20px;display:flex;flex-direction:column;gap:14px}
+  .row{display:grid;gap:14px}
+  .row.two-6040{grid-template-columns:1.55fr 1fr}
+  .row.two-5050{grid-template-columns:1fr 1fr}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+  .phead{background:var(--chrome);color:#aebfd0;display:flex;justify-content:space-between;align-items:center;
+    padding:9px 14px;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase}
+  .phead .r{color:#6f8299;font-weight:600;letter-spacing:.6px}
+  .pbody{padding:14px}
+
+  /* ---------- regime read ---------- */
+  .regime{display:grid;grid-template-columns:repeat(6,1fr)}
+  .rcell{padding:14px 16px;border-right:1px solid var(--line)}
+  .rcell:last-child{border-right:none}
+  .rcell .lbl{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--label);margin-bottom:8px}
+  .rcell .big{font-size:22px;font-weight:700;letter-spacing:.3px}
+  .rcell .note{font-family:var(--mono);font-size:10.5px;color:var(--muted);margin-top:7px}
+  .rcell .stack{font-size:12.5px;font-weight:600;line-height:1.5}
+  .rcell .stack .dim{color:var(--muted);font-weight:400;font-size:11px}
+  .hl .big{font-family:var(--mono)}
+  .sep{color:var(--muted);font-weight:400;margin:0 4px}
+
+  /* ---------- index grid ---------- */
+  .idx{display:grid;grid-template-columns:repeat(5,1fr);gap:0}
+  .idxcol{padding:2px 16px;border-right:1px solid var(--line)}
+  .idxcol:last-child{border-right:none}
+  .idxcol .tk{font-family:var(--mono);font-weight:700;font-size:15px}
+  .idxcol .desc{font-size:9.5px;letter-spacing:.5px;text-transform:uppercase;color:var(--label);margin:1px 0 10px}
+  .idxrow{display:flex;justify-content:space-between;font-family:var(--mono);font-size:11.5px;padding:2px 0}
+  .idxrow .k{color:var(--muted)}
+
+  /* ---------- breadth ---------- */
+  .breadth{display:grid;grid-template-columns:1fr 1fr;gap:2px 26px}
+  .bline{display:flex;justify-content:space-between;align-items:baseline;padding:6px 0;border-bottom:1px dotted var(--line)}
+  .bline .k{font-size:11.5px;color:var(--muted)}
+  .bline .v{font-family:var(--mono);font-weight:600;font-size:13px}
+
+  /* ---------- theme tables ---------- */
+  table{width:100%;border-collapse:collapse}
+  th{font-size:9.5px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--label);
+    text-align:right;padding:6px 8px;border-bottom:1px solid var(--line)}
+  th.l{text-align:left}
+  td{padding:9px 8px;border-bottom:1px solid var(--line);font-size:12.5px}
+  tr:last-child td{border-bottom:none}
+  td.rank{color:var(--label);font-family:var(--mono);font-size:11px;width:22px}
+  td.name{font-weight:600}
+  td.name .cnt{color:var(--muted);font-weight:400;font-family:var(--mono);font-size:10.5px;margin-left:6px}
+  td.num{text-align:right;font-family:var(--mono);font-weight:600}
+  td.score{font-size:14px}
+  .pill{display:inline-block;font-size:9.5px;font-weight:700;letter-spacing:.5px;padding:3px 8px;border-radius:4px;text-transform:uppercase}
+  .pill.good{background:var(--pill-good-bg);color:var(--pill-good-ink)}
+  .pill.bad{background:var(--pill-bad-bg);color:var(--pill-bad-ink)}
+  .pill.warn{background:var(--pill-warn-bg);color:var(--pill-warn-ink)}
+  .pill.neut{background:var(--pill-neut-bg);color:var(--pill-neut-ink)}
+  td.st{text-align:right;width:120px}
+
+  @media(max-width:1080px){
+    .row.two-6040,.row.two-5050{grid-template-columns:1fr}
+    .regime{grid-template-columns:repeat(2,1fr)}
+    .rcell{border-bottom:1px solid var(--line)}
+    .idx{grid-template-columns:repeat(2,1fr)}
+    nav{display:none}
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="bar">
+    <div class="logo">
+      <span class="mark">SMB</span>
+      <div>
+        <div class="title">MARKET BOARD</div>
+        <div class="sub" id="metaline">loading…</div>
+      </div>
+    </div>
+    <nav>
+      <a href="#" data-tab="Daily Board" class="active">Daily Board</a>
+      <a href="#" data-tab="Themes">Themes</a>
+      <a href="#" data-tab="Breadth">Breadth</a>
+      <a href="#" data-tab="ETF Grid">ETF Grid</a>
+      <a href="#" data-tab="RVOL">RVOL</a>
+      <a href="#" data-tab="Options">Options</a>
+      <a href="#" data-tab="Momentum">Momentum</a>
+      <a href="#" data-tab="Extension">Extension</a>
+      <a href="#" data-tab="Clean Momentum">Clean Momentum</a>
+    </nav>
+    <div class="ctrls">
+      <button id="themeBtn">DARK</button>
+      <button id="liveBtn">● LIVE OFF</button>
+      <button id="refreshBtn">⟳ REFRESH</button>
+      <span class="date mono" id="dateline">—</span>
+    </div>
+  </div>
+</header>
+
+<main id="main"></main>
+
+<script>
+
+/* =====================================================================
+   Live loader. Fetches dashboard_data.json (written by market_ingest.py).
+   REFRESH re-fetches. LIVE polls every 60s. Tabs switch views.
+   ===================================================================== */
+let DATA = null;
+let liveTimer = null;
+const WORKING_TABS = ["Daily Board", "Themes", "Breadth", "ETF Grid", "RVOL", "Momentum", "Extension"];
+let activeTab = "Daily Board";
+
+async function load(){
+  const el = document.getElementById("metaline");
+  try{
+    const r = await fetch("dashboard_data.json?t=" + Date.now());   // cache-bust
+    if(!r.ok) throw new Error("HTTP " + r.status);
+    DATA = await r.json();
+    render();
+  }catch(err){
+    el.textContent = "LOAD FAILED — " + err.message;
+    el.style.color = "#e8746f";
+  }
+}
+
+/* ---------- helpers ---------- */
+const cls = v => v>0?"pos":v<0?"neg":"flat";
+const pctSign = v => (v>0?"+":"")+Number(v).toFixed(2)+"%";
+const numSign = v => (v>0?"+":"")+Number(v).toFixed(1);
+const pillClass = st => ({DOMINANT:"good",STRONG:"good",NEUTRAL:"neut",WEAK:"warn",FADING:"bad",DETERIORATING:"bad"}[st]||"neut");
+const scoreColor = s => s>=75?"pos":s>=55?"":s>=35?"warn":"neg";
+
+const themeRows = arr => arr.map(t=>`
+    <tr>
+      <td class="rank">${t.r}</td>
+      <td class="name">${t.name}<span class="cnt">${t.cnt}</span></td>
+      <td class="num score ${scoreColor(t.score)}">${t.score}</td>
+      <td class="num ${cls(t.delta)}">${numSign(t.delta)}</td>
+      <td class="st"><span class="pill ${pillClass(t.st)}">${t.st}</span></td>
+    </tr>`).join("");
+const THEAD = `<tr><th class="l">#</th><th class="l">Theme</th><th>Score</th><th>1D Δ</th><th>Status</th></tr>`;
+
+/* ---------- views ---------- */
+function viewDailyBoard(d){
+  const rg = d.regime;
+  const emerging = (rg.emerging && rg.emerging.length) ? rg.emerging.join(" · ") : `<span class="dim">${rg.emergingNote||"no themes improving"}</span>`;
+  return `
+  <section class="panel">
+    <div class="phead">Regime Read <span class="r">AS OF ${d.date}</span></div>
+    <div class="regime">
+      <div class="rcell hl"><div class="lbl">Regime</div>
+        <div class="big ${rg.label.includes('OFF')?'neg':rg.label.includes('ON')?'pos':'flat'}">${rg.label}</div>
+        <div class="note">${rg.breadth}</div></div>
+      <div class="rcell"><div class="lbl">Dominant</div>
+        <div class="stack">${rg.dominant[0]||"—"}<br><span class="dim">${rg.dominant.slice(1).join(" · ")}</span></div></div>
+      <div class="rcell"><div class="lbl">Emerging</div>
+        <div class="stack">${(rg.emerging&&rg.emerging[0])||"—"}<br><span class="dim">${emerging}</span></div></div>
+      <div class="rcell"><div class="lbl">Fading</div>
+        <div class="stack">${rg.fading[0]||"—"}<br><span class="dim">${rg.fading.slice(1).join(" · ")}</span></div></div>
+      <div class="rcell hl"><div class="lbl">New Highs / Lows</div>
+        <div class="big"><span class="pos">${rg.newHighs}</span> <span class="sep">/</span> <span class="neg">${rg.newLows}</span></div>
+        <div class="note">52w highs: ${rg.highs52w}</div></div>
+      <div class="rcell hl"><div class="lbl">Up 3% / Down 3%</div>
+        <div class="big"><span class="pos">${rg.up3}</span> <span class="sep">/</span> <span class="neg">${rg.down3}</span></div>
+        <div class="note">impulse / volatility</div></div>
+    </div>
+  </section>
+
+  <div class="row two-6040">
+    <section class="panel">
+      <div class="phead">Index &amp; Benchmark <span class="r">RET / DIST 50DMA / ATR EXT</span></div>
+      <div class="pbody"><div class="idx">${d.indices.map(x=>`
+        <div class="idxcol">
+          <div class="tk">${x.tk}</div><div class="desc">${x.desc}</div>
+          <div class="idxrow"><span class="k">1D</span><span class="${cls(x.d1)}">${pctSign(x.d1)}</span></div>
+          <div class="idxrow"><span class="k">5D</span><span class="${cls(x.d5)}">${pctSign(x.d5)}</span></div>
+          <div class="idxrow"><span class="k">&gt;50DMA</span><span class="${cls(x.d50)}">${pctSign(x.d50)}</span></div>
+          <div class="idxrow"><span class="k">ATR EXT</span><span class="${cls(x.atr)}">${numSign(x.atr)}</span></div>
+        </div>`).join("")}</div></div>
+    </section>
+    <section class="panel">
+      <div class="phead">Universe Breadth <span class="r">EX-BENCHMARK</span></div>
+      <div class="pbody"><div class="breadth">${d.breadth.map(([k,v])=>`
+        <div class="bline"><span class="k">${k}</span><span class="v">${v}</span></div>`).join("")}</div></div>
+    </section>
+  </div>
+
+  <div class="row two-5050">
+    <section class="panel">
+      <div class="phead">Dominant Themes <span class="r">SCORE / 1D Δ / STATUS</span></div>
+      <div class="pbody"><table>${THEAD}${themeRows(d.dominant)}</table></div>
+    </section>
+    <section class="panel">
+      <div class="phead">Emerging &amp; Fading <span class="r">BIGGEST 1D Δ MOVES</span></div>
+      <div class="pbody"><table>${THEAD}${themeRows(d.emerging)}</table></div>
+    </section>
+  </div>`;
+}
+
+function viewThemes(d){
+  const all = [...d.dominant];
+  d.emerging.forEach(t=>{ if(!all.find(x=>x.name===t.name)) all.push(t); });
+  all.sort((a,b)=>b.score-a.score);
+  const movers = [...all].sort((a,b)=>Math.abs(b.delta)-Math.abs(a.delta));
+  return `
+  <div class="row two-5050">
+    <section class="panel">
+      <div class="phead">All Themes — by score <span class="r">${all.length} THEMES</span></div>
+      <div class="pbody"><table>${THEAD}${themeRows(all)}</table></div>
+    </section>
+    <section class="panel">
+      <div class="phead">All Themes — by 1D move <span class="r">ABS Δ</span></div>
+      <div class="pbody"><table>${THEAD}${themeRows(movers)}</table></div>
+    </section>
+  </div>`;
+}
+
+function viewBreadth(d){
+  const rg = d.regime;
+  return `
+  <div class="row two-5050">
+    <section class="panel">
+      <div class="phead">Universe Breadth <span class="r">EX-BENCHMARK · ${d.tickers} NAMES</span></div>
+      <div class="pbody"><div class="breadth">${d.breadth.map(([k,v])=>`
+        <div class="bline"><span class="k">${k}</span><span class="v">${v}</span></div>`).join("")}</div></div>
+    </section>
+    <section class="panel">
+      <div class="phead">Regime Detail <span class="r">AS OF ${d.date}</span></div>
+      <div class="pbody"><div class="breadth">
+        <div class="bline"><span class="k">Regime</span><span class="v ${rg.label.includes('OFF')?'neg':rg.label.includes('ON')?'pos':''}">${rg.label}</span></div>
+        <div class="bline"><span class="k">Moving-average breadth</span><span class="v">${rg.breadth}</span></div>
+        <div class="bline"><span class="k">New 20D highs</span><span class="v pos">${rg.newHighs}</span></div>
+        <div class="bline"><span class="k">New 20D lows</span><span class="v neg">${rg.newLows}</span></div>
+        <div class="bline"><span class="k">New 52W highs</span><span class="v">${rg.highs52w}</span></div>
+        <div class="bline"><span class="k">Up 3%+</span><span class="v pos">${rg.up3}</span></div>
+        <div class="bline"><span class="k">Down 3%+</span><span class="v neg">${rg.down3}</span></div>
+        <div class="bline"><span class="k">Universe size</span><span class="v">${d.tickers}</span></div>
+      </div></div>
+    </section>
+  </div>
+
+  <section class="panel">
+    <div class="phead">Index &amp; Benchmark <span class="r">RET / DIST 50DMA / ATR EXT</span></div>
+    <div class="pbody"><div class="idx">${d.indices.map(x=>`
+      <div class="idxcol">
+        <div class="tk">${x.tk}</div><div class="desc">${x.desc}</div>
+        <div class="idxrow"><span class="k">1D</span><span class="${cls(x.d1)}">${pctSign(x.d1)}</span></div>
+        <div class="idxrow"><span class="k">5D</span><span class="${cls(x.d5)}">${pctSign(x.d5)}</span></div>
+        <div class="idxrow"><span class="k">&gt;50DMA</span><span class="${cls(x.d50)}">${pctSign(x.d50)}</span></div>
+        <div class="idxrow"><span class="k">ATR EXT</span><span class="${cls(x.atr)}">${numSign(x.atr)}</span></div>
+      </div>`).join("")}</div></div>
+  </section>`;
+}
+
+/* ---------- generic ranked-table renderer ---------- */
+function rankTable(rows, cols){
+  const head = `<tr><th class="l">#</th><th class="l">Ticker</th><th class="l">Theme</th>${cols.map(c=>`<th>${c.h}</th>`).join("")}</tr>`;
+  const body = rows.map((r,i)=>`
+    <tr>
+      <td class="rank">${i+1}</td>
+      <td class="name">${r.tk}</td>
+      <td class="name" style="font-weight:400;color:var(--muted);font-size:11.5px">${r.theme}</td>
+      ${cols.map(c=>{
+        const v = r[c.k];
+        if(v===null||v===undefined) return `<td class="num flat">—</td>`;
+        return `<td class="num ${c.signed?cls(v):""}">${c.fmt(v)}</td>`;
+      }).join("")}
+    </tr>`).join("");
+  return `<table>${head}${body}</table>`;
+}
+const F_PCT = v => (v>0?"+":"")+Number(v).toFixed(1)+"%";
+const F_NUM = v => Number(v).toFixed(1);
+const F_X   = v => Number(v).toFixed(2)+"×";
+
+function viewEtfGrid(d){
+  if(!d.etfs || !d.etfs.length) return emptyPanel("ETF Grid", "no ETF data in this JSON — re-run market_ingest.py");
+  return `
+  <section class="panel">
+    <div class="phead">ETF Grid <span class="r">RET / DIST 50DMA / ATR EXT</span></div>
+    <div class="pbody"><table>
+      <tr><th class="l">ETF</th><th class="l">Sector</th><th>1D</th><th>5D</th><th>21D</th><th>&gt;50DMA</th><th>ATR EXT</th></tr>
+      ${d.etfs.map(x=>`
+        <tr>
+          <td class="name mono">${x.tk}</td>
+          <td class="name" style="font-weight:400;color:var(--muted);font-size:11.5px">${x.desc}</td>
+          <td class="num ${cls(x.d1)}">${pctSign(x.d1)}</td>
+          <td class="num ${cls(x.d5)}">${pctSign(x.d5)}</td>
+          <td class="num ${cls(x.d21)}">${pctSign(x.d21)}</td>
+          <td class="num ${cls(x.d50)}">${numSign(x.d50)}%</td>
+          <td class="num ${cls(x.atr)}">${numSign(x.atr)}</td>
+        </tr>`).join("")}
+    </table></div>
+  </section>`;
+}
+
+function viewRvol(d){
+  if(!d.rvol || !d.rvol.length) return emptyPanel("RVOL", "no RVOL data in this JSON — re-run market_ingest.py");
+  return `
+  <section class="panel">
+    <div class="phead">Relative Volume <span class="r">TODAY vs 20D AVG · TOP ${d.rvol.length}</span></div>
+    <div class="pbody">${rankTable(d.rvol, [
+      {h:"RVOL", k:"rvol", fmt:F_X},
+      {h:"1D",   k:"d1",   fmt:F_PCT, signed:true},
+      {h:"5D",   k:"d5",   fmt:F_PCT, signed:true}])}</div>
+  </section>`;
+}
+
+function viewMomentum(d){
+  if(!d.momentum) return emptyPanel("Momentum", "no momentum data in this JSON — re-run market_ingest.py");
+  const cols = [{h:"21D", k:"r21", fmt:F_PCT, signed:true},
+                {h:"63D", k:"r63", fmt:F_PCT, signed:true},
+                {h:"1D",  k:"d1",  fmt:F_PCT, signed:true}];
+  return `
+  <div class="row two-5050">
+    <section class="panel">
+      <div class="phead">Momentum Leaders <span class="r">BY 21D RETURN</span></div>
+      <div class="pbody">${rankTable(d.momentum.leaders, cols)}</div>
+    </section>
+    <section class="panel">
+      <div class="phead">Momentum Laggards <span class="r">BY 21D RETURN</span></div>
+      <div class="pbody">${rankTable(d.momentum.laggards, cols)}</div>
+    </section>
+  </div>`;
+}
+
+function viewExtension(d){
+  if(!d.extension) return emptyPanel("Extension", "no extension data in this JSON — re-run market_ingest.py");
+  const cols = [{h:"ATR EXT", k:"atr",  fmt:F_NUM, signed:true},
+                {h:">50DMA", k:"d50",  fmt:F_PCT, signed:true},
+                {h:"1D",     k:"d1",   fmt:F_PCT, signed:true}];
+  return `
+  <div class="row two-5050">
+    <section class="panel">
+      <div class="phead">Most Extended — Above <span class="r">STRETCHED / MEAN-REVERSION RISK</span></div>
+      <div class="pbody">${rankTable(d.extension.high, cols)}</div>
+    </section>
+    <section class="panel">
+      <div class="phead">Most Extended — Below <span class="r">OVERSOLD / WASHED OUT</span></div>
+      <div class="pbody">${rankTable(d.extension.low, cols)}</div>
+    </section>
+  </div>`;
+}
+
+function emptyPanel(title, msg){
+  return `<section class="panel"><div class="phead">${title}</div>
+    <div class="pbody"><span class="dim" style="color:var(--muted)">${msg}</span></div></section>`;
+}
+
+/* ---------- render ---------- */
+function render(){
+  if(!DATA) return;
+  const d = DATA;
+  const el = document.getElementById("metaline");
+  el.style.color = "";
+  el.textContent = `${d.date} · ${d.tickers} TICKERS · ${d.universe}`;
+  document.getElementById("dateline").textContent = d.date;
+
+  document.querySelectorAll("nav a").forEach(a=>{
+    a.classList.toggle("active", a.dataset.tab === activeTab);
+    a.classList.toggle("disabled", !WORKING_TABS.includes(a.dataset.tab));
+  });
+
+  const main = document.getElementById("main");
+  if(activeTab === "Themes")         main.innerHTML = viewThemes(d);
+  else if(activeTab === "Breadth")   main.innerHTML = viewBreadth(d);
+  else if(activeTab === "ETF Grid")  main.innerHTML = viewEtfGrid(d);
+  else if(activeTab === "RVOL")      main.innerHTML = viewRvol(d);
+  else if(activeTab === "Momentum")  main.innerHTML = viewMomentum(d);
+  else if(activeTab === "Extension") main.innerHTML = viewExtension(d);
+  else                               main.innerHTML = viewDailyBoard(d);
+}
+
+/* ---------- controls ---------- */
+document.getElementById("themeBtn").onclick = () => {
+  const dark = document.body.getAttribute("data-theme")==="dark";
+  document.body.setAttribute("data-theme", dark?"light":"dark");
+  document.getElementById("themeBtn").textContent = dark?"DARK":"LIGHT";
+};
+
+document.getElementById("refreshBtn").onclick = () => load();
+
+document.getElementById("liveBtn").onclick = function(){
+  if(liveTimer){
+    clearInterval(liveTimer); liveTimer = null;
+    this.textContent = "● LIVE OFF"; this.classList.remove("on");
+  }else{
+    liveTimer = setInterval(load, 60000);
+    this.textContent = "● LIVE ON"; this.classList.add("on");
+    load();
+  }
+};
+
+document.querySelectorAll("nav a").forEach(a=>{
+  a.onclick = e => {
+    e.preventDefault();
+    if(!WORKING_TABS.includes(a.dataset.tab)) return;
+    activeTab = a.dataset.tab;
+    render();
+  };
+});
+
+load();
+
+</script>
+</body>
+</html>
