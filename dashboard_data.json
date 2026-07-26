@@ -392,6 +392,80 @@
       "atr": -4.4
     }
   ],
+  "macro": [
+    {
+      "tk": "GLD",
+      "desc": "Gold",
+      "d1": -2.0,
+      "d5": 1.8,
+      "d21": -1.54,
+      "d50": -5.1
+    },
+    {
+      "tk": "SLV",
+      "desc": "Silver",
+      "d1": -3.45,
+      "d5": 3.31,
+      "d21": -6.59,
+      "d50": -13.9
+    },
+    {
+      "tk": "USO",
+      "desc": "Crude Oil",
+      "d1": 5.93,
+      "d5": 16.92,
+      "d21": 25.37,
+      "d50": 11.1
+    },
+    {
+      "tk": "UUP",
+      "desc": "US Dollar",
+      "d1": 0.39,
+      "d5": 0.78,
+      "d21": 0.39,
+      "d50": 1.6
+    },
+    {
+      "tk": "TLT",
+      "desc": "20Y Treasuries",
+      "d1": -0.32,
+      "d5": -1.24,
+      "d21": -3.16,
+      "d50": -1.9
+    },
+    {
+      "tk": "HYG",
+      "desc": "High Yield",
+      "d1": -0.36,
+      "d5": -0.71,
+      "d21": -0.34,
+      "d50": -0.3
+    },
+    {
+      "tk": "BITO",
+      "desc": "Bitcoin",
+      "d1": -2.01,
+      "d5": 0.57,
+      "d21": 3.67,
+      "d50": -3.7
+    },
+    {
+      "tk": "UNG",
+      "desc": "Nat Gas",
+      "d1": 0.09,
+      "d5": 1.82,
+      "d21": -7.74,
+      "d50": -6.1
+    },
+    {
+      "tk": "DBC",
+      "desc": "Commodities",
+      "d1": 1.51,
+      "d5": 6.5,
+      "d21": 11.76,
+      "d50": 4.9
+    }
+  ],
   "rvol": [
     {
       "tk": "TSLA",
@@ -1035,5 +1109,1237 @@
         "d50": -11.7
       }
     ]
-  }
+  },
+  "earnings": [
+    {
+      "tk": "CDNS",
+      "theme": "Semiconductors",
+      "date": "2026-07-27"
+    },
+    {
+      "tk": "AMT",
+      "theme": "Datacenter REITs",
+      "date": "2026-07-28"
+    },
+    {
+      "tk": "F",
+      "theme": "EV & Autonomy",
+      "date": "2026-07-28"
+    },
+    {
+      "tk": "INCY",
+      "theme": "Biotech",
+      "date": "2026-07-28"
+    },
+    {
+      "tk": "ITW",
+      "theme": "Industrials",
+      "date": "2026-07-28"
+    },
+    {
+      "tk": "KLAC",
+      "theme": "Semiconductors",
+      "date": "2026-07-28"
+    },
+    {
+      "tk": "KO",
+      "theme": "Defensives",
+      "date": "2026-07-28"
+    },
+    {
+      "tk": "MDLZ",
+      "theme": "Defensives",
+      "date": "2026-07-28"
+    },
+    {
+      "tk": "NEO",
+      "theme": "AI Healthcare & Diagnostics",
+      "date": "2026-07-28"
+    },
+    {
+      "tk": "NXPI",
+      "theme": "Semiconductors",
+      "date": "2026-07-28"
+    },
+    {
+      "tk": "PYPL",
+      "theme": "Fintech & Payments",
+      "date": "2026-07-28"
+    },
+    {
+      "tk": "QRVO",
+      "theme": "Semiconductors",
+      "date": "2026-07-28"
+    },
+    {
+      "tk": "SWKS",
+      "theme": "Semiconductors",
+      "date": "2026-07-28"
+    },
+    {
+      "tk": "TER",
+      "theme": "Semiconductors",
+      "date": "2026-07-28"
+    },
+    {
+      "tk": "UPS",
+      "theme": "Industrials",
+      "date": "2026-07-28"
+    },
+    {
+      "tk": "V",
+      "theme": "Fintech & Payments",
+      "date": "2026-07-28"
+    },
+    {
+      "tk": "VRNS",
+      "theme": "Cybersecurity",
+      "date": "2026-07-28"
+    },
+    {
+      "tk": "ARM",
+      "theme": "Semiconductors",
+      "date": "2026-07-29"
+    },
+    {
+      "tk": "BIIB",
+      "theme": "Biotech",
+      "date": "2026-07-29"
+    },
+    {
+      "tk": "BSX",
+      "theme": "Medical Devices",
+      "date": "2026-07-29"
+    },
+    {
+      "tk": "CMG",
+      "theme": "Consumer Momentum",
+      "date": "2026-07-29"
+    },
+    {
+      "tk": "EQIX",
+      "theme": "Datacenter REITs",
+      "date": "2026-07-29"
+    },
+    {
+      "tk": "FTNT",
+      "theme": "Cybersecurity",
+      "date": "2026-07-29"
+    },
+    {
+      "tk": "GD",
+      "theme": "Space & Defense Tech",
+      "date": "2026-07-29"
+    },
+    {
+      "tk": "HOOD",
+      "theme": "Fintech & Payments",
+      "date": "2026-07-29"
+    },
+    {
+      "tk": "IONS",
+      "theme": "Biotech",
+      "date": "2026-07-29"
+    },
+    {
+      "tk": "LHX",
+      "theme": "Space & Defense Tech",
+      "date": "2026-07-29"
+    },
+    {
+      "tk": "LRCX",
+      "theme": "Semiconductors",
+      "date": "2026-07-29"
+    },
+    {
+      "tk": "META",
+      "theme": "Mega-cap Platforms",
+      "date": "2026-07-29"
+    },
+    {
+      "tk": "MSFT",
+      "theme": "Software Infrastructure",
+      "date": "2026-07-29"
+    },
+    {
+      "tk": "PG",
+      "theme": "Defensives",
+      "date": "2026-07-29"
+    },
+    {
+      "tk": "PTC",
+      "theme": "Robotics & Automation",
+      "date": "2026-07-29"
+    },
+    {
+      "tk": "QCOM",
+      "theme": "Semiconductors",
+      "date": "2026-07-29"
+    },
+    {
+      "tk": "SBUX",
+      "theme": "Consumer Momentum",
+      "date": "2026-07-29"
+    },
+    {
+      "tk": "SOFI",
+      "theme": "Fintech & Payments",
+      "date": "2026-07-29"
+    },
+    {
+      "tk": "TENB",
+      "theme": "Cybersecurity",
+      "date": "2026-07-29"
+    },
+    {
+      "tk": "VRT",
+      "theme": "AI Power & Datacenter",
+      "date": "2026-07-29"
+    },
+    {
+      "tk": "AAPL",
+      "theme": "Mega-cap Platforms",
+      "date": "2026-07-30"
+    },
+    {
+      "tk": "ALNY",
+      "theme": "Biotech",
+      "date": "2026-07-30"
+    },
+    {
+      "tk": "AMZN",
+      "theme": "Consumer Momentum",
+      "date": "2026-07-30"
+    },
+    {
+      "tk": "APD",
+      "theme": "Materials & Uranium",
+      "date": "2026-07-30"
+    },
+    {
+      "tk": "BFLY",
+      "theme": "Medical Devices",
+      "date": "2026-07-30"
+    },
+    {
+      "tk": "CHKP",
+      "theme": "Cybersecurity",
+      "date": "2026-07-30"
+    },
+    {
+      "tk": "COIN",
+      "theme": "Crypto-linked",
+      "date": "2026-07-30"
+    },
+    {
+      "tk": "DXCM",
+      "theme": "Medical Devices",
+      "date": "2026-07-30"
+    },
+    {
+      "tk": "GH",
+      "theme": "AI Healthcare & Diagnostics",
+      "date": "2026-07-30"
+    },
+    {
+      "tk": "KKR",
+      "theme": "Financials",
+      "date": "2026-07-30"
+    },
+    {
+      "tk": "MA",
+      "theme": "Fintech & Payments",
+      "date": "2026-07-30"
+    },
+    {
+      "tk": "MO",
+      "theme": "Defensives",
+      "date": "2026-07-30"
+    },
+    {
+      "tk": "MSTR",
+      "theme": "Crypto-linked",
+      "date": "2026-07-30"
+    },
+    {
+      "tk": "NBIX",
+      "theme": "Biotech",
+      "date": "2026-07-30"
+    },
+    {
+      "tk": "OMCL",
+      "theme": "Robotics & Automation",
+      "date": "2026-07-30"
+    },
+    {
+      "tk": "PWR",
+      "theme": "AI Power & Datacenter",
+      "date": "2026-07-30"
+    },
+    {
+      "tk": "REGN",
+      "theme": "Biotech",
+      "date": "2026-07-30"
+    },
+    {
+      "tk": "RIOT",
+      "theme": "Crypto-linked",
+      "date": "2026-07-30"
+    },
+    {
+      "tk": "RIVN",
+      "theme": "EV & Autonomy",
+      "date": "2026-07-30"
+    },
+    {
+      "tk": "SYK",
+      "theme": "Medical Devices",
+      "date": "2026-07-30"
+    },
+    {
+      "tk": "TEM",
+      "theme": "AI Healthcare & Diagnostics",
+      "date": "2026-07-30"
+    },
+    {
+      "tk": "VCYT",
+      "theme": "AI Healthcare & Diagnostics",
+      "date": "2026-07-30"
+    },
+    {
+      "tk": "VLO",
+      "theme": "Energy",
+      "date": "2026-07-30"
+    },
+    {
+      "tk": "CCJ",
+      "theme": "Materials & Uranium",
+      "date": "2026-07-31"
+    },
+    {
+      "tk": "CL",
+      "theme": "Defensives",
+      "date": "2026-07-31"
+    },
+    {
+      "tk": "CVX",
+      "theme": "Energy",
+      "date": "2026-07-31"
+    },
+    {
+      "tk": "ETN",
+      "theme": "AI Power & Datacenter",
+      "date": "2026-07-31"
+    },
+    {
+      "tk": "LIN",
+      "theme": "Materials & Uranium",
+      "date": "2026-07-31"
+    },
+    {
+      "tk": "MRNA",
+      "theme": "Biotech",
+      "date": "2026-07-31"
+    },
+    {
+      "tk": "XOM",
+      "theme": "Energy",
+      "date": "2026-07-31"
+    },
+    {
+      "tk": "BMRN",
+      "theme": "Biotech",
+      "date": "2026-08-03"
+    },
+    {
+      "tk": "BWXT",
+      "theme": "AI Power & Datacenter",
+      "date": "2026-08-03"
+    },
+    {
+      "tk": "FANG",
+      "theme": "Energy",
+      "date": "2026-08-03"
+    },
+    {
+      "tk": "ON",
+      "theme": "Semiconductors",
+      "date": "2026-08-03"
+    },
+    {
+      "tk": "VRTX",
+      "theme": "Biotech",
+      "date": "2026-08-03"
+    },
+    {
+      "tk": "WGS",
+      "theme": "AI Healthcare & Diagnostics",
+      "date": "2026-08-03"
+    },
+    {
+      "tk": "WMB",
+      "theme": "Energy",
+      "date": "2026-08-03"
+    },
+    {
+      "tk": "ALAB",
+      "theme": "Semiconductors",
+      "date": "2026-08-04"
+    },
+    {
+      "tk": "AMD",
+      "theme": "Semiconductors",
+      "date": "2026-08-04"
+    },
+    {
+      "tk": "AMGN",
+      "theme": "Biotech",
+      "date": "2026-08-04"
+    },
+    {
+      "tk": "APO",
+      "theme": "Financials",
+      "date": "2026-08-04"
+    },
+    {
+      "tk": "BKNG",
+      "theme": "Consumer Momentum",
+      "date": "2026-08-04"
+    },
+    {
+      "tk": "CAT",
+      "theme": "Industrials",
+      "date": "2026-08-04"
+    },
+    {
+      "tk": "CERT",
+      "theme": "AI Healthcare & Diagnostics",
+      "date": "2026-08-04"
+    },
+    {
+      "tk": "CMI",
+      "theme": "Industrials",
+      "date": "2026-08-04"
+    },
+    {
+      "tk": "DVN",
+      "theme": "Energy",
+      "date": "2026-08-04"
+    },
+    {
+      "tk": "EMR",
+      "theme": "Robotics & Automation",
+      "date": "2026-08-04"
+    },
+    {
+      "tk": "ENTG",
+      "theme": "Semiconductors",
+      "date": "2026-08-04"
+    },
+    {
+      "tk": "EOG",
+      "theme": "Energy",
+      "date": "2026-08-04"
+    },
+    {
+      "tk": "FIS",
+      "theme": "Fintech & Payments",
+      "date": "2026-08-04"
+    },
+    {
+      "tk": "GILD",
+      "theme": "Biotech",
+      "date": "2026-08-04"
+    },
+    {
+      "tk": "HUT",
+      "theme": "Crypto-linked",
+      "date": "2026-08-04"
+    },
+    {
+      "tk": "IPGP",
+      "theme": "Optics & Photonics",
+      "date": "2026-08-04"
+    },
+    {
+      "tk": "KMB",
+      "theme": "Defensives",
+      "date": "2026-08-04"
+    },
+    {
+      "tk": "KTOS",
+      "theme": "Space & Defense Tech",
+      "date": "2026-08-04"
+    },
+    {
+      "tk": "LCID",
+      "theme": "EV & Autonomy",
+      "date": "2026-08-04"
+    },
+    {
+      "tk": "LDOS",
+      "theme": "Space & Defense Tech",
+      "date": "2026-08-04"
+    },
+    {
+      "tk": "MCD",
+      "theme": "Defensives",
+      "date": "2026-08-04"
+    },
+    {
+      "tk": "MPC",
+      "theme": "Energy",
+      "date": "2026-08-04"
+    },
+    {
+      "tk": "NRG",
+      "theme": "AI Power & Datacenter",
+      "date": "2026-08-04"
+    },
+    {
+      "tk": "QLYS",
+      "theme": "Cybersecurity",
+      "date": "2026-08-04"
+    },
+    {
+      "tk": "ROK",
+      "theme": "Robotics & Automation",
+      "date": "2026-08-04"
+    },
+    {
+      "tk": "TOST",
+      "theme": "Fintech & Payments",
+      "date": "2026-08-04"
+    },
+    {
+      "tk": "ZBRA",
+      "theme": "Robotics & Automation",
+      "date": "2026-08-04"
+    },
+    {
+      "tk": "CAI",
+      "theme": "AI Healthcare & Diagnostics",
+      "date": "2026-08-05"
+    },
+    {
+      "tk": "CGNX",
+      "theme": "Robotics & Automation",
+      "date": "2026-08-05"
+    },
+    {
+      "tk": "DT",
+      "theme": "Software Infrastructure",
+      "date": "2026-08-05"
+    },
+    {
+      "tk": "EXEL",
+      "theme": "Biotech",
+      "date": "2026-08-05"
+    },
+    {
+      "tk": "GPN",
+      "theme": "Fintech & Payments",
+      "date": "2026-08-05"
+    },
+    {
+      "tk": "HUBS",
+      "theme": "Software Infrastructure",
+      "date": "2026-08-05"
+    },
+    {
+      "tk": "IONQ",
+      "theme": "Quantum",
+      "date": "2026-08-05"
+    },
+    {
+      "tk": "IRM",
+      "theme": "Datacenter REITs",
+      "date": "2026-08-05"
+    },
+    {
+      "tk": "LEU",
+      "theme": "AI Power & Datacenter",
+      "date": "2026-08-05"
+    },
+    {
+      "tk": "NXE",
+      "theme": "Materials & Uranium",
+      "date": "2026-08-05"
+    },
+    {
+      "tk": "OXY",
+      "theme": "Energy",
+      "date": "2026-08-05"
+    },
+    {
+      "tk": "PODD",
+      "theme": "Medical Devices",
+      "date": "2026-08-05"
+    },
+    {
+      "tk": "PSNL",
+      "theme": "AI Healthcare & Diagnostics",
+      "date": "2026-08-05"
+    },
+    {
+      "tk": "PSX",
+      "theme": "Energy",
+      "date": "2026-08-05"
+    },
+    {
+      "tk": "RDW",
+      "theme": "Space & Defense Tech",
+      "date": "2026-08-05"
+    },
+    {
+      "tk": "RXRX",
+      "theme": "AI Healthcare & Diagnostics",
+      "date": "2026-08-05"
+    },
+    {
+      "tk": "SDGR",
+      "theme": "AI Healthcare & Diagnostics",
+      "date": "2026-08-05"
+    },
+    {
+      "tk": "SMR",
+      "theme": "AI Power & Datacenter",
+      "date": "2026-08-05"
+    },
+    {
+      "tk": "SRPT",
+      "theme": "Biotech",
+      "date": "2026-08-05"
+    },
+    {
+      "tk": "SYM",
+      "theme": "Robotics & Automation",
+      "date": "2026-08-05"
+    },
+    {
+      "tk": "TLN",
+      "theme": "AI Power & Datacenter",
+      "date": "2026-08-05"
+    },
+    {
+      "tk": "UTHR",
+      "theme": "Biotech",
+      "date": "2026-08-05"
+    },
+    {
+      "tk": "AAOI",
+      "theme": "Optics & Photonics",
+      "date": "2026-08-06"
+    },
+    {
+      "tk": "ABNB",
+      "theme": "Consumer Momentum",
+      "date": "2026-08-06"
+    },
+    {
+      "tk": "CEG",
+      "theme": "AI Power & Datacenter",
+      "date": "2026-08-06"
+    },
+    {
+      "tk": "CLSK",
+      "theme": "Crypto-linked",
+      "date": "2026-08-06"
+    },
+    {
+      "tk": "COP",
+      "theme": "Energy",
+      "date": "2026-08-06"
+    },
+    {
+      "tk": "DDOG",
+      "theme": "Software Infrastructure",
+      "date": "2026-08-06"
+    },
+    {
+      "tk": "DKNG",
+      "theme": "Consumer Momentum",
+      "date": "2026-08-06"
+    },
+    {
+      "tk": "FROG",
+      "theme": "Software Infrastructure",
+      "date": "2026-08-06"
+    },
+    {
+      "tk": "LUNR",
+      "theme": "Space & Defense Tech",
+      "date": "2026-08-06"
+    },
+    {
+      "tk": "MARA",
+      "theme": "Crypto-linked",
+      "date": "2026-08-06"
+    },
+    {
+      "tk": "MCHP",
+      "theme": "Semiconductors",
+      "date": "2026-08-06"
+    },
+    {
+      "tk": "NET",
+      "theme": "Software Infrastructure",
+      "date": "2026-08-06"
+    },
+    {
+      "tk": "NVMI",
+      "theme": "Optics & Photonics",
+      "date": "2026-08-06"
+    },
+    {
+      "tk": "PH",
+      "theme": "Industrials",
+      "date": "2026-08-06"
+    },
+    {
+      "tk": "QBTS",
+      "theme": "Quantum",
+      "date": "2026-08-06"
+    },
+    {
+      "tk": "RGTI",
+      "theme": "Quantum",
+      "date": "2026-08-06"
+    },
+    {
+      "tk": "RLAY",
+      "theme": "AI Healthcare & Diagnostics",
+      "date": "2026-08-06"
+    },
+    {
+      "tk": "SERV",
+      "theme": "Robotics & Automation",
+      "date": "2026-08-06"
+    },
+    {
+      "tk": "TEAM",
+      "theme": "Software Infrastructure",
+      "date": "2026-08-06"
+    },
+    {
+      "tk": "TWLO",
+      "theme": "Software Infrastructure",
+      "date": "2026-08-06"
+    },
+    {
+      "tk": "VST",
+      "theme": "AI Power & Datacenter",
+      "date": "2026-08-07"
+    },
+    {
+      "tk": "ASTS",
+      "theme": "Space & Defense Tech",
+      "date": "2026-08-10"
+    },
+    {
+      "tk": "OKLO",
+      "theme": "AI Power & Datacenter",
+      "date": "2026-08-10"
+    },
+    {
+      "tk": "QUBT",
+      "theme": "Quantum",
+      "date": "2026-08-10"
+    },
+    {
+      "tk": "RKLB",
+      "theme": "Space & Defense Tech",
+      "date": "2026-08-10"
+    },
+    {
+      "tk": "RPD",
+      "theme": "Cybersecurity",
+      "date": "2026-08-10"
+    },
+    {
+      "tk": "ABSI",
+      "theme": "AI Healthcare & Diagnostics",
+      "date": "2026-08-11"
+    },
+    {
+      "tk": "CAVA",
+      "theme": "Consumer Momentum",
+      "date": "2026-08-11"
+    },
+    {
+      "tk": "DNN",
+      "theme": "Materials & Uranium",
+      "date": "2026-08-11"
+    },
+    {
+      "tk": "JD",
+      "theme": "China Tech",
+      "date": "2026-08-11"
+    },
+    {
+      "tk": "LITE",
+      "theme": "Optics & Photonics",
+      "date": "2026-08-11"
+    },
+    {
+      "tk": "ONON",
+      "theme": "Consumer Momentum",
+      "date": "2026-08-11"
+    },
+    {
+      "tk": "POET",
+      "theme": "Optics & Photonics",
+      "date": "2026-08-11"
+    },
+    {
+      "tk": "TME",
+      "theme": "China Tech",
+      "date": "2026-08-11"
+    },
+    {
+      "tk": "COHR",
+      "theme": "Optics & Photonics",
+      "date": "2026-08-12"
+    },
+    {
+      "tk": "NNE",
+      "theme": "AI Power & Datacenter",
+      "date": "2026-08-12"
+    },
+    {
+      "tk": "TCEHY",
+      "theme": "China Tech",
+      "date": "2026-08-12"
+    },
+    {
+      "tk": "AMAT",
+      "theme": "Semiconductors",
+      "date": "2026-08-13"
+    },
+    {
+      "tk": "INFQ",
+      "theme": "Quantum",
+      "date": "2026-08-13"
+    },
+    {
+      "tk": "NTES",
+      "theme": "China Tech",
+      "date": "2026-08-13"
+    },
+    {
+      "tk": "NU",
+      "theme": "Fintech & Payments",
+      "date": "2026-08-13"
+    },
+    {
+      "tk": "FN",
+      "theme": "Optics & Photonics",
+      "date": "2026-08-17"
+    },
+    {
+      "tk": "PANW",
+      "theme": "Cybersecurity",
+      "date": "2026-08-18"
+    },
+    {
+      "tk": "XPEV",
+      "theme": "EV & Autonomy",
+      "date": "2026-08-18"
+    },
+    {
+      "tk": "ADI",
+      "theme": "Semiconductors",
+      "date": "2026-08-19"
+    },
+    {
+      "tk": "BIDU",
+      "theme": "China Tech",
+      "date": "2026-08-19"
+    },
+    {
+      "tk": "NDSN",
+      "theme": "Robotics & Automation",
+      "date": "2026-08-19"
+    },
+    {
+      "tk": "DE",
+      "theme": "Industrials",
+      "date": "2026-08-20"
+    },
+    {
+      "tk": "INTU",
+      "theme": "Software Infrastructure",
+      "date": "2026-08-20"
+    },
+    {
+      "tk": "WDAY",
+      "theme": "Software Infrastructure",
+      "date": "2026-08-20"
+    },
+    {
+      "tk": "WMT",
+      "theme": "Defensives",
+      "date": "2026-08-20"
+    },
+    {
+      "tk": "OKTA",
+      "theme": "Cybersecurity",
+      "date": "2026-08-25"
+    },
+    {
+      "tk": "PDD",
+      "theme": "China Tech",
+      "date": "2026-08-25"
+    },
+    {
+      "tk": "BEKE",
+      "theme": "China Tech",
+      "date": "2026-08-26"
+    },
+    {
+      "tk": "MDB",
+      "theme": "Software Infrastructure",
+      "date": "2026-08-26"
+    },
+    {
+      "tk": "NVDA",
+      "theme": "Semiconductors",
+      "date": "2026-08-26"
+    },
+    {
+      "tk": "SNOW",
+      "theme": "Software Infrastructure",
+      "date": "2026-08-26"
+    },
+    {
+      "tk": "SNPS",
+      "theme": "Semiconductors",
+      "date": "2026-08-26"
+    },
+    {
+      "tk": "AFRM",
+      "theme": "Fintech & Payments",
+      "date": "2026-08-27"
+    },
+    {
+      "tk": "ESTC",
+      "theme": "Software Infrastructure",
+      "date": "2026-08-27"
+    },
+    {
+      "tk": "LI",
+      "theme": "EV & Autonomy",
+      "date": "2026-08-27"
+    },
+    {
+      "tk": "MRVL",
+      "theme": "Semiconductors",
+      "date": "2026-08-27"
+    },
+    {
+      "tk": "S",
+      "theme": "Cybersecurity",
+      "date": "2026-08-27"
+    },
+    {
+      "tk": "BABA",
+      "theme": "China Tech",
+      "date": "2026-08-28"
+    },
+    {
+      "tk": "CRWD",
+      "theme": "Cybersecurity",
+      "date": "2026-09-01"
+    },
+    {
+      "tk": "MDT",
+      "theme": "Medical Devices",
+      "date": "2026-09-01"
+    },
+    {
+      "tk": "NIO",
+      "theme": "EV & Autonomy",
+      "date": "2026-09-01"
+    },
+    {
+      "tk": "AVAV",
+      "theme": "Space & Defense Tech",
+      "date": "2026-09-02"
+    },
+    {
+      "tk": "CRM",
+      "theme": "Software Infrastructure",
+      "date": "2026-09-02"
+    },
+    {
+      "tk": "GTLB",
+      "theme": "Software Infrastructure",
+      "date": "2026-09-02"
+    },
+    {
+      "tk": "VEEV",
+      "theme": "Software Infrastructure",
+      "date": "2026-09-02"
+    },
+    {
+      "tk": "ZS",
+      "theme": "Cybersecurity",
+      "date": "2026-09-02"
+    },
+    {
+      "tk": "AVGO",
+      "theme": "Semiconductors",
+      "date": "2026-09-03"
+    },
+    {
+      "tk": "LULU",
+      "theme": "Consumer Momentum",
+      "date": "2026-09-03"
+    },
+    {
+      "tk": "PATH",
+      "theme": "Software Infrastructure",
+      "date": "2026-09-03"
+    },
+    {
+      "tk": "CIEN",
+      "theme": "Optics & Photonics",
+      "date": "2026-09-09"
+    },
+    {
+      "tk": "ORCL",
+      "theme": "Software Infrastructure",
+      "date": "2026-09-09"
+    },
+    {
+      "tk": "PL",
+      "theme": "Space & Defense Tech",
+      "date": "2026-09-09"
+    },
+    {
+      "tk": "ADBE",
+      "theme": "Software Infrastructure",
+      "date": "2026-09-10"
+    },
+    {
+      "tk": "RH",
+      "theme": "Consumer Momentum",
+      "date": "2026-09-10"
+    },
+    {
+      "tk": "GIS",
+      "theme": "Defensives",
+      "date": "2026-09-23"
+    },
+    {
+      "tk": "MU",
+      "theme": "Semiconductors",
+      "date": "2026-09-23"
+    },
+    {
+      "tk": "COST",
+      "theme": "Defensives",
+      "date": "2026-09-24"
+    },
+    {
+      "tk": "UEC",
+      "theme": "Materials & Uranium",
+      "date": "2026-09-24"
+    },
+    {
+      "tk": "NKE",
+      "theme": "Consumer Momentum",
+      "date": "2026-09-29"
+    },
+    {
+      "tk": "PEP",
+      "theme": "Defensives",
+      "date": "2026-10-08"
+    },
+    {
+      "tk": "C",
+      "theme": "Financials",
+      "date": "2026-10-13"
+    },
+    {
+      "tk": "GS",
+      "theme": "Financials",
+      "date": "2026-10-13"
+    },
+    {
+      "tk": "JNJ",
+      "theme": "Defensives",
+      "date": "2026-10-13"
+    },
+    {
+      "tk": "JPM",
+      "theme": "Financials",
+      "date": "2026-10-13"
+    },
+    {
+      "tk": "WFC",
+      "theme": "Financials",
+      "date": "2026-10-13"
+    },
+    {
+      "tk": "ABT",
+      "theme": "Medical Devices",
+      "date": "2026-10-14"
+    },
+    {
+      "tk": "ASML",
+      "theme": "Semiconductors",
+      "date": "2026-10-14"
+    },
+    {
+      "tk": "BAC",
+      "theme": "Financials",
+      "date": "2026-10-14"
+    },
+    {
+      "tk": "BLK",
+      "theme": "Financials",
+      "date": "2026-10-14"
+    },
+    {
+      "tk": "MS",
+      "theme": "Financials",
+      "date": "2026-10-14"
+    },
+    {
+      "tk": "SCHW",
+      "theme": "Financials",
+      "date": "2026-10-15"
+    },
+    {
+      "tk": "TSM",
+      "theme": "Semiconductors",
+      "date": "2026-10-15"
+    },
+    {
+      "tk": "USB",
+      "theme": "Financials",
+      "date": "2026-10-15"
+    },
+    {
+      "tk": "COF",
+      "theme": "Financials",
+      "date": "2026-10-20"
+    },
+    {
+      "tk": "GE",
+      "theme": "Industrials",
+      "date": "2026-10-20"
+    },
+    {
+      "tk": "GM",
+      "theme": "EV & Autonomy",
+      "date": "2026-10-20"
+    },
+    {
+      "tk": "HAL",
+      "theme": "Energy",
+      "date": "2026-10-20"
+    },
+    {
+      "tk": "ISRG",
+      "theme": "Robotics & Automation",
+      "date": "2026-10-20"
+    },
+    {
+      "tk": "LMT",
+      "theme": "Space & Defense Tech",
+      "date": "2026-10-20"
+    },
+    {
+      "tk": "MMM",
+      "theme": "Industrials",
+      "date": "2026-10-20"
+    },
+    {
+      "tk": "NFLX",
+      "theme": "Consumer Momentum",
+      "date": "2026-10-20"
+    },
+    {
+      "tk": "NOC",
+      "theme": "Space & Defense Tech",
+      "date": "2026-10-20"
+    },
+    {
+      "tk": "RTX",
+      "theme": "Space & Defense Tech",
+      "date": "2026-10-20"
+    },
+    {
+      "tk": "CCI",
+      "theme": "Datacenter REITs",
+      "date": "2026-10-21"
+    },
+    {
+      "tk": "GEV",
+      "theme": "AI Power & Datacenter",
+      "date": "2026-10-21"
+    },
+    {
+      "tk": "TSLA",
+      "theme": "EV & Autonomy",
+      "date": "2026-10-21"
+    },
+    {
+      "tk": "BX",
+      "theme": "Financials",
+      "date": "2026-10-22"
+    },
+    {
+      "tk": "DECK",
+      "theme": "Consumer Momentum",
+      "date": "2026-10-22"
+    },
+    {
+      "tk": "DLR",
+      "theme": "Datacenter REITs",
+      "date": "2026-10-22"
+    },
+    {
+      "tk": "FCX",
+      "theme": "Materials & Uranium",
+      "date": "2026-10-22"
+    },
+    {
+      "tk": "HON",
+      "theme": "Robotics & Automation",
+      "date": "2026-10-22"
+    },
+    {
+      "tk": "INTC",
+      "theme": "Semiconductors",
+      "date": "2026-10-22"
+    },
+    {
+      "tk": "NEM",
+      "theme": "Materials & Uranium",
+      "date": "2026-10-22"
+    },
+    {
+      "tk": "UNP",
+      "theme": "Industrials",
+      "date": "2026-10-22"
+    },
+    {
+      "tk": "AXP",
+      "theme": "Financials",
+      "date": "2026-10-23"
+    },
+    {
+      "tk": "BAH",
+      "theme": "Space & Defense Tech",
+      "date": "2026-10-23"
+    },
+    {
+      "tk": "SLB",
+      "theme": "Energy",
+      "date": "2026-10-23"
+    }
+  ]
 }
