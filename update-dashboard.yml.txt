@@ -1,0 +1,79 @@
+# Goes in your repo at: .github/workflows/update-dashboard.yml
+name: Update market dashboard
+
+on:
+  schedule:
+    # 21:30 UTC on weekdays = 5:30pm ET (EDT) / 4:30pm ET (EST) -- after the close either way
+    - cron: "30 21 * * 1-5"
+  workflow_dispatch:        # lets you run it manually from the Actions tab
+
+permissions:
+  contents: write           # needed to commit the refreshed JSON
+
+concurrency:
+  group: dashboard-update
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # market.db holds price history AND the theme-score history the 1D deltas
+      # need. Cached rather than committed so the repo doesn't bloat with a new
+      # multi-MB binary every day. On a cache miss the ingest script detects an
+      # empty DB and auto-backfills, so this is self-healing.
+      - name: Restore price database
+        uses: actions/cache@v4
+        with:
+          path: market.db
+          key: market-db-${{ github.run_id }}
+          restore-keys: |
+            market-db-
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install yfinance pandas numpy
+
+      - name: Run ingest
+        run: python market_ingest.py
+
+      - name: Validate JSON
+        run: |
+          python - <<'PY'
+          import json, sys
+          d = json.load(open("dashboard_data.json"))
+          need = {"date","universe","tickers","regime","indices","breadth",
+                  "dominant","emerging","etfs","rvol","momentum","extension"}
+          missing = need - set(d)
+          if missing:
+              sys.exit(f"JSON missing keys: {sorted(missing)}")
+          if d["tickers"] < 50:
+              sys.exit(f"suspiciously few tickers ({d['tickers']}) -- refusing to publish")
+          print(f"ok: {d['date']}  regime={d['regime']['label']}  tickers={d['tickers']}")
+          PY
+
+      - name: Commit refreshed data
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add dashboard_data.json
+          if git diff --staged --quiet; then
+            echo "no change -- nothing to commit"
+          else
+            git commit -m "data: $(date -u +%Y-%m-%d)"
+            # pull any manual pushes first so we never collide; JSON is regenerated
+            # data, so on a conflict the freshly-built local copy wins.
+            git pull --no-edit -X ours origin main || true
+            git push
+          fi
