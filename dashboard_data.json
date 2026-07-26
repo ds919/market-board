@@ -4,7 +4,7 @@
   "tickers": 254,
   "regime": {
     "label": "NEUTRAL",
-    "breadth": "43% > 50DMA, 54% > 200DMA",
+    "breadth": "44% > 50DMA, 54% > 200DMA",
     "dominant": [
       "Cybersecurity",
       "Energy"
@@ -69,11 +69,11 @@
     ],
     [
       "% > 50DMA",
-      "43.3%"
+      "43.7%"
     ],
     [
       "% > 200DMA",
-      "53.8%"
+      "54.2%"
     ],
     [
       "Total names",
