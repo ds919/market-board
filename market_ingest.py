@@ -16,7 +16,7 @@ Run:
 
 Deps: pip install yfinance pandas numpy   (sqlite3 is stdlib)
 """
-import argparse, json, sqlite3, sys
+import argparse, os, json, sqlite3, sys
 import numpy as np
 import pandas as pd
 
@@ -48,7 +48,7 @@ NON_MEMBERS = set(INDEX_SYMS) | set(SECTOR_SYMS) | set(MACRO_SYMS)
 # ---- than one theme (that's realistic; it just contributes to both scores).
 THEMES = {
     "Semiconductors": ["NVDA", "AMD", "AVGO", "TSM", "MU", "INTC", "QCOM", "ASML", "AMAT", "LRCX", "KLAC", "ADI", "TXN", "NXPI", "MRVL", "ON", "MCHP", "SWKS", "QRVO", "TER", "ENTG", "ARM", "SNPS", "CDNS", "ALAB"],
-    "Software Infrastructure": ["MSFT", "ORCL", "NOW", "SNOW", "DDOG", "NET", "MDB", "GTLB", "FROG", "ESTC", "TEAM", "WDAY", "DT", "PATH", "TWLO", "HUBS", "VEEV", "CRM", "ADBE", "INTU", "PLTR"],
+    "Software Infrastructure": ["MSFT", "ORCL", "NOW", "SNOW", "DDOG", "NET", "MDB", "GTLB", "FROG", "ESTC", "TEAM", "WDAY", "DT", "PATH", "TWLO", "HUBS", "VEEV", "CRM", "ADBE", "INTU"],
     "Cybersecurity": ["CRWD", "PANW", "ZS", "S", "OKTA", "FTNT", "CHKP", "RPD", "TENB", "QLYS", "VRNS"],
     "Robotics & Automation": ["ISRG", "ROK", "ZBRA", "SYM", "OMCL", "CGNX", "EMR", "HON", "PTC", "ABBNY", "NDSN", "SERV"],
     "AI Power & Datacenter": ["VST", "CEG", "NRG", "TLN", "GEV", "PWR", "ETN", "VRT", "SMR", "OKLO", "BWXT", "NNE", "LEU", "CEG"],
@@ -72,8 +72,57 @@ THEMES = {
     "Mega-cap Platforms": ["AAPL", "GOOGL", "META", "MSFT", "AMZN", "NVDA"],
 }
 
+# ---- Universe source -------------------------------------------------------
+# THEMES above is the built-in fallback. If SHEET_CSV_URL is set (env var or the
+# literal below), the universe is loaded from a published Google Sheet CSV with
+# columns: ticker, theme. Edit the sheet -> next ingest picks it up. If the sheet
+# is unreachable or malformed, we fall back to the built-in THEMES so the board
+# never breaks.
+SHEET_CSV_URL = os.environ.get("SHEET_CSV_URL", "").strip()
+
+def load_universe_from_sheet(url):
+    import urllib.request, csv, io
+    req = urllib.request.Request(url, headers={"User-Agent": "market-ingest"})
+    with urllib.request.urlopen(req, timeout=20) as r:
+        raw = r.read().decode("utf-8", "ignore")
+    rows = list(csv.reader(io.StringIO(raw)))
+    if not rows:
+        raise ValueError("sheet empty")
+    # detect header
+    hdr = [c.strip().lower() for c in rows[0]]
+    ti = hdr.index("ticker") if "ticker" in hdr else 0
+    hi = hdr.index("theme") if "theme" in hdr else 1
+    start_row = 1 if ("ticker" in hdr or "theme" in hdr) else 0
+    themes = {}
+    for row in rows[start_row:]:
+        if len(row) <= max(ti, hi):
+            continue
+        tk = row[ti].strip().upper()
+        th = row[hi].strip()
+        if not tk or not th:
+            continue
+        themes.setdefault(th, [])
+        if tk not in themes[th]:
+            themes[th].append(tk)
+    total = len({t for v in themes.values() for t in v})
+    if total < 10:
+        raise ValueError(f"sheet only yielded {total} tickers -- refusing, using fallback")
+    return themes
+
+def active_themes():
+    """THEMES to use this run: sheet if configured & healthy, else built-in fallback."""
+    if SHEET_CSV_URL:
+        try:
+            th = load_universe_from_sheet(SHEET_CSV_URL)
+            print(f"[universe] loaded {sum(len(v) for v in th.values())} entries from sheet")
+            return th
+        except Exception as e:
+            print(f"[universe] sheet load failed ({e}); using built-in THEMES")
+    return THEMES
+
+
 def universe():
-    return sorted(set([s for m in THEMES.values() for s in m] + INDEX_SYMS + SECTOR_SYMS + MACRO_SYMS))
+    return sorted(set([s for m in active_themes().values() for s in m] + INDEX_SYMS + SECTOR_SYMS + MACRO_SYMS))
 
 # ------------------------------------------------------------------ storage
 def init_db(conn):
@@ -255,11 +304,12 @@ def compute_and_emit(conn):
     spy = metrics.get("SPY") or {}
     spy_ret21 = spy.get("ret21", 0.0) if _v(spy.get("ret21", np.nan)) else 0.0
 
+    _TH = active_themes()
     # theme scores + persist + 1-day delta
     prev = dict(conn.execute(
         "SELECT theme, score FROM theme_scores WHERE d=(SELECT max(d) FROM theme_scores WHERE d<?)",
         (today,)).fetchall())
-    scores = {th: s for th, syms in THEMES.items()
+    scores = {th: s for th, syms in _TH.items()
               if (s := theme_score(syms, metrics, spy_ret21)) is not None}
     for th, s in scores.items():
         conn.execute("INSERT OR REPLACE INTO theme_scores VALUES (?,?,?)", (today, th, s))
@@ -292,7 +342,7 @@ def compute_and_emit(conn):
 
     # ---- tab data: ETF grid, RVOL, momentum, extension ----
     t2theme = {}
-    for th, syms in THEMES.items():
+    for th, syms in _TH.items():
         for t in syms:
             t2theme.setdefault(t, th)
 
@@ -333,7 +383,19 @@ def compute_and_emit(conn):
     extension = {"high": [erow(t, m) for t, m in ex[:18]],
                  "low":  [erow(t, m) for t, m in ex[-18:][::-1]]}
 
-    universe_map = [{"theme": th, "tickers": sorted(syms)} for th, syms in THEMES.items()]
+    universe_map = [{"theme": th, "tickers": sorted(syms)} for th, syms in _TH.items()]
+
+    verify_map = {}
+    for t, m in metrics.items():
+        if not m or t in NON_MEMBERS:
+            continue
+        verify_map[t] = {
+            "close": rnd(m["close"]), "d1": rnd(m["ret1"]), "d5": rnd(m["ret5"]),
+            "d21": rnd(m["ret21"]), "d63": rnd(m["ret63"]),
+            "dist50": rnd(m["dist50"], 1), "atr": rnd(m["atr_ext"], 1),
+            "rvol": rnd(m["rvol"]), "a50": m["above50"], "a200": m["above200"],
+            "nh20": m["new20high"], "nl20": m["new20low"],
+        }
 
     earn_map = globals().get("_EARNINGS", {})
     t2th = t2theme
@@ -362,7 +424,7 @@ def compute_and_emit(conn):
         ],
         "dominant": dominant, "emerging": emerging,
         "etfs": etfs, "macro": macro, "rvol": rvol_rows, "momentum": momentum,
-        "universe_map": universe_map,
+        "universe_map": universe_map, "verify_map": verify_map,
         "extension": extension, "earnings": earnings,
     }
     with open(JSON_OUT, "w") as f:
