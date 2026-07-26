@@ -37,7 +37,12 @@ SECTOR_ETFS = [("XLK", "Technology"), ("XLF", "Financials"), ("XLE", "Energy"),
                ("IBB", "Biotech"), ("XBI", "Biotech SMID"), ("ITA", "Aero & Defense"),
                ("KWEB", "China Internet"), ("URA", "Uranium"), ("TAN", "Solar")]
 SECTOR_SYMS = [s for s, _ in SECTOR_ETFS]
-NON_MEMBERS = set(INDEX_SYMS) | set(SECTOR_SYMS)
+
+MACRO_ETFS = [("GLD", "Gold"), ("SLV", "Silver"), ("USO", "Crude Oil"),
+              ("UUP", "US Dollar"), ("TLT", "20Y Treasuries"), ("HYG", "High Yield"),
+              ("BITO", "Bitcoin"), ("UNG", "Nat Gas"), ("DBC", "Commodities")]
+MACRO_SYMS = [s for s, _ in MACRO_ETFS]
+NON_MEMBERS = set(INDEX_SYMS) | set(SECTOR_SYMS) | set(MACRO_SYMS)
 
 # ---- Theme map: ~250-name universe. Edit freely -- a ticker may appear in more
 # ---- than one theme (that's realistic; it just contributes to both scores).
@@ -79,7 +84,7 @@ THEMES = {
 }
 
 def universe():
-    return sorted(set([s for m in THEMES.values() for s in m] + INDEX_SYMS + SECTOR_SYMS))
+    return sorted(set([s for m in THEMES.values() for s in m] + INDEX_SYMS + SECTOR_SYMS + MACRO_SYMS))
 
 # ------------------------------------------------------------------ storage
 def init_db(conn):
@@ -148,6 +153,31 @@ def ingest(conn, period):
         print(f"[ingest] yfinance missed {len(missing)}, Stooq recovered "
               f"{len(missing) - len(still)}" + (f", still missing: {still}" if still else ""))
     return set(frames)
+
+
+def fetch_earnings(tickers):
+    """Best-effort next-earnings date per ticker via yfinance. Network; skipped in selftest."""
+    import yfinance as yf
+    import datetime as _dt
+    out = {}
+    today = _dt.date.today()
+    for t in tickers:
+        try:
+            cal = yf.Ticker(t).calendar
+            ed = None
+            if isinstance(cal, dict):
+                v = cal.get("Earnings Date")
+                if isinstance(v, (list, tuple)) and v:
+                    ed = v[0]
+                elif v:
+                    ed = v
+            if ed is not None:
+                d = ed.date() if hasattr(ed, "date") else ed
+                if isinstance(d, _dt.date) and d >= today:
+                    out[t] = d.strftime("%Y-%m-%d")
+        except Exception:
+            pass
+    return out
 
 # ------------------------------------------------------------------ metrics
 def _v(x):                                  # valid (non-NaN) number?
@@ -282,6 +312,13 @@ def compute_and_emit(conn):
 
     names = [(t, m) for t, m in metrics.items() if m and t not in NON_MEMBERS]
 
+    macro = []
+    for sym, desc in MACRO_ETFS:
+        m = metrics.get(sym)
+        if m:
+            macro.append({"tk": sym, "desc": desc, "d1": rnd(m["ret1"]), "d5": rnd(m["ret5"]),
+                          "d21": rnd(m["ret21"]), "d50": rnd(m["dist50"], 1)})
+
     etfs = []
     for sym, desc in SECTOR_ETFS:
         m = metrics.get(sym)
@@ -307,6 +344,12 @@ def compute_and_emit(conn):
     extension = {"high": [erow(t, m) for t, m in ex[:18]],
                  "low":  [erow(t, m) for t, m in ex[-18:][::-1]]}
 
+    earn_map = globals().get("_EARNINGS", {})
+    t2th = t2theme
+    earnings = []
+    for t, d8 in sorted(earn_map.items(), key=lambda kv: kv[1]):
+        earnings.append({"tk": t, "theme": t2th.get(t, "—"), "date": d8})
+
     out = {
         "date": today, "universe": UNIVERSE, "tickers": b["n"],
         "regime": {
@@ -327,7 +370,8 @@ def compute_and_emit(conn):
             ["Up 3%+", str(b["up3"])], ["Down 3%+", str(b["down3"])],
         ],
         "dominant": dominant, "emerging": emerging,
-        "etfs": etfs, "rvol": rvol_rows, "momentum": momentum, "extension": extension,
+        "etfs": etfs, "macro": macro, "rvol": rvol_rows, "momentum": momentum,
+        "extension": extension, "earnings": earnings,
     }
     with open(JSON_OUT, "w") as f:
         json.dump(out, f, indent=2)
@@ -344,8 +388,9 @@ def make_synthetic(ticker, n=320):
     low  = np.minimum(openp, close) * (1 - np.abs(rng.normal(0, 0.008, n)))
     vol  = rng.integers(1_000_000, 10_000_000, n)
     idx = pd.bdate_range(end=pd.Timestamp.today().normalize(), periods=n)
-    return pd.DataFrame({"open": openp, "high": high, "low": low,
-                         "close": close, "volume": vol}, index=idx)
+    m = len(idx)   # bdate_range can return n-1 when today is a weekend; align to it
+    return pd.DataFrame({"open": openp[:m], "high": high[:m], "low": low[:m],
+                         "close": close[:m], "volume": vol[:m]}, index=idx)
 
 def selftest():
     conn = sqlite3.connect(":memory:")
@@ -383,6 +428,13 @@ def main():
     period = BACKFILL_PERIOD if (args.backfill or have == 0) else NIGHTLY_PERIOD
     print(f"[run] {'backfill' if period == BACKFILL_PERIOD else 'nightly'} pull ({period})")
     ingest(conn, period)
+    try:
+        named = [t for t in universe() if t not in NON_MEMBERS]
+        globals()["_EARNINGS"] = fetch_earnings(named)
+        print(f"[run] earnings dates found for {len(globals()['_EARNINGS'])} names")
+    except Exception as e:
+        globals()["_EARNINGS"] = {}
+        print(f"[run] earnings fetch skipped: {e}")
     out = compute_and_emit(conn)
     print(f"[run] {out['date']}  regime={out['regime']['label']}  "
           f"tickers={out['tickers']}  ->  {JSON_OUT}")
