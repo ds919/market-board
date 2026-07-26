@@ -157,6 +157,15 @@
     .idx{grid-template-columns:1fr}
     th,td{padding:7px 4px;font-size:11.5px}
   }
+  .uni-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+  .uni-theme{border:1px solid var(--line);border-radius:10px;padding:11px 12px;background:var(--panel2,#0e1e33)}
+  .uni-head{font-size:12.5px;font-weight:700;letter-spacing:.02em;margin-bottom:9px;color:var(--fg)}
+  .uni-head .cnt{margin-left:7px;font-weight:400;color:var(--muted);font-size:11px}
+  .uni-tags{display:flex;flex-wrap:wrap;gap:5px}
+  .uni-tags .tag{font-family:var(--mono,monospace);font-size:11.5px;padding:3px 7px;border-radius:5px;
+    background:var(--chip,#12263f);color:var(--fg);border:1px solid var(--line)}
+  @media(max-width:700px){.uni-grid{grid-template-columns:1fr 1fr}}
+  @media(max-width:430px){.uni-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body data-theme="dark">
@@ -178,6 +187,7 @@
       <a href="#" data-tab="Events">Events</a>
       <a href="#" data-tab="Momentum">Momentum</a>
       <a href="#" data-tab="Extension">Extension</a>
+      <a href="#" data-tab="Universe">Universe</a>
       <a href="#" data-tab="Clean Momentum">Clean Momentum</a>
     </nav>
     <div class="ctrls">
@@ -199,7 +209,7 @@
    ===================================================================== */
 let DATA = null;
 let liveTimer = null;
-const WORKING_TABS = ["Daily Board", "Themes", "Breadth", "ETF Grid", "RVOL", "Momentum", "Extension", "Events"];
+const WORKING_TABS = ["Daily Board", "Themes", "Breadth", "ETF Grid", "RVOL", "Momentum", "Extension", "Events", "Universe"];
 let activeTab = "Daily Board";
 
 async function load(){
@@ -476,6 +486,28 @@ function viewEvents(d){
   return macro + earn;
 }
 
+function viewUniverse(d){
+  if(!d.universe_map || !d.universe_map.length)
+    return emptyPanel("Universe", "no universe data — re-run market_ingest.py");
+  const total = d.universe_map.reduce((a,t)=>a+t.tickers.length,0);
+  const blocks = d.universe_map.map(t=>`
+    <div class="uni-theme" data-tickers="${t.tickers.join(' ').toLowerCase()} ${t.theme.toLowerCase()}">
+      <div class="uni-head">${t.theme}<span class="cnt">${t.tickers.length}</span></div>
+      <div class="uni-tags">${t.tickers.map(tk=>`<span class="tag" data-tk="${tk.toLowerCase()}">${tk}</span>`).join("")}</div>
+    </div>`).join("");
+  return `
+  <section class="panel">
+    <div class="phead">Universe <span class="r">${total} NAMES · ${d.universe_map.length} THEMES</span></div>
+    <div class="pbody">
+      <input id="uniFilter" placeholder="filter ticker or theme…" autocomplete="off"
+        style="width:100%;box-sizing:border-box;margin-bottom:12px;padding:9px 11px;
+        background:var(--panel2,#0e1e33);border:1px solid var(--line);border-radius:8px;
+        color:var(--fg);font-size:13px;font-family:inherit">
+      <div id="uniWrap" class="uni-grid">${blocks}</div>
+    </div>
+  </section>`;
+}
+
 function emptyPanel(title, msg){
   return `<section class="panel"><div class="phead">${title}</div>
     <div class="pbody"><span class="dim" style="color:var(--muted)">${msg}</span></div></section>`;
@@ -503,7 +535,27 @@ function render(){
   else if(activeTab === "Momentum")  main.innerHTML = viewMomentum(d);
   else if(activeTab === "Extension") main.innerHTML = viewExtension(d);
   else if(activeTab === "Events")    main.innerHTML = viewEvents(d);
+  else if(activeTab === "Universe")  { main.innerHTML = viewUniverse(d); attachUniFilter(); }
   else                               main.innerHTML = viewDailyBoard(d);
+}
+
+function attachUniFilter(){
+  const box = document.getElementById("uniFilter");
+  if(!box) return;
+  box.oninput = () => {
+    const q = box.value.trim().toLowerCase();
+    document.querySelectorAll(".uni-theme").forEach(th=>{
+      let any = false;
+      th.querySelectorAll(".tag").forEach(tag=>{
+        const hit = !q || tag.dataset.tk.includes(q);
+        tag.style.display = hit ? "" : "none";
+        if(hit) any = true;
+      });
+      const themeMatch = th.dataset.tickers.includes(q);
+      th.style.display = (any || themeMatch) ? "" : "none";
+      if(themeMatch && q) th.querySelectorAll(".tag").forEach(t=>t.style.display="");
+    });
+  };
 }
 
 /* ---------- controls ---------- */

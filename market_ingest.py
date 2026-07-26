@@ -47,40 +47,29 @@ NON_MEMBERS = set(INDEX_SYMS) | set(SECTOR_SYMS) | set(MACRO_SYMS)
 # ---- Theme map: ~250-name universe. Edit freely -- a ticker may appear in more
 # ---- than one theme (that's realistic; it just contributes to both scores).
 THEMES = {
-    "Semiconductors": ["NVDA","AMD","AVGO","TSM","MU","INTC","QCOM","ASML","AMAT","LRCX",
-                       "KLAC","ADI","TXN","NXPI","MRVL","ON","MCHP","SWKS","QRVO","TER",
-                       "ENTG","ARM","SNPS","CDNS","ALAB"],
-    "Software Infrastructure": ["MSFT","ORCL","NOW","SNOW","DDOG","NET","MDB","GTLB","FROG","ESTC",
-                                "TEAM","WDAY","DT","PATH","TWLO","HUBS","VEEV","CRM","ADBE","INTU"],
-    "Cybersecurity": ["CRWD","PANW","ZS","S","OKTA","FTNT","CHKP","RPD","TENB","QLYS","VRNS"],
-    "Robotics & Automation": ["ISRG","ROK","ZBRA","SYM","OMCL","CGNX","EMR","HON","PTC","ABBNY",
-                              "NDSN","SERV"],
-    "AI Power & Datacenter": ["VST","CEG","NRG","TLN","GEV","PWR","ETN","VRT","SMR","OKLO",
-                              "BWXT","NNE","LEU","CEG"],
-    "Datacenter REITs": ["EQIX","DLR","AMT","CCI","IRM"],
-    "Optics & Photonics": ["COHR","LITE","FN","AAOI","POET","CIEN","IPGP","NVMI"],
-    "Quantum": ["IONQ","RGTI","QBTS","QUBT","ARQQ","INFQ","LAES"],
-    "Space & Defense Tech": ["RDW","RKLB","ASTS","LUNR","PL","LMT","NOC","RTX","GD","LHX",
-                             "AVAV","KTOS","LDOS","BAH"],
-    "Biotech": ["VRTX","REGN","AMGN","GILD","BIIB","MRNA","ALNY","BMRN","INCY","NBIX",
-                "SRPT","IONS","EXEL","UTHR"],
-    "AI Healthcare & Diagnostics": ["TEM","CAI","VCYT","WGS","NEO","PSNL","RXRX","SDGR","ABSI","RLAY",
-                                    "CERT","GH"],
-    "Medical Devices": ["BSX","MDT","SYK","ABT","EW","DXCM","PODD","BFLY"],
-    "Financials": ["JPM","BAC","GS","MS","WFC","C","SCHW","BLK","BX","KKR",
-                   "APO","AXP","COF","USB"],
-    "Fintech & Payments": ["V","MA","PYPL","FIS","GPN","AFRM","TOST","SOFI","HOOD","NU"],
-    "Energy": ["XOM","CVX","COP","SLB","EOG","OXY","MPC","PSX","VLO","HAL",
-               "DVN","FANG","WMB","KMI"],
-    "Defensives": ["PG","KO","PEP","WMT","COST","MCD","JNJ","CL","KMB","GIS","MDLZ","MO"],
-    "Consumer Momentum": ["AMZN","NFLX","SBUX","NKE","LULU","CMG","ABNB","BKNG","DKNG","RH",
-                          "DECK","ONON","CAVA"],
-    "EV & Autonomy": ["TSLA","RIVN","LCID","GM","F","NIO","XPEV","LI"],
-    "China Tech": ["BABA","JD","PDD","BIDU","TCEHY","NTES","TME","BEKE"],
-    "Industrials": ["CAT","DE","GE","MMM","UNP","UPS","PH","CMI","ITW","ETN"],
-    "Materials & Uranium": ["FCX","NEM","LIN","APD","CCJ","UEC","DNN","NXE"],
-    "Crypto-linked": ["COIN","MSTR","MARA","RIOT","CLSK","HUT"],
-    "Mega-cap Platforms": ["AAPL","GOOGL","META","MSFT","AMZN","NVDA"],
+    "Semiconductors": ["NVDA", "AMD", "AVGO", "TSM", "MU", "INTC", "QCOM", "ASML", "AMAT", "LRCX", "KLAC", "ADI", "TXN", "NXPI", "MRVL", "ON", "MCHP", "SWKS", "QRVO", "TER", "ENTG", "ARM", "SNPS", "CDNS", "ALAB"],
+    "Software Infrastructure": ["MSFT", "ORCL", "NOW", "SNOW", "DDOG", "NET", "MDB", "GTLB", "FROG", "ESTC", "TEAM", "WDAY", "DT", "PATH", "TWLO", "HUBS", "VEEV", "CRM", "ADBE", "INTU", "PLTR"],
+    "Cybersecurity": ["CRWD", "PANW", "ZS", "S", "OKTA", "FTNT", "CHKP", "RPD", "TENB", "QLYS", "VRNS"],
+    "Robotics & Automation": ["ISRG", "ROK", "ZBRA", "SYM", "OMCL", "CGNX", "EMR", "HON", "PTC", "ABBNY", "NDSN", "SERV"],
+    "AI Power & Datacenter": ["VST", "CEG", "NRG", "TLN", "GEV", "PWR", "ETN", "VRT", "SMR", "OKLO", "BWXT", "NNE", "LEU", "CEG"],
+    "Datacenter REITs": ["EQIX", "DLR", "AMT", "CCI", "IRM"],
+    "Optics & Photonics": ["COHR", "LITE", "FN", "AAOI", "POET", "CIEN", "IPGP", "NVMI"],
+    "Quantum": ["IONQ", "RGTI", "QBTS", "QUBT", "ARQQ", "INFQ", "LAES"],
+    "Space & Defense Tech": ["RDW", "RKLB", "ASTS", "LUNR", "PL", "LMT", "NOC", "RTX", "GD", "LHX", "AVAV", "KTOS", "LDOS", "BAH"],
+    "Biotech": ["VRTX", "REGN", "AMGN", "GILD", "BIIB", "MRNA", "ALNY", "BMRN", "INCY", "NBIX", "SRPT", "IONS", "EXEL", "UTHR"],
+    "AI Healthcare & Diagnostics": ["TEM", "CAI", "VCYT", "WGS", "NEO", "PSNL", "RXRX", "SDGR", "ABSI", "RLAY", "CERT", "GH"],
+    "Medical Devices": ["BSX", "MDT", "SYK", "ABT", "EW", "DXCM", "PODD", "BFLY"],
+    "Financials": ["JPM", "BAC", "GS", "MS", "WFC", "C", "SCHW", "BLK", "BX", "KKR", "APO", "AXP", "COF", "USB"],
+    "Fintech & Payments": ["V", "MA", "PYPL", "FIS", "GPN", "AFRM", "TOST", "SOFI", "HOOD", "NU"],
+    "Energy": ["XOM", "CVX", "COP", "SLB", "EOG", "OXY", "MPC", "PSX", "VLO", "HAL", "DVN", "FANG", "WMB", "KMI"],
+    "Defensives": ["PG", "KO", "PEP", "WMT", "COST", "MCD", "JNJ", "CL", "KMB", "GIS", "MDLZ", "MO"],
+    "Consumer Momentum": ["AMZN", "NFLX", "SBUX", "NKE", "LULU", "CMG", "ABNB", "BKNG", "DKNG", "RH", "DECK", "ONON", "CAVA"],
+    "EV & Autonomy": ["TSLA", "RIVN", "LCID", "GM", "F", "NIO", "XPEV", "LI"],
+    "China Tech": ["BABA", "JD", "PDD", "BIDU", "TCEHY", "NTES", "TME", "BEKE"],
+    "Industrials": ["CAT", "DE", "GE", "MMM", "UNP", "UPS", "PH", "CMI", "ITW", "ETN"],
+    "Materials & Uranium": ["FCX", "NEM", "LIN", "APD", "CCJ", "UEC", "DNN", "NXE"],
+    "Crypto-linked": ["COIN", "MSTR", "MARA", "RIOT", "CLSK", "HUT"],
+    "Mega-cap Platforms": ["AAPL", "GOOGL", "META", "MSFT", "AMZN", "NVDA"],
 }
 
 def universe():
@@ -344,6 +333,8 @@ def compute_and_emit(conn):
     extension = {"high": [erow(t, m) for t, m in ex[:18]],
                  "low":  [erow(t, m) for t, m in ex[-18:][::-1]]}
 
+    universe_map = [{"theme": th, "tickers": sorted(syms)} for th, syms in THEMES.items()]
+
     earn_map = globals().get("_EARNINGS", {})
     t2th = t2theme
     earnings = []
@@ -371,6 +362,7 @@ def compute_and_emit(conn):
         ],
         "dominant": dominant, "emerging": emerging,
         "etfs": etfs, "macro": macro, "rvol": rvol_rows, "momentum": momentum,
+        "universe_map": universe_map,
         "extension": extension, "earnings": earnings,
     }
     with open(JSON_OUT, "w") as f:
@@ -412,14 +404,115 @@ def selftest():
     print("  JSON contract check: PASS")
 
 # ------------------------------------------------------------------ main
+def verify(tickers):
+    """Audit mode: print the full calculation chain per ticker so each value can
+    be checked against Yahoo/your broker by hand. Read-only; no network, no write."""
+    conn = sqlite3.connect(DB_PATH)
+    asof = conn.execute("SELECT max(d) FROM prices").fetchone()[0]
+    print(f"\n=== VERIFY  (data as-of {asof}) ===")
+    print("Compare 'close' and the returns against Yahoo for that same date.\n")
+    for t in tickers:
+        t = t.upper()
+        df = load_prices(conn, t)
+        if df is None or len(df) < 21:
+            print(f"{t:<7} no / insufficient data in market.db\n")
+            continue
+        m = ticker_metrics(df)
+        c = df["close"]
+        last5 = list(zip([d.strftime("%Y-%m-%d") for d in df.index[-5:]],
+                         [round(float(x), 2) for x in c.iloc[-5:]]))
+        sma50  = float(c.rolling(50).mean().iloc[-1])
+        sma200 = float(c.rolling(200).mean().iloc[-1]) if len(c) >= 200 else float("nan")
+        def show(x, suf="", nd=2):
+            return "n/a" if not _v(x) else f"{x:+.{nd}f}{suf}" if suf == "%" else f"{x:.{nd}f}{suf}"
+        print(f"{t:<7} close {m['close']:.2f}   ({len(c)} bars in DB)")
+        print(f"        last 5 closes: " + ", ".join(f"{d}={v}" for d, v in last5))
+        print(f"        1D {show(m['ret1'],'%')}   5D {show(m['ret5'],'%')}   "
+              f"21D {show(m['ret21'],'%')}   63D {show(m['ret63'],'%')}")
+        print(f"        50DMA {sma50:.2f}  -> dist {show(m['dist50'],'%',1)}   "
+              f"(above50={m['above50']})")
+        a200 = f"{sma200:.2f}" if _v(sma200) else "n/a (<200 bars)"
+        print(f"        200DMA {a200}   above200={m['above200']}")
+        print(f"        ATR ext {show(m['atr_ext'],'',1)}   RVOL {show(m['rvol'],'x',2)}   "
+              f"new20high={m['new20high']}  new20low={m['new20low']}\n")
+    conn.close()
+
+def _rewrite_themes(new_themes):
+    """Rewrite the THEMES = {...} block in this source file, preserving the rest."""
+    import re, io
+    src = open(__file__, encoding="utf-8").read()
+    # locate 'THEMES = {' ... matching closing brace at column 0 ('}\n')
+    start = src.index("THEMES = {")
+    depth = 0
+    i = start + len("THEMES = ")
+    end = None
+    for j in range(i, len(src)):
+        if src[j] == "{":
+            depth += 1
+        elif src[j] == "}":
+            depth -= 1
+            if depth == 0:
+                end = j + 1
+                break
+    if end is None:
+        raise RuntimeError("could not locate end of THEMES block")
+    # pretty-print the new dict
+    lines = ["THEMES = {"]
+    for th in new_themes:
+        toks = new_themes[th]
+        inner = ", ".join(f'"{t}"' for t in toks)
+        lines.append(f'    "{th}": [{inner}],')
+    lines.append("}")
+    block = "\n".join(lines)
+    open(__file__, "w", encoding="utf-8").write(src[:start] + block + src[end:])
+
+def edit_universe(add=None, remove=None, theme=None):
+    themes = {k: list(v) for k, v in THEMES.items()}
+    if add:
+        add = add.upper()
+        if not theme:
+            print("--add requires --theme \"Theme Name\""); return
+        if theme not in themes:
+            print(f"unknown theme '{theme}'. existing: {', '.join(themes)}"); return
+        if add in themes[theme]:
+            print(f"{add} already in {theme}")
+        else:
+            themes[theme].append(add)
+            print(f"added {add} -> {theme}")
+    if remove:
+        remove = remove.upper()
+        hit = [th for th, ts in themes.items() if remove in ts]
+        if not hit:
+            print(f"{remove} not found in any theme")
+        else:
+            for th in hit:
+                themes[th] = [t for t in themes[th] if t != remove]
+            print(f"removed {remove} from: {', '.join(hit)}")
+    _rewrite_themes(themes)
+    total = len({t for ts in themes.values() for t in ts})
+    print(f"universe now {total} named tickers. Run --backfill to pull history for new names.")
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--backfill", action="store_true", help="force full-history pull")
     ap.add_argument("--selftest", action="store_true", help="synthetic data, no network")
+    ap.add_argument("--verify", nargs="+", metavar="TICKER",
+                    help="audit calc chain for given tickers vs the DB (read-only)")
+    ap.add_argument("--add", metavar="TICKER", help="add a ticker (needs --theme)")
+    ap.add_argument("--remove", metavar="TICKER", help="remove a ticker from all themes")
+    ap.add_argument("--theme", metavar="NAME", help="theme name for --add")
     args = ap.parse_args()
 
     if args.selftest:
         selftest()
+        return
+
+    if args.verify:
+        verify(args.verify)
+        return
+
+    if args.add or args.remove:
+        edit_universe(add=args.add, remove=args.remove, theme=args.theme)
         return
 
     conn = sqlite3.connect(DB_PATH)
