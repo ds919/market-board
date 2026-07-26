@@ -72,5 +72,8 @@ jobs:
             echo "no change -- nothing to commit"
           else
             git commit -m "data: $(date -u +%Y-%m-%d)"
+            # pull any manual pushes first so we never collide; JSON is regenerated
+            # data, so on a conflict the freshly-built local copy wins.
+            git pull --no-edit -X ours origin main || true
             git push
           fi
