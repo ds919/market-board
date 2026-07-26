@@ -188,6 +188,7 @@
       <a href="#" data-tab="Momentum">Momentum</a>
       <a href="#" data-tab="Extension">Extension</a>
       <a href="#" data-tab="Universe">Universe</a>
+      <a href="#" data-tab="Verify">Verify</a>
       <a href="#" data-tab="Clean Momentum">Clean Momentum</a>
     </nav>
     <div class="ctrls">
@@ -209,7 +210,7 @@
    ===================================================================== */
 let DATA = null;
 let liveTimer = null;
-const WORKING_TABS = ["Daily Board", "Themes", "Breadth", "ETF Grid", "RVOL", "Momentum", "Extension", "Events", "Universe"];
+const WORKING_TABS = ["Daily Board", "Themes", "Breadth", "ETF Grid", "RVOL", "Momentum", "Extension", "Events", "Universe", "Verify"];
 let activeTab = "Daily Board";
 
 async function load(){
@@ -508,6 +509,55 @@ function viewUniverse(d){
   </section>`;
 }
 
+function viewVerify(d){
+  if(!d.verify_map || !Object.keys(d.verify_map).length)
+    return emptyPanel("Verify", "no per-ticker data — re-run market_ingest.py");
+  return `
+  <section class="panel">
+    <div class="phead">Verify <span class="r">DATA AS-OF ${d.date} · CHECK vs YAHOO</span></div>
+    <div class="pbody">
+      <input id="vfInput" placeholder="type a ticker (e.g. NVDA) and press Enter" autocomplete="off"
+        style="width:100%;box-sizing:border-box;margin-bottom:12px;padding:9px 11px;text-transform:uppercase;
+        background:var(--panel2,#0e1e33);border:1px solid var(--line);border-radius:8px;color:var(--fg);font-size:13px;font-family:inherit">
+      <div id="vfOut"><span class="dim" style="color:var(--muted)">Compare the close and 1D against Yahoo for ${d.date}. Data is as-of the last ingest, not live.</span></div>
+    </div>
+  </section>`;
+}
+
+function renderVerify(tk){
+  const d = DATA, out = document.getElementById("vfOut");
+  const m = d.verify_map[tk];
+  if(!m){ out.innerHTML = `<span class="neg">${tk} not in universe (or no data).</span>`; return; }
+  const yn = b => b===true?'<span class="pos">yes</span>':b===false?'<span class="neg">no</span>':'<span class="flat">n/a</span>';
+  const sp = v => v===null||v===undefined?'<span class="flat">n/a</span>':`<span class="${cls(v)}">${pctSign(v)}</span>`;
+  const nn = (v,su='')=>v===null||v===undefined?'<span class="flat">n/a</span>':`${Number(v).toFixed(2)}${su}`;
+  out.innerHTML = `
+    <table>
+      <tr><th class="l">${tk}</th><th class="l">value</th></tr>
+      <tr><td class="name">Close</td><td class="num mono">${nn(m.close)}</td></tr>
+      <tr><td class="name">1D return</td><td class="num">${sp(m.d1)}</td></tr>
+      <tr><td class="name">5D return</td><td class="num">${sp(m.d5)}</td></tr>
+      <tr><td class="name">21D return</td><td class="num">${sp(m.d21)}</td></tr>
+      <tr><td class="name">63D return</td><td class="num">${sp(m.d63)}</td></tr>
+      <tr><td class="name">Dist from 50DMA</td><td class="num">${sp(m.dist50)}</td></tr>
+      <tr><td class="name">ATR extension</td><td class="num">${nn(m.atr)}</td></tr>
+      <tr><td class="name">Rel. volume</td><td class="num mono">${nn(m.rvol,'×')}</td></tr>
+      <tr><td class="name">Above 50DMA</td><td class="num">${yn(m.a50)}</td></tr>
+      <tr><td class="name">Above 200DMA</td><td class="num">${yn(m.a200)}</td></tr>
+      <tr><td class="name">New 20D high / low</td><td class="num">${yn(m.nh20)} / ${yn(m.nl20)}</td></tr>
+    </table>
+    <div class="dim" style="color:var(--muted);margin-top:10px;font-size:11.5px">
+      Cross-check Close and 1D against Yahoo Finance for ${d.date}. Closes are split/dividend-adjusted.</div>`;
+}
+
+function attachVerify(){
+  const box = document.getElementById("vfInput");
+  if(!box) return;
+  const go = () => { const t = box.value.trim().toUpperCase(); if(t) renderVerify(t); };
+  box.onkeydown = e => { if(e.key === "Enter") go(); };
+  box.oninput = () => { const t = box.value.trim().toUpperCase(); if(DATA.verify_map[t]) renderVerify(t); };
+}
+
 function emptyPanel(title, msg){
   return `<section class="panel"><div class="phead">${title}</div>
     <div class="pbody"><span class="dim" style="color:var(--muted)">${msg}</span></div></section>`;
@@ -536,6 +586,7 @@ function render(){
   else if(activeTab === "Extension") main.innerHTML = viewExtension(d);
   else if(activeTab === "Events")    main.innerHTML = viewEvents(d);
   else if(activeTab === "Universe")  { main.innerHTML = viewUniverse(d); attachUniFilter(); }
+  else if(activeTab === "Verify")    { main.innerHTML = viewVerify(d); attachVerify(); }
   else                               main.innerHTML = viewDailyBoard(d);
 }
 
