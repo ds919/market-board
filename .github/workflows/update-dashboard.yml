@@ -46,6 +46,8 @@ jobs:
           pip install yfinance pandas numpy
 
       - name: Run ingest
+        env:
+          SHEET_CSV_URL: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRxlgKVoEulfvoOhk8U3u9uoCUnTBqm2EjfeOMm5zKv1rMThXSFSP0ssKBh7-zB8YM49T_p88JtTBtq/pub?gid=1502660236&single=true&output=csv"
         run: python market_ingest.py
 
       - name: Validate JSON
@@ -73,7 +75,10 @@ jobs:
           else
             git commit -m "data: $(date -u +%Y-%m-%d)"
             # pull any manual pushes first so we never collide; JSON is regenerated
-            # data, so on a conflict the freshly-built local copy wins.
-            git pull --no-edit -X ours origin main || true
-            git push
+            # data, so on a conflict the freshly-built local copy wins. Explicit
+            # merge strategy + no-rebase so the runner doesn't error on divergent
+            # branches (it has no pull.rebase config of its own). Retry once.
+            git config pull.rebase false
+            git pull --no-edit --no-rebase -X ours origin main
+            git push || (git pull --no-edit --no-rebase -X ours origin main && git push)
           fi
