@@ -472,7 +472,7 @@
       "tk": "QBTS",
       "theme": "Quantum",
       "d1": 14.09,
-      "rvol": 2.26,
+      "rvol": 2.4,
       "d5": 16.62
     },
     {
@@ -3898,7 +3898,7 @@
       "d63": 1.04,
       "dist50": -14.5,
       "atr": -2.4,
-      "rvol": 2.26,
+      "rvol": 2.4,
       "a50": false,
       "a200": false,
       "nh20": false,
@@ -4802,7 +4802,7 @@
     }
   },
   "macro_structure": {
-    "updated_at": "2026-07-27T23:36:26Z",
+    "updated_at": "2026-07-27T23:44:56Z",
     "system_health": {
       "data_status": "ok",
       "last_close": "2026-07-27"
@@ -4885,13 +4885,13 @@
       },
       {
         "pair": "BTC-USD/GLD",
-        "value": 170.145,
-        "ema5": 173.422,
-        "ema21": 170.984,
+        "value": 169.82,
+        "ema5": 173.313,
+        "ema21": 170.955,
         "direction": "up",
         "score": 1,
         "age_days": 12,
-        "weight": 0.251,
+        "weight": 0.25,
         "weighted_score": 0.25,
         "label": "Digital Risk vs Safety",
         "inverted": false
@@ -5025,8 +5025,8 @@
       },
       {
         "ticker": "BTC-USD",
-        "spread_1m": -1.194,
-        "spread_3m": -22.113
+        "spread_1m": -1.384,
+        "spread_3m": -22.27
       }
     ]
   },
