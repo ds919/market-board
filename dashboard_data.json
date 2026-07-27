@@ -472,7 +472,7 @@
       "tk": "QBTS",
       "theme": "Quantum",
       "d1": 14.09,
-      "rvol": 2.4,
+      "rvol": 2.26,
       "d5": 16.62
     },
     {
@@ -3898,7 +3898,7 @@
       "d63": 1.04,
       "dist50": -14.5,
       "atr": -2.4,
-      "rvol": 2.4,
+      "rvol": 2.26,
       "a50": false,
       "a200": false,
       "nh20": false,
@@ -4802,19 +4802,30 @@
     }
   },
   "macro_structure": {
-    "updated_at": "2026-07-27T23:44:56Z",
+    "updated_at": "2026-07-27T23:47:10Z",
     "system_health": {
       "data_status": "ok",
       "last_close": "2026-07-27"
     },
     "global_regime": {
-      "status": "Moderate Risk-On",
+      "status": "Neutral / Choppy",
       "score": 2.39,
       "delta_1d": 0,
       "min": -10,
       "max": 10,
       "breadth_engine_regime": "NEUTRAL",
-      "agrees": false,
+      "components": {
+        "intermarket": 0.39,
+        "vix": 0,
+        "trend": 1,
+        "breadth": 1
+      },
+      "bands": {
+        "full_on": 7.0,
+        "moderate_on": 3.5,
+        "full_off": -3.0
+      },
+      "agrees": true,
       "confirmed_status": "Moderate Risk-On"
     },
     "absolute_trend": {
@@ -4885,9 +4896,9 @@
       },
       {
         "pair": "BTC-USD/GLD",
-        "value": 169.82,
-        "ema5": 173.313,
-        "ema21": 170.955,
+        "value": 169.919,
+        "ema5": 173.346,
+        "ema21": 170.964,
         "direction": "up",
         "score": 1,
         "age_days": 12,
@@ -5025,8 +5036,8 @@
       },
       {
         "ticker": "BTC-USD",
-        "spread_1m": -1.384,
-        "spread_3m": -22.27
+        "spread_1m": -1.326,
+        "spread_3m": -22.222
       }
     ]
   },

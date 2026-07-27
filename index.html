@@ -597,7 +597,7 @@ function viewMacroStructure(d){
       <div class="big ${regCls}" style="font-size:26px;font-weight:800">${g.status}</div>
       <div style="font-size:15px" class="mono">score ${g.score > 0 ? "+" + g.score : g.score}
         ${g.delta_1d ? `<span class="${g.delta_1d>0?'pos':'neg'}" style="font-size:12px">(${g.delta_1d>0?'+':''}${g.delta_1d} 1D)</span>` : ""}
-        <span class="dim" style="color:var(--muted);font-size:12px">(${g.min} to +${g.max})</span></div>
+        <span class="dim" style="color:var(--muted);font-size:12px">(${g.min} to +${g.max}${g.bands ? `; risk-on ≥ ${g.bands.moderate_on}` : ""})</span></div>
       <div style="font-size:13px" class="mono">VIX ${vol.vix_close ?? "—"}${vol.vix3m_close ? ` / 3M ${vol.vix3m_close}` : ""}
         ${vol.backwardated ? '<span class="neg" style="font-weight:700"> BACKWARDATED</span>' : ""} → ${sc(vol.score)}</div>
       ${sparkline(ms.score_history, g.min, g.max)}
@@ -610,6 +610,9 @@ function viewMacroStructure(d){
         <div><span class="dim" style="color:var(--muted)">Breadth &gt;200DMA</span>
           <span class="mono ${ms.absolute_trend.breadth_score>0?'pos':'neg'}"> ${ms.absolute_trend.breadth_pct200 ?? '—'}%</span>
           ${sc(ms.absolute_trend.breadth_score)}</div>` : ""}
+      ${g.components ? `
+        <div><span class="dim" style="color:var(--muted)">Drivers</span>
+          <span class="mono" style="font-size:11.5px"> intermarket ${sc(g.components.intermarket)} · vix ${sc(g.components.vix)} · trend ${sc(g.components.trend)} · breadth ${sc(g.components.breadth)}</span></div>` : ""}
       ${g.breadth_engine_regime ? `
         <div><span class="dim" style="color:var(--muted)">Breadth engine</span>
           <span class="mono"> ${g.breadth_engine_regime}</span>

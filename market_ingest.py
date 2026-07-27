@@ -415,11 +415,20 @@ def build_macro_structure(conn, breadth_pct200, breadth_pct50=None, breadth_regi
     total += breadth_score
 
     total = round(total, 2)
-    # bands rescaled for the -10..+10 range
-    if total >= 6:      status = "Full Risk-On"
-    elif total >= 1:    status = "Moderate Risk-On"
-    elif total >= -2:   status = "Neutral / Choppy"
+    # CALIBRATED BANDS. The naive mapping (+1 = "Moderate Risk-On") was far too
+    # generous once conviction weighting shrank typical ratio contributions: a
+    # score of +1 out of 10 is noise, not risk appetite. The absolute components
+    # alone contribute +2 whenever SPY is above its 200-SMA with >50% breadth --
+    # i.e. any non-bear tape -- so the risk-on threshold must sit ABOVE that floor
+    # to mean anything. Requiring +3.5 forces the intermarket engine to actually
+    # agree before the label turns bullish.
+    if total >= 7.0:    status = "Full Risk-On"
+    elif total >= 3.5:  status = "Moderate Risk-On"
+    elif total > -3.0:  status = "Neutral / Choppy"
     else:               status = "Full Risk-Off"
+
+    # expose the split so the UI can show what is actually driving the score
+    ratio_component = round(total - vix_score - trend_score - breadth_score, 2)
 
     # ---- asset scorecards (Sec.4) ----
     def _checks(ticker, checks):
@@ -503,6 +512,9 @@ def build_macro_structure(conn, breadth_pct200, breadth_pct50=None, breadth_regi
         "global_regime": {"status": status, "score": total, "delta_1d": score_delta,
                           "min": -10, "max": 10,
                           "breadth_engine_regime": breadth_regime,
+                          "components": {"intermarket": ratio_component, "vix": vix_score,
+                                         "trend": trend_score, "breadth": breadth_score},
+                          "bands": {"full_on": 7.0, "moderate_on": 3.5, "full_off": -3.0},
                           "agrees": _agreement(status, breadth_regime)},
         "absolute_trend": {"spy_vs_200sma_pct": spy_vs_200, "trend_score": trend_score,
                            "breadth_pct200": round(breadth_pct200, 1) if breadth_pct200 is not None else None,
