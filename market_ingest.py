@@ -42,7 +42,13 @@ MACRO_ETFS = [("GLD", "Gold"), ("SLV", "Silver"), ("USO", "Crude Oil"),
               ("UUP", "US Dollar"), ("TLT", "20Y Treasuries"), ("HYG", "High Yield"),
               ("BITO", "Bitcoin"), ("UNG", "Nat Gas"), ("DBC", "Commodities")]
 MACRO_SYMS = [s for s, _ in MACRO_ETFS]
-NON_MEMBERS = set(INDEX_SYMS) | set(SECTOR_SYMS) | set(MACRO_SYMS)
+
+# Macro Risk Engine inputs (Sec.2 of spec). Most already exist in the index/
+# sector/macro lists; these are the genuinely new ones. Excluded from breadth.
+MACRO_STRUCT_EXTRA = [("BTC-USD", "Bitcoin"), ("IEI", "3-7Y Treasuries"),
+                      ("CPER", "Copper"), ("^VIX", "VIX"), ("^VIX3M", "VIX 3M")]
+MACRO_STRUCT_SYMS = [s for s, _ in MACRO_STRUCT_EXTRA]
+NON_MEMBERS = set(INDEX_SYMS) | set(SECTOR_SYMS) | set(MACRO_SYMS) | set(MACRO_STRUCT_SYMS)
 
 # ---- Theme map: ~250-name universe. Edit freely -- a ticker may appear in more
 # ---- than one theme (that's realistic; it just contributes to both scores).
@@ -122,7 +128,7 @@ def active_themes():
 
 
 def universe():
-    return sorted(set([s for m in active_themes().values() for s in m] + INDEX_SYMS + SECTOR_SYMS + MACRO_SYMS))
+    return sorted(set([s for m in active_themes().values() for s in m] + INDEX_SYMS + SECTOR_SYMS + MACRO_SYMS + MACRO_STRUCT_SYMS))
 
 # ------------------------------------------------------------------ storage
 def init_db(conn):
@@ -150,9 +156,21 @@ def load_prices(conn, ticker):
 
 # ------------------------------------------------------------------ feeds
 def fetch_yf(tickers, period):
-    import yfinance as yf
-    raw = yf.download(tickers, period=period, auto_adjust=True,
-                      group_by="ticker", threads=True, progress=False)
+    import yfinance as yf, time
+    raw = None
+    for attempt, wait in enumerate([0, 2, 5, 10]):        # 3 retries: 2s/5s/10s
+        if wait:
+            time.sleep(wait)
+        try:
+            raw = yf.download(tickers, period=period, auto_adjust=True,
+                              group_by="ticker", threads=True, progress=False)
+            if raw is not None and not raw.empty:
+                break
+        except Exception as e:
+            print(f"[ingest] yfinance attempt {attempt + 1} failed: {e}")
+    if raw is None or raw.empty:
+        print("[ingest] yfinance unavailable after retries; relying on Stooq fallback")
+        return {}
     out = {}
     for t in tickers:
         try:
@@ -291,6 +309,180 @@ def status(score, delta):
     return "NEUTRAL"
 
 # ------------------------------------------------------------------ assemble
+
+# ------------------------------------------------------------------ macro risk engine
+def _close_series(conn, ticker):
+    df = load_prices(conn, ticker)
+    return None if df is None or df.empty else df["close"]
+
+def _ratio_signal(conn, num, den, inverted=False):
+    """5/21 EMA crossover on a date-aligned price ratio. Returns dict or None.
+    Date alignment matters: BTC-USD trades 7d/wk vs 5 for equities, so we inner-
+    join on common dates before computing the ratio and its EMAs."""
+    a, b = _close_series(conn, num), _close_series(conn, den)
+    if a is None or b is None:
+        return None
+    j = pd.concat([a, b], axis=1, join="inner").dropna()
+    if len(j) < 30 or (j.iloc[:, 1] == 0).any():
+        return None
+    r = j.iloc[:, 0] / j.iloc[:, 1]
+    e5, e21 = r.ewm(span=5, adjust=False).mean(), r.ewm(span=21, adjust=False).mean()
+    up = bool(e5.iloc[-1] > e21.iloc[-1])
+    score = (1 if up else -1) * (-1 if inverted else 1)
+    sign = (e5 > e21)
+    flips = sign != sign.shift()
+    last_flip = flips[flips].index[-1] if flips.any() else sign.index[0]
+    age = int((sign.index >= last_flip).sum()) - 1
+    return {"pair": f"{num}/{den}", "value": round(float(r.iloc[-1]), 3),
+            "ema5": round(float(e5.iloc[-1]), 3), "ema21": round(float(e21.iloc[-1]), 3),
+            "direction": "up" if up else "down", "score": score, "age_days": age}
+
+def _atr14(df):
+    hc = pd.concat([df["high"] - df["low"],
+                    (df["high"] - df["close"].shift()).abs(),
+                    (df["low"] - df["close"].shift()).abs()], axis=1).max(axis=1)
+    return hc.rolling(14).mean()
+
+def build_macro_structure(conn, breadth_pct200):
+    import datetime as _dt
+    RATIOS = [("RSP", "SPY", False, "Market Breadth"),
+              ("XLY", "XLP", False, "Consumer Demand"),
+              ("HYG", "IEI", False, "Credit Spreads"),
+              ("IWM", "SPY", False, "Small Cap Appetite"),
+              ("BTC-USD", "GLD", False, "Digital Risk vs Safety"),
+              ("CPER", "GLD", False, "Industrial Demand"),
+              ("UUP", "SPY", True,  "US Dollar vs Equities")]
+    ratios = []
+    total = 0
+    for num, den, inv, label in RATIOS:
+        sig = _ratio_signal(conn, num, den, inv)
+        if sig:
+            sig["label"] = label
+            sig["inverted"] = inv
+            ratios.append(sig)
+            total += sig["score"]
+
+    vix = _close_series(conn, "^VIX")
+    vix3 = _close_series(conn, "^VIX3M")
+    vix_close = round(float(vix.iloc[-1]), 3) if vix is not None and len(vix) else None
+    vix3_close = round(float(vix3.iloc[-1]), 3) if vix3 is not None and len(vix3) else None
+    backwardated = vix_close is not None and vix3_close is not None and vix_close > vix3_close
+    vix_score = 0
+    if vix_close is not None:
+        if backwardated:
+            vix_score = -1          # term-structure stress overrides level
+        else:
+            vix_score = 1 if vix_close < 15.0 else (-1 if vix_close > 20.0 else 0)
+    total += vix_score
+
+    if total >= 5:      status = "Full Risk-On"
+    elif total >= 1:    status = "Moderate Risk-On"
+    elif total >= -2:   status = "Neutral / Choppy"
+    else:               status = "Full Risk-Off"
+
+    # ---- asset scorecards (Sec.4) ----
+    def _checks(ticker, checks):
+        passed = [{"label": lbl, "pass": bool(ok)} for lbl, ok in checks]
+        n = sum(1 for c in passed if c["pass"])
+        return {"ticker": ticker, "score": f"{n}/3", "n": n, "checks": passed}
+
+    def _sma(sr, n): return sr.rolling(n).mean()
+    def _ema(sr, n): return sr.ewm(span=n, adjust=False).mean()
+    def _ret(sr, n): return (sr.iloc[-1] / sr.iloc[-1 - n] - 1) * 100 if len(sr) > n else None
+
+    spy = _close_series(conn, "SPY"); qqq = _close_series(conn, "QQQ")
+    iwm = _close_series(conn, "IWM"); btc = _close_series(conn, "BTC-USD")
+    spy_r21 = _ret(spy, 21) if spy is not None else None
+    r_rsp = next((r for r in ratios if r["pair"] == "RSP/SPY"), None)
+    r_hyg = next((r for r in ratios if r["pair"] == "HYG/IEI"), None)
+    r_cop = next((r for r in ratios if r["pair"] == "CPER/GLD"), None)
+
+    engines = []
+    if spy is not None and len(spy) > 200:
+        engines.append(_checks("SPX", [
+            ("Close > 200d SMA", spy.iloc[-1] > _sma(spy, 200).iloc[-1]),
+            (">50% universe > 200d SMA", (breadth_pct200 or 0) > 50),
+            ("RSP/SPY 5>21 EMA", bool(r_rsp and r_rsp["direction"] == "up"))]))
+    if qqq is not None and len(qqq) > 60:
+        qdf = load_prices(conn, "QQQ")
+        qatr = _atr14(qdf).iloc[-1]
+        q21r = _ret(qqq, 21)
+        engines.append(_checks("QQQ", [
+            ("Close > 21d EMA", qqq.iloc[-1] > _ema(qqq, 21).iloc[-1]),
+            ("21d return > SPY", q21r is not None and spy_r21 is not None and q21r > spy_r21),
+            ("Not stretched (<=50SMA+3ATR)", qqq.iloc[-1] <= _sma(qqq, 50).iloc[-1] + 3 * qatr)]))
+    if iwm is not None and len(iwm) > 60:
+        i21r = _ret(iwm, 21)
+        engines.append(_checks("IWM", [
+            ("Close > 50d SMA", iwm.iloc[-1] > _sma(iwm, 50).iloc[-1]),
+            ("HYG/IEI 5>21 EMA", bool(r_hyg and r_hyg["direction"] == "up")),
+            ("21d return > SPY", i21r is not None and spy_r21 is not None and i21r > spy_r21)]))
+    if btc is not None and len(btc) > 60:
+        bdf = load_prices(conn, "BTC-USD")
+        batr = _atr14(bdf).iloc[-1]
+        engines.append(_checks("BTC", [
+            ("Close > 21d EMA", btc.iloc[-1] > _ema(btc, 21).iloc[-1]),
+            ("Vol contained (ATR/px < 5%)", (batr / btc.iloc[-1]) < 0.05 if btc.iloc[-1] else False),
+            ("CPER/GLD 5>21 EMA", bool(r_cop and r_cop["direction"] == "up"))]))
+
+    # ---- relative performance spreads vs SPY (Sec.5; NOTE: momentum, not valuation) ----
+    relval = []
+    if spy is not None:
+        spy21, spy63 = _ret(spy, 21), _ret(spy, 63)
+        for t in ["RSP", "QQQ", "IWM", "BTC-USD"]:
+            sr = _close_series(conn, t)
+            if sr is None:
+                continue
+            a21, a63 = _ret(sr, 21), _ret(sr, 63)
+            relval.append({"ticker": t,
+                "spread_1m": round(a21 - spy21, 3) if a21 is not None and spy21 is not None else None,
+                "spread_3m": round(a63 - spy63, 3) if a63 is not None and spy63 is not None else None})
+
+    # ---- freshness ----
+    conn.execute("CREATE TABLE IF NOT EXISTS macro_scores (d TEXT PRIMARY KEY, score INTEGER)")
+    today_iso = _dt.date.today().isoformat()
+    conn.execute("INSERT OR REPLACE INTO macro_scores VALUES (?,?)", (today_iso, int(total)))
+    conn.commit()
+    hist_rows = conn.execute("SELECT d, score FROM macro_scores ORDER BY d DESC LIMIT 60").fetchall()
+    score_history = [{"d": d, "score": sc} for d, sc in reversed(hist_rows)]
+    score_delta = int(total) - score_history[-2]["score"] if len(score_history) > 1 else 0
+
+    last_d = conn.execute("SELECT max(d) FROM prices WHERE ticker='SPY'").fetchone()[0]
+    stale = True
+    if last_d:
+        try:
+            age = (_dt.date.today() - _dt.date.fromisoformat(str(last_d)[:10])).days
+            stale = age > 4
+        except Exception:
+            pass
+
+    return {
+        "updated_at": _dt.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "system_health": {"data_status": "stale" if stale else "ok", "last_close": last_d},
+        "global_regime": {"status": status, "score": total, "delta_1d": score_delta, "min": -8, "max": 8},
+        "score_history": score_history,
+        "intermarket_ratios": ratios,
+        "volatility": {"vix_close": vix_close, "vix3m_close": vix3_close, "backwardated": bool(backwardated), "score": vix_score},
+        "asset_engines": engines,
+        "relative_valuation": relval,
+    }
+
+def dispatch_webhook(prev_status, new_status, payload):
+    """POST a regime-shift alert to WEBHOOK_URL if set. Never crashes the run."""
+    url = os.environ.get("WEBHOOK_URL", "").strip()
+    if not url or prev_status == new_status:
+        return
+    try:
+        import urllib.request
+        body = json.dumps({"event": "macro_regime_shift", "from": prev_status,
+                           "to": new_status, "payload": payload}).encode()
+        req = urllib.request.Request(url, data=body,
+                                     headers={"Content-Type": "application/json"})
+        urllib.request.urlopen(req, timeout=10)
+        print(f"[webhook] regime shift {prev_status} -> {new_status} dispatched")
+    except Exception as e:
+        print(f"[webhook] dispatch failed (non-fatal): {e}")
+
 def compute_and_emit(conn):
     today = conn.execute("SELECT max(d) FROM prices").fetchone()[0]
     if not today:
@@ -403,6 +595,41 @@ def compute_and_emit(conn):
     for t, d8 in sorted(earn_map.items(), key=lambda kv: kv[1]):
         earnings.append({"tk": t, "theme": t2th.get(t, "—"), "date": d8})
 
+    # ---- macro structure (Sec.3-6): graceful -- on failure, preserve previous ----
+    try:
+        macro_structure = build_macro_structure(conn, b.get("pct200"))
+        conn.execute("CREATE TABLE IF NOT EXISTS macro_state (k TEXT PRIMARY KEY, v TEXT)")
+        prev = conn.execute("SELECT v FROM macro_state WHERE k='regime'").fetchone()
+        pend = conn.execute("SELECT v FROM macro_state WHERE k='pending'").fetchone()
+        confirmed = prev[0] if prev else None
+        pending = pend[0] if pend else None
+        new_status = macro_structure["global_regime"]["status"]
+        # a regime shift must hold for TWO consecutive runs before it is confirmed
+        # and webhooked -- kills boundary flapping (e.g. score oscillating 0<->1).
+        if confirmed is None or new_status == confirmed:
+            conn.execute("DELETE FROM macro_state WHERE k='pending'")
+            if confirmed is None:
+                conn.execute("INSERT OR REPLACE INTO macro_state VALUES ('regime', ?)", (new_status,))
+        elif new_status == pending:
+            dispatch_webhook(confirmed, new_status, macro_structure["global_regime"])
+            conn.execute("INSERT OR REPLACE INTO macro_state VALUES ('regime', ?)", (new_status,))
+            conn.execute("DELETE FROM macro_state WHERE k='pending'")
+        else:
+            conn.execute("INSERT OR REPLACE INTO macro_state VALUES ('pending', ?)", (new_status,))
+        conn.commit()
+        macro_structure["global_regime"]["confirmed_status"] = new_status if (confirmed is None or new_status == confirmed or new_status == pending) else confirmed
+    except Exception as e:
+        print(f"[macro] build failed ({e}); preserving previous payload as stale")
+        macro_structure = None
+        try:
+            with open(JSON_OUT) as f:
+                old = json.load(f).get("macro_structure")
+            if old:
+                old["system_health"] = {"data_status": "stale", "last_close": old.get("system_health", {}).get("last_close")}
+                macro_structure = old
+        except Exception:
+            pass
+
     out = {
         "date": today, "universe": UNIVERSE, "tickers": b["n"],
         "regime": {
@@ -425,6 +652,7 @@ def compute_and_emit(conn):
         "dominant": dominant, "emerging": emerging,
         "etfs": etfs, "macro": macro, "rvol": rvol_rows, "momentum": momentum,
         "universe_map": universe_map, "verify_map": verify_map,
+        "macro_structure": macro_structure,
         "extension": extension, "earnings": earnings,
     }
     with open(JSON_OUT, "w") as f:
