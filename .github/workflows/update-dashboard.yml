@@ -3,8 +3,14 @@ name: Update market dashboard
 
 on:
   schedule:
-    # 21:30 UTC on weekdays = 5:30pm ET (EDT) / 4:30pm ET (EST) -- after the close either way
-    - cron: "30 21 * * 1-5"
+    # 22:47 UTC weekdays = 6:47pm ET (EDT) / 5:47pm ET (EST).
+    # Two deliberate choices:
+    #  - ODD MINUTE: GitHub's scheduler queues everything fired at :00/:30, so
+    #    those slots get delayed the most (we saw a Friday run land Sunday).
+    #    An off-spike minute measurably reduces queue delay.
+    #  - LATER HOUR: gives Yahoo more margin to finalize the daily bar than
+    #    21:30 UTC did (only 90 min after the close).
+    - cron: "47 22 * * 1-5"
   workflow_dispatch:        # lets you run it manually from the Actions tab
 
 permissions:
