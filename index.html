@@ -587,7 +587,7 @@ function viewMacroStructure(d){
   const g = ms.global_regime, vol = ms.volatility, health = ms.system_health;
   const regCls = g.status.includes("Risk-On") ? "pos" : g.status.includes("Risk-Off") ? "neg" : "flat";
   const chk = ok => ok ? '<span class="pos">✓</span>' : '<span class="neg">✗</span>';
-  const sc  = v => v>0?`<span class="pos">+${v}</span>`:v<0?`<span class="neg">${v}</span>`:`<span class="flat">0</span>`;
+  const sc  = v => v>0?`<span class="pos">+${Number(v).toFixed(2).replace(/\.00$/,'')}</span>`:v<0?`<span class="neg">${Number(v).toFixed(2).replace(/\.00$/,'')}</span>`:`<span class="flat">0</span>`;
   const spd = v => v===null||v===undefined ? '<span class="flat">—</span>' : `<span class="${v>0?'pos':v<0?'neg':'flat'}">${v>0?'+':''}${Number(v).toFixed(2)}%</span>`;
 
   const banner = `
@@ -601,6 +601,19 @@ function viewMacroStructure(d){
       <div style="font-size:13px" class="mono">VIX ${vol.vix_close ?? "—"}${vol.vix3m_close ? ` / 3M ${vol.vix3m_close}` : ""}
         ${vol.backwardated ? '<span class="neg" style="font-weight:700"> BACKWARDATED</span>' : ""} → ${sc(vol.score)}</div>
       ${sparkline(ms.score_history, g.min, g.max)}
+    </div>
+    <div class="pbody" style="border-top:1px solid var(--line);display:flex;gap:22px;flex-wrap:wrap;font-size:12.5px">
+      ${ms.absolute_trend ? `
+        <div><span class="dim" style="color:var(--muted)">SPY vs 200SMA</span>
+          <span class="mono ${ms.absolute_trend.trend_score>0?'pos':'neg'}"> ${ms.absolute_trend.spy_vs_200sma_pct>0?'+':''}${ms.absolute_trend.spy_vs_200sma_pct ?? '—'}%</span>
+          ${sc(ms.absolute_trend.trend_score)}</div>
+        <div><span class="dim" style="color:var(--muted)">Breadth &gt;200DMA</span>
+          <span class="mono ${ms.absolute_trend.breadth_score>0?'pos':'neg'}"> ${ms.absolute_trend.breadth_pct200 ?? '—'}%</span>
+          ${sc(ms.absolute_trend.breadth_score)}</div>` : ""}
+      ${g.breadth_engine_regime ? `
+        <div><span class="dim" style="color:var(--muted)">Breadth engine</span>
+          <span class="mono"> ${g.breadth_engine_regime}</span>
+          ${g.agrees === false ? '<span class="neg" style="font-weight:700"> ⚠ DIVERGENCE</span>' : g.agrees === true ? '<span class="pos"> agree</span>' : ""}</div>` : ""}
     </div>
   </section>`;
 
@@ -621,14 +634,15 @@ function viewMacroStructure(d){
       <td class="num mono">${r.value}</td>
       <td class="num">${r.direction === "up" ? '<span class="pos">▲ 5>21</span>' : '<span class="neg">▼ 5<21</span>'}</td>
       <td class="num mono" style="font-size:11.5px">${r.age_days ?? "—"}d${r.age_days !== undefined && r.age_days <= 3 ? ' <span class="pos" style="font-size:9px">NEW</span>' : ""}</td>
-      <td class="num">${sc(r.score)}</td>
+      <td class="num mono" style="font-size:11.5px">${r.weight !== undefined ? (r.weight*100).toFixed(0)+"%" : "—"}</td>
+      <td class="num">${sc(r.weighted_score !== undefined ? r.weighted_score : r.score)}</td>
       <td class="num flat">—</td><td class="num flat">—</td>
     </tr>`).join("")
   + ms.relative_valuation.map(v => `
     <tr>
       <td class="name mono">${v.ticker} vs SPY</td>
       <td class="name" style="font-weight:400;color:var(--muted);font-size:11.5px">Relative performance</td>
-      <td class="num flat">—</td><td class="num flat">—</td><td class="num flat">—</td><td class="num flat">—</td>
+      <td class="num flat">—</td><td class="num flat">—</td><td class="num flat">—</td><td class="num flat">—</td><td class="num flat">—</td>
       <td class="num">${spd(v.spread_1m)}</td>
       <td class="num">${spd(v.spread_3m)}</td>
     </tr>`).join("");
@@ -637,8 +651,8 @@ function viewMacroStructure(d){
   <section class="panel">
     <div class="phead">Intermarket Ratios &amp; Relative Performance <span class="r">5/21 EMA CROSS · SPREADS vs SPY</span></div>
     <div class="pbody" style="overflow-x:auto">
-      <table style="min-width:700px">
-        <tr><th class="l">Pair</th><th class="l">Meaning</th><th>Value</th><th>EMA Cross</th><th>Age</th><th>Score</th><th>1M Spread</th><th>3M Spread</th></tr>
+      <table style="min-width:760px">
+        <tr><th class="l">Pair</th><th class="l">Meaning</th><th>Value</th><th>EMA Cross</th><th>Age</th><th>Conv</th><th>Score</th><th>1M Spread</th><th>3M Spread</th></tr>
         ${rows}
       </table>
     </div>

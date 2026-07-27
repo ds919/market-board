@@ -333,9 +333,21 @@ def _ratio_signal(conn, num, den, inverted=False):
     flips = sign != sign.shift()
     last_flip = flips[flips].index[-1] if flips.any() else sign.index[0]
     age = int((sign.index >= last_flip).sum()) - 1
+
+    # CONVICTION WEIGHT: a ratio barely above its 21-EMA should not count the same
+    # as one decisively trending. Separation is normalized against its own recent
+    # distribution (so each pair is judged on its own scale), then damped for very
+    # fresh crosses which flip back often.
+    sep = (e5 - e21).abs() / e21.abs().replace(0, np.nan)
+    sep_now = float(sep.iloc[-1]) if _v(sep.iloc[-1]) else 0.0
+    sep_ref = float(sep.tail(252).quantile(0.75)) if len(sep.dropna()) > 30 else sep_now
+    mag_w = min(1.0, sep_now / sep_ref) if sep_ref and sep_ref > 0 else 0.5
+    age_w = min(1.0, (age + 1) / 5.0)          # full weight once the cross is 4+ days old
+    weight = max(0.25, round(mag_w * age_w, 3))
     return {"pair": f"{num}/{den}", "value": round(float(r.iloc[-1]), 3),
             "ema5": round(float(e5.iloc[-1]), 3), "ema21": round(float(e21.iloc[-1]), 3),
-            "direction": "up" if up else "down", "score": score, "age_days": age}
+            "direction": "up" if up else "down", "score": score, "age_days": age,
+            "weight": weight, "weighted_score": round(score * weight, 2)}
 
 def _atr14(df):
     hc = pd.concat([df["high"] - df["low"],
@@ -343,7 +355,16 @@ def _atr14(df):
                     (df["low"] - df["close"].shift()).abs()], axis=1).max(axis=1)
     return hc.rolling(14).mean()
 
-def build_macro_structure(conn, breadth_pct200):
+def _agreement(macro_status, breadth_regime):
+    """Do the two independent engines agree? Divergence is itself information."""
+    if not breadth_regime:
+        return None
+    m = "on" if "Risk-On" in macro_status else "off" if "Risk-Off" in macro_status else "neutral"
+    br = str(breadth_regime).upper()
+    b = "on" if "ON" in br else "off" if "OFF" in br else "neutral"
+    return m == b
+
+def build_macro_structure(conn, breadth_pct200, breadth_pct50=None, breadth_regime=None):
     import datetime as _dt
     RATIOS = [("RSP", "SPY", False, "Market Breadth"),
               ("XLY", "XLP", False, "Consumer Demand"),
@@ -360,7 +381,7 @@ def build_macro_structure(conn, breadth_pct200):
             sig["label"] = label
             sig["inverted"] = inv
             ratios.append(sig)
-            total += sig["score"]
+            total += sig["weighted_score"]
 
     vix = _close_series(conn, "^VIX")
     vix3 = _close_series(conn, "^VIX3M")
@@ -375,7 +396,27 @@ def build_macro_structure(conn, breadth_pct200):
             vix_score = 1 if vix_close < 15.0 else (-1 if vix_close > 20.0 else 0)
     total += vix_score
 
-    if total >= 5:      status = "Full Risk-On"
+    # ---- ABSOLUTE components (the fix for rotation masquerading as risk appetite) ----
+    # Four of the seven ratios are equity-vs-equity and are scale-invariant to the
+    # market's direction: RSP/SPY can rise during a selloff. These two inputs anchor
+    # the score to whether the market is actually going UP.
+    spy_s = _close_series(conn, "SPY")
+    trend_score = 0
+    spy_vs_200 = None
+    if spy_s is not None and len(spy_s) > 200:
+        sma200 = spy_s.rolling(200).mean().iloc[-1]
+        spy_vs_200 = round(float((spy_s.iloc[-1] / sma200 - 1) * 100), 2)
+        trend_score = 1 if spy_s.iloc[-1] > sma200 else -1
+    total += trend_score
+
+    breadth_score = 0
+    if breadth_pct200 is not None:
+        breadth_score = 1 if breadth_pct200 > 50 else -1
+    total += breadth_score
+
+    total = round(total, 2)
+    # bands rescaled for the -10..+10 range
+    if total >= 6:      status = "Full Risk-On"
     elif total >= 1:    status = "Moderate Risk-On"
     elif total >= -2:   status = "Neutral / Choppy"
     else:               status = "Full Risk-Off"
@@ -439,13 +480,13 @@ def build_macro_structure(conn, breadth_pct200):
                 "spread_3m": round(a63 - spy63, 3) if a63 is not None and spy63 is not None else None})
 
     # ---- freshness ----
-    conn.execute("CREATE TABLE IF NOT EXISTS macro_scores (d TEXT PRIMARY KEY, score INTEGER)")
+    conn.execute("CREATE TABLE IF NOT EXISTS macro_scores (d TEXT PRIMARY KEY, score REAL)")
     today_iso = _dt.date.today().isoformat()
-    conn.execute("INSERT OR REPLACE INTO macro_scores VALUES (?,?)", (today_iso, int(total)))
+    conn.execute("INSERT OR REPLACE INTO macro_scores VALUES (?,?)", (today_iso, float(total)))
     conn.commit()
     hist_rows = conn.execute("SELECT d, score FROM macro_scores ORDER BY d DESC LIMIT 60").fetchall()
     score_history = [{"d": d, "score": sc} for d, sc in reversed(hist_rows)]
-    score_delta = int(total) - score_history[-2]["score"] if len(score_history) > 1 else 0
+    score_delta = round(float(total) - float(score_history[-2]["score"]), 2) if len(score_history) > 1 else 0
 
     last_d = conn.execute("SELECT max(d) FROM prices WHERE ticker='SPY'").fetchone()[0]
     stale = True
@@ -459,7 +500,14 @@ def build_macro_structure(conn, breadth_pct200):
     return {
         "updated_at": _dt.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"),
         "system_health": {"data_status": "stale" if stale else "ok", "last_close": last_d},
-        "global_regime": {"status": status, "score": total, "delta_1d": score_delta, "min": -8, "max": 8},
+        "global_regime": {"status": status, "score": total, "delta_1d": score_delta,
+                          "min": -10, "max": 10,
+                          "breadth_engine_regime": breadth_regime,
+                          "agrees": _agreement(status, breadth_regime)},
+        "absolute_trend": {"spy_vs_200sma_pct": spy_vs_200, "trend_score": trend_score,
+                           "breadth_pct200": round(breadth_pct200, 1) if breadth_pct200 is not None else None,
+                           "breadth_pct50": round(breadth_pct50, 1) if breadth_pct50 is not None else None,
+                           "breadth_score": breadth_score},
         "score_history": score_history,
         "intermarket_ratios": ratios,
         "volatility": {"vix_close": vix_close, "vix3m_close": vix3_close, "backwardated": bool(backwardated), "score": vix_score},
@@ -597,7 +645,7 @@ def compute_and_emit(conn):
 
     # ---- macro structure (Sec.3-6): graceful -- on failure, preserve previous ----
     try:
-        macro_structure = build_macro_structure(conn, b.get("pct200"))
+        macro_structure = build_macro_structure(conn, b.get("pct200"), b.get("pct50"), regime_label(b))
         conn.execute("CREATE TABLE IF NOT EXISTS macro_state (k TEXT PRIMARY KEY, v TEXT)")
         prev = conn.execute("SELECT v FROM macro_state WHERE k='regime'").fetchone()
         pend = conn.execute("SELECT v FROM macro_state WHERE k='pending'").fetchone()
