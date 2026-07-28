@@ -22,6 +22,7 @@ import pandas as pd
 
 DB_PATH   = "market.db"
 JSON_OUT  = "dashboard_data.json"
+REPLAY_CSV = "macro_replay.csv"
 UNIVERSE  = "UNIVERSE V1"
 BACKFILL_PERIOD = "2y"    # enough history for 200DMA + 52-week highs
 NIGHTLY_PERIOD  = "10d"   # small incremental pull
@@ -425,10 +426,65 @@ def build_macro_structure(conn, breadth_pct200, breadth_pct50=None, breadth_regi
     # i.e. any non-bear tape -- so the risk-on threshold must sit ABOVE that floor
     # to mean anything. Requiring +3.5 forces the intermarket engine to actually
     # agree before the label turns bullish.
-    if total >= 7.0:    status = "Full Risk-On"
-    elif total >= 3.5:  status = "Moderate Risk-On"
-    elif total > -3.0:  status = "Neutral / Choppy"
-    else:               status = "Full Risk-Off"
+    # BANDS. +7 for Full Risk-On was empirically unreachable (0 of 300 replayed
+    # days); the observed max was +6.70. Lowered to +5.0, which fires ~10% of the
+    # time. Moderate stays at +3.5 -- it sits just above the +2 floor the absolute
+    # components contribute in any non-bear tape, which is an independent reason
+    # rather than a curve-fit. Full Risk-Off stays at -3.0: the percentile fit
+    # suggested -1.7, but that was derived from a 14-month BULL sample where deep
+    # negatives are rare, and adopting it would flag full risk-off on ordinary
+    # pullbacks. -3.0 fired on 5% of days and caught the genuine stress episodes.
+    B_FULL_ON, B_MOD_ON, B_FULL_OFF = 5.0, 3.5, -3.0
+
+    # SMOOTHED REGIME. The raw score flips across a band boundary on decimal noise,
+    # which made the daily label alternate green/yellow day to day (visible as
+    # striping when overlaid on SPX). The LABEL is driven by a short EMA of the
+    # score instead; the raw score stays visible for the daily read. Only PRIOR
+    # dates are used, so this is lookahead-free during replay.
+    SMOOTH_SPAN = 5
+    raw_score = total
+    try:
+        conn.execute("CREATE TABLE IF NOT EXISTS macro_scores (d TEXT PRIMARY KEY, score REAL)")
+        cutoff = (pd.Timestamp(as_of).date().isoformat() if as_of else _dt.date.today().isoformat())
+        prior = conn.execute(
+            "SELECT score FROM macro_scores WHERE d < ? ORDER BY d DESC LIMIT ?",
+            (cutoff, SMOOTH_SPAN * 3)).fetchall()
+        hist = [float(x[0]) for x in reversed(prior)] + [float(total)]
+        smooth = float(pd.Series(hist).ewm(span=SMOOTH_SPAN, adjust=False).mean().iloc[-1])
+    except Exception:
+        smooth = float(total)
+    total = round(smooth, 2)
+
+    # HYSTERESIS: the score must clear a threshold by `hyst` to ENTER a regime,
+    # but only fall back through it to EXIT. Without this the label flips on
+    # decimal noise around a boundary (35 changes in 300 days).
+    hyst = 0.4
+    prev_lab = None
+    try:
+        _r = conn.execute("SELECT v FROM macro_state WHERE k='label'").fetchone()
+        prev_lab = _r[0] if _r else None
+    except Exception:
+        pass
+
+    def _band(x, entering_from=None):
+        if x >= B_FULL_ON:    return "Full Risk-On"
+        if x >= B_MOD_ON:     return "Moderate Risk-On"
+        if x > B_FULL_OFF:    return "Neutral / Choppy"
+        return "Full Risk-Off"
+
+    raw_status = _band(total)
+    status = raw_status
+    if prev_lab and raw_status != prev_lab:
+        # require an extra `hyst` of margin to move away from the previous label
+        if raw_status == "Full Risk-On"     and total < B_FULL_ON + hyst:   status = prev_lab
+        elif raw_status == "Moderate Risk-On" and total < B_MOD_ON + hyst:  status = prev_lab
+        elif raw_status == "Full Risk-Off"  and total > B_FULL_OFF - hyst:  status = prev_lab
+        elif raw_status == "Neutral / Choppy":
+            # leaving a stronger regime requires clearing the boundary by hyst too
+            if prev_lab in ("Full Risk-On", "Moderate Risk-On") and total > B_MOD_ON - hyst:
+                status = prev_lab
+            elif prev_lab == "Full Risk-Off" and total < B_FULL_OFF + hyst:
+                status = prev_lab
 
     # expose the split so the UI can show what is actually driving the score
     ratio_component = round(total - vix_score - trend_score - breadth_score, 2)
@@ -494,6 +550,8 @@ def build_macro_structure(conn, breadth_pct200, breadth_pct50=None, breadth_regi
                 "spread_3m": round(a63 - spy63, 3) if a63 is not None and spy63 is not None else None})
 
     # ---- freshness ----
+    conn.execute("CREATE TABLE IF NOT EXISTS macro_state (k TEXT PRIMARY KEY, v TEXT)")
+    conn.execute("INSERT OR REPLACE INTO macro_state VALUES ('label', ?)", (status,))
     conn.execute("CREATE TABLE IF NOT EXISTS macro_scores (d TEXT PRIMARY KEY, score REAL)")
     today_iso = (pd.Timestamp(as_of).date().isoformat() if as_of else _dt.date.today().isoformat())
     conn.execute("INSERT OR REPLACE INTO macro_scores VALUES (?,?)", (today_iso, float(total)))
@@ -514,12 +572,14 @@ def build_macro_structure(conn, breadth_pct200, breadth_pct50=None, breadth_regi
     return {
         "updated_at": _dt.datetime.now(_dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "system_health": {"data_status": "stale" if stale else "ok", "last_close": last_d},
-        "global_regime": {"status": status, "score": total, "delta_1d": score_delta,
+        "global_regime": {"status": status, "score": total, "raw_score": round(raw_score, 2),
+                          "smooth_span": SMOOTH_SPAN, "delta_1d": score_delta,
                           "min": -10, "max": 10,
                           "breadth_engine_regime": breadth_regime,
                           "components": {"intermarket": ratio_component, "vix": vix_score,
                                          "trend": trend_score, "breadth": breadth_score},
-                          "bands": {"full_on": 7.0, "moderate_on": 3.5, "full_off": -3.0},
+                          "bands": {"full_on": B_FULL_ON, "moderate_on": B_MOD_ON, "full_off": B_FULL_OFF, "hysteresis": hyst},
+                          "raw_status": raw_status,
                           "agrees": _agreement(status, breadth_regime)},
         "absolute_trend": {"spy_vs_200sma_pct": spy_vs_200, "trend_score": trend_score,
                            "breadth_pct200": round(breadth_pct200, 1) if breadth_pct200 is not None else None,
@@ -601,15 +661,31 @@ def replay(conn, start):
             continue
         g = ms["global_regime"]; c = g["components"]
         rows.append((d.date().isoformat(), g["score"]))
+        conn.execute("INSERT OR REPLACE INTO macro_scores VALUES (?,?)",
+                     (d.date().isoformat(), float(g["raw_score"])))
+        conn.commit()
         statuses.append((d.date().isoformat(), g["status"], g["score"], c["intermarket"]))
         if verbose:
             print(f"{str(d.date()):<12}{g['score']:>7.2f}  {g['status']:<20}"
                   f"{c['intermarket']:>9.2f}{c['vix']:>5}{c['trend']:>6}{c['breadth']:>6}")
         elif len(rows) % 50 == 0:
             print(f"  ...{len(rows)}/{len(dates)} days")
-    for d_iso, sc in rows:
-        conn.execute("INSERT OR REPLACE INTO macro_scores VALUES (?,?)", (d_iso, float(sc)))
     conn.commit()
+
+    # CSV export so the SPX-vs-regime overlay can be rebuilt in one step
+    try:
+        spy_px = _close_series(conn, "SPY")
+        out = pd.DataFrame(statuses, columns=["date", "status", "score", "intermarket"])
+        out["spx"] = [float(spy_px.loc[pd.Timestamp(d)]) if pd.Timestamp(d) in spy_px.index else None
+                      for d in out["date"]]
+        out["risk_on"] = (out["status"].str.contains("Risk-On")).astype(int)
+        out["neutral"] = (out["status"] == "Neutral / Choppy").astype(int)
+        out["risk_off"] = (out["status"] == "Full Risk-Off").astype(int)
+        out.to_csv(REPLAY_CSV, index=False)
+        print(f"[replay] overlay data -> {REPLAY_CSV}  (columns: date, spx, status, score, "
+              f"risk_on/neutral/risk_off flags)")
+    except Exception as e:
+        print(f"[replay] csv export skipped: {e}")
     print(f"\n[replay] wrote {len(rows)} scores to macro_scores")
     if len(rows) > 1:
         first, last = rows[0][1], rows[-1][1]
