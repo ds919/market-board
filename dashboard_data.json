@@ -4806,22 +4806,22 @@
     }
   },
   "macro_structure": {
-    "updated_at": "2026-07-28T03:21:31Z",
+    "updated_at": "2026-07-28T03:28:29Z",
     "system_health": {
       "data_status": "ok",
       "last_close": "2026-07-27"
     },
     "global_regime": {
       "status": "Neutral / Choppy",
-      "score": 2.49,
+      "score": 2.04,
       "raw_score": 2.46,
       "smooth_span": 5,
-      "delta_1d": 0.51,
+      "delta_1d": 2.06,
       "min": -10,
       "max": 10,
       "breadth_engine_regime": "NEUTRAL",
       "components": {
-        "intermarket": 0.49,
+        "intermarket": 0.04,
         "vix": 0,
         "trend": 1,
         "breadth": 1
@@ -5078,11 +5078,11 @@
       },
       {
         "d": "2026-07-24",
-        "score": 1.98
+        "score": -0.02
       },
       {
         "d": "2026-07-27",
-        "score": 2.49
+        "score": 2.04
       }
     ],
     "intermarket_ratios": [
@@ -5280,8 +5280,8 @@
       },
       {
         "ticker": "BTC-USD",
-        "spread_1m": -0.697,
-        "spread_3m": -20.349
+        "spread_1m": -0.779,
+        "spread_3m": -20.418
       }
     ]
   },
