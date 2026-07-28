@@ -533,13 +533,31 @@ def build_macro_structure(conn, breadth_pct200, breadth_pct50=None, breadth_regi
     }
 
 
-def historical_breadth(conn, as_of, tickers):
-    """% of universe above its 200-DMA as of a past date. Recomputed from raw
-    prices -- must NOT use today's snapshot, or the score would be using future
-    information."""
-    ts = pd.Timestamp(as_of)
-    above = 0
-    total = 0
+def breadth_matrix(conn, tickers):
+    """Precompute an above-200DMA boolean matrix ONCE (dates x tickers) so a
+    multi-year replay doesn't re-query SQLite per ticker per date. Turns
+    ~127k queries into one pass."""
+    closes = {}
+    for t in tickers:
+        c = _close_series(conn, t)
+        if c is not None and len(c) >= 200:
+            closes[t] = c
+    if not closes:
+        return None
+    px = pd.DataFrame(closes).sort_index()
+    sma200 = px.rolling(200).mean()
+    above = (px > sma200) & sma200.notna()
+    valid = sma200.notna()
+    pct = (above.sum(axis=1) / valid.sum(axis=1).replace(0, np.nan)) * 100
+    return pct
+
+def historical_breadth(conn, as_of, tickers, pct_series=None):
+    """% of universe above its 200-DMA as of a past date. Uses only data through
+    that date -- no lookahead. Pass pct_series from breadth_matrix() for speed."""
+    if pct_series is not None:
+        sub = pct_series[pct_series.index <= pd.Timestamp(as_of)]
+        return float(sub.iloc[-1]) if len(sub) and _v(sub.iloc[-1]) else None
+    above = total = 0
     for t in tickers:
         c = _close_series(conn, t, as_of)
         if c is None or len(c) < 200:
@@ -564,13 +582,18 @@ def replay(conn, start):
     if not dates:
         print(f"[replay] no trading days on/after {start}"); return
     names = [t for t in universe() if t not in NON_MEMBERS]
+    print("[replay] precomputing breadth matrix...")
+    pct_series = breadth_matrix(conn, names)
     conn.execute("CREATE TABLE IF NOT EXISTS macro_scores (d TEXT PRIMARY KEY, score REAL)")
     print(f"[replay] {len(dates)} trading days from {dates[0].date()} to {dates[-1].date()}")
-    print(f"{'date':<12}{'score':>7}  {'status':<20}{'intermkt':>9}{'vix':>5}{'trend':>6}{'brdth':>6}")
-    print("-" * 70)
+    verbose = len(dates) <= 60
+    if verbose:
+        print(f"{'date':<12}{'score':>7}  {'status':<20}{'intermkt':>9}{'vix':>5}{'trend':>6}{'brdth':>6}")
+        print("-" * 70)
     rows = []
+    statuses = []
     for d in dates:
-        b200 = historical_breadth(conn, d, names)
+        b200 = historical_breadth(conn, d, names, pct_series)
         try:
             ms = build_macro_structure(conn, b200, None, None, as_of=d)
         except Exception as e:
@@ -578,8 +601,12 @@ def replay(conn, start):
             continue
         g = ms["global_regime"]; c = g["components"]
         rows.append((d.date().isoformat(), g["score"]))
-        print(f"{str(d.date()):<12}{g['score']:>7.2f}  {g['status']:<20}"
-              f"{c['intermarket']:>9.2f}{c['vix']:>5}{c['trend']:>6}{c['breadth']:>6}")
+        statuses.append((d.date().isoformat(), g["status"], g["score"], c["intermarket"]))
+        if verbose:
+            print(f"{str(d.date()):<12}{g['score']:>7.2f}  {g['status']:<20}"
+                  f"{c['intermarket']:>9.2f}{c['vix']:>5}{c['trend']:>6}{c['breadth']:>6}")
+        elif len(rows) % 50 == 0:
+            print(f"  ...{len(rows)}/{len(dates)} days")
     for d_iso, sc in rows:
         conn.execute("INSERT OR REPLACE INTO macro_scores VALUES (?,?)", (d_iso, float(sc)))
     conn.commit()
@@ -587,6 +614,79 @@ def replay(conn, start):
     if len(rows) > 1:
         first, last = rows[0][1], rows[-1][1]
         print(f"[replay] {rows[0][0]} {first:+.2f}  ->  {rows[-1][0]} {last:+.2f}   (change {last-first:+.2f})")
+    if statuses:
+        vals = [r[2] for r in statuses]
+        print(f"[replay] score range {min(vals):+.2f} to {max(vals):+.2f}   mean {sum(vals)/len(vals):+.2f}")
+        from collections import Counter
+        cnt = Counter(r[1] for r in statuses)
+        print("[replay] days in each regime:")
+        for k in ["Full Risk-On", "Moderate Risk-On", "Neutral / Choppy", "Full Risk-Off"]:
+            n = cnt.get(k, 0)
+            print(f"           {k:<20}{n:>5}  ({100*n/len(statuses):.0f}%)")
+        # regime transitions, so you can eyeball whether it led or lagged turns
+        print("[replay] regime changes:")
+        prev = None
+        for d_iso, st, sc_, im in statuses:
+            if st != prev:
+                if prev is not None:
+                    print(f"           {d_iso}  {prev}  ->  {st}   (score {sc_:+.2f}, intermkt {im:+.2f})")
+                prev = st
+
+
+def calibrate(conn, exclude_warmup=True):
+    """Recommend regime bands from the REPLAYED score history instead of judgment.
+    Requires --replay to have been run first. Excludes the warmup period where the
+    200-day SMA was unavailable (trend/breadth == 0), since those scores are
+    ratio-only and not comparable."""
+    rows = conn.execute("SELECT d, score FROM macro_scores ORDER BY d").fetchall()
+    if len(rows) < 60:
+        print(f"[calibrate] only {len(rows)} scores stored -- run --replay first"); return
+    ser = pd.Series({pd.Timestamp(d): float(sc) for d, sc in rows}).sort_index()
+
+    # warmup detection: the absolute components need 200 bars of SPY history
+    spy = _close_series(conn, "SPY")
+    if exclude_warmup and spy is not None and len(spy) > 200:
+        valid_from = spy.index[199]
+        dropped = int((ser.index < valid_from).sum())
+        if dropped:
+            print(f"[calibrate] excluding {dropped} warmup days before {valid_from.date()} "
+                  f"(200-day SMA unavailable -> ratio-only scores)")
+            ser = ser[ser.index >= valid_from]
+
+    n = len(ser)
+    print(f"\n[calibrate] {n} usable days  {ser.index[0].date()} -> {ser.index[-1].date()}")
+    print(f"  min {ser.min():+.2f}   max {ser.max():+.2f}   mean {ser.mean():+.2f}   sd {ser.std():.2f}")
+    qs = [1, 5, 10, 25, 50, 75, 90, 95, 99]
+    print("  percentiles: " + "  ".join(f"p{q}={ser.quantile(q/100):+.2f}" for q in qs))
+
+    # symmetric, percentile-anchored bands: extremes = tails, moderate = shoulders
+    full_on   = round(float(ser.quantile(0.90)), 1)
+    mod_on    = round(float(ser.quantile(0.65)), 1)
+    full_off  = round(float(ser.quantile(0.10)), 1)
+    print(f"\n  RECOMMENDED BANDS (p90 / p65 / p10):")
+    print(f"    Full Risk-On     >= {full_on:+.1f}")
+    print(f"    Moderate Risk-On >= {mod_on:+.1f}")
+    print(f"    Full Risk-Off    <= {full_off:+.1f}")
+
+    def dist(fon, mon, foff):
+        c = {"Full Risk-On": int((ser >= fon).sum()),
+             "Moderate Risk-On": int(((ser >= mon) & (ser < fon)).sum()),
+             "Neutral / Choppy": int(((ser > foff) & (ser < mon)).sum()),
+             "Full Risk-Off": int((ser <= foff).sum())}
+        return c
+    cur = dist(7.0, 3.5, -3.0)
+    new = dist(full_on, mod_on, full_off)
+    print(f"\n  {'regime':<20}{'current':>16}{'recommended':>16}")
+    for k in ["Full Risk-On", "Moderate Risk-On", "Neutral / Choppy", "Full Risk-Off"]:
+        print(f"    {k:<18}{cur[k]:>6} ({100*cur[k]/n:>3.0f}%){new[k]:>10} ({100*new[k]/n:>3.0f}%)")
+
+    # label stability: how often would the regime flip?
+    def flips(fon, mon, foff):
+        lab = pd.cut(ser, [-99, foff, mon, fon, 99], labels=["off","neutral","mod","full"])
+        return int((lab != lab.shift()).sum() - 1)
+    print(f"\n  regime changes over the window:  current {flips(7.0,3.5,-3.0)}   "
+          f"recommended {flips(full_on,mod_on,full_off)}")
+    print("  (fewer = less whipsaw; a hysteresis buffer would cut this further)")
 
 def dispatch_webhook(prev_status, new_status, payload):
     """POST a regime-shift alert to WEBHOOK_URL if set. Never crashes the run."""
@@ -909,6 +1009,8 @@ def main():
     ap.add_argument("--selftest", action="store_true", help="synthetic data, no network")
     ap.add_argument("--verify", nargs="+", metavar="TICKER",
                     help="audit calc chain for given tickers vs the DB (read-only)")
+    ap.add_argument("--calibrate", action="store_true",
+                    help="recommend regime bands from replayed score history")
     ap.add_argument("--replay", metavar="YYYY-MM-DD",
                     help="recompute macro scores from this date forward (no lookahead)")
     ap.add_argument("--add", metavar="TICKER", help="add a ticker (needs --theme)")
@@ -922,6 +1024,12 @@ def main():
 
     if args.verify:
         verify(args.verify)
+        return
+
+    if args.calibrate:
+        conn = sqlite3.connect(DB_PATH)
+        calibrate(conn)
+        conn.close()
         return
 
     if args.replay:
