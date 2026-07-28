@@ -1,7 +1,7 @@
 {
   "date": "2026-07-28",
   "universe": "UNIVERSE V1",
-  "tickers": 254,
+  "tickers": 255,
   "regime": {
     "label": "NEUTRAL",
     "breadth": "50% > 50DMA, 56% > 200DMA",
@@ -22,7 +22,7 @@
     "newHighs": 35,
     "newLows": 35,
     "highs52w": 8,
-    "up3": 75,
+    "up3": 76,
     "down3": 36
   },
   "indices": [
@@ -70,19 +70,19 @@
   "breadth": [
     [
       "% > 20DMA",
-      "45.7%"
+      "45.9%"
     ],
     [
       "% > 50DMA",
-      "50.0%"
+      "49.8%"
     ],
     [
       "% > 200DMA",
-      "55.7%"
+      "55.5%"
     ],
     [
       "Total names",
-      "254"
+      "255"
     ],
     [
       "New 20D highs",
@@ -94,7 +94,7 @@
     ],
     [
       "Up 3%+",
-      "75"
+      "76"
     ],
     [
       "Down 3%+",
@@ -114,8 +114,8 @@
       "r": 2,
       "name": "Software Infrastructure",
       "cnt": 20,
-      "score": 84,
-      "delta": 3.0,
+      "score": 83,
+      "delta": 2.0,
       "st": "DOMINANT"
     },
     {
@@ -144,18 +144,18 @@
     },
     {
       "r": 6,
-      "name": "Medical Devices",
-      "cnt": 8,
-      "score": 71,
-      "delta": 1.0,
-      "st": "STRONG"
-    },
-    {
-      "r": 7,
       "name": "Energy",
       "cnt": 14,
       "score": 71,
       "delta": -3.0,
+      "st": "STRONG"
+    },
+    {
+      "r": 7,
+      "name": "Medical Devices",
+      "cnt": 8,
+      "score": 71,
+      "delta": 1.0,
       "st": "STRONG"
     },
     {
@@ -193,7 +193,7 @@
       "st": "NEUTRAL"
     },
     {
-      "r": 15,
+      "r": 14,
       "name": "Consumer Momentum",
       "cnt": 13,
       "score": 49,
@@ -209,28 +209,28 @@
       "st": "NEUTRAL"
     },
     {
-      "r": 2,
-      "name": "Software Infrastructure",
-      "cnt": 20,
-      "score": 84,
+      "r": 11,
+      "name": "Defensives",
+      "cnt": 12,
+      "score": 58,
       "delta": 3.0,
-      "st": "DOMINANT"
+      "st": "STRONG"
     },
     {
-      "r": 19,
-      "name": "AI Power & Datacenter",
-      "cnt": 14,
-      "score": 25,
-      "delta": 3.0,
-      "st": "WEAK"
-    },
-    {
-      "r": 7,
+      "r": 6,
       "name": "Energy",
       "cnt": 14,
       "score": 71,
       "delta": -3.0,
       "st": "STRONG"
+    },
+    {
+      "r": 20,
+      "name": "Materials & Uranium",
+      "cnt": 8,
+      "score": 21,
+      "delta": -3.0,
+      "st": "FADING"
     }
   ],
   "etfs": [
@@ -700,6 +700,13 @@
         "r63": 2.2
       },
       {
+        "tk": "PLTR",
+        "theme": "Software Infrastructure",
+        "d1": 7.0,
+        "r21": 22.6,
+        "r63": -8.1
+      },
+      {
         "tk": "AAPL",
         "theme": "Mega-cap Platforms",
         "d1": 1.17,
@@ -719,13 +726,6 @@
         "d1": 2.55,
         "r21": 21.0,
         "r63": -14.6
-      },
-      {
-        "tk": "VEEV",
-        "theme": "Software Infrastructure",
-        "d1": 8.29,
-        "r21": 20.5,
-        "r63": 24.5
       }
     ],
     "laggards": [
@@ -859,6 +859,305 @@
   },
   "universe_map": [
     {
+      "theme": "AI Healthcare & Diagnostics",
+      "tickers": [
+        "ABSI",
+        "CAI",
+        "CERT",
+        "GH",
+        "NEO",
+        "PSNL",
+        "RLAY",
+        "RXRX",
+        "SDGR",
+        "TEM",
+        "VCYT",
+        "WGS"
+      ]
+    },
+    {
+      "theme": "AI Power & Datacenter",
+      "tickers": [
+        "BWXT",
+        "CEG",
+        "ETN",
+        "GEV",
+        "LEU",
+        "NNE",
+        "NRG",
+        "OKLO",
+        "PWR",
+        "SMR",
+        "TLN",
+        "VRT",
+        "VST"
+      ]
+    },
+    {
+      "theme": "Biotech",
+      "tickers": [
+        "ALNY",
+        "AMGN",
+        "BIIB",
+        "BMRN",
+        "EXEL",
+        "GILD",
+        "INCY",
+        "IONS",
+        "MRNA",
+        "NBIX",
+        "REGN",
+        "SRPT",
+        "UTHR",
+        "VRTX"
+      ]
+    },
+    {
+      "theme": "China Tech",
+      "tickers": [
+        "BABA",
+        "BEKE",
+        "BIDU",
+        "JD",
+        "NTES",
+        "PDD",
+        "TCEHY",
+        "TME"
+      ]
+    },
+    {
+      "theme": "Consumer Momentum",
+      "tickers": [
+        "ABNB",
+        "AMZN",
+        "BKNG",
+        "CAVA",
+        "CMG",
+        "DECK",
+        "DKNG",
+        "LULU",
+        "NFLX",
+        "NKE",
+        "ONON",
+        "RH",
+        "SBUX"
+      ]
+    },
+    {
+      "theme": "Crypto-linked",
+      "tickers": [
+        "CLSK",
+        "COIN",
+        "HUT",
+        "MARA",
+        "MSTR",
+        "RIOT"
+      ]
+    },
+    {
+      "theme": "Cybersecurity",
+      "tickers": [
+        "CHKP",
+        "CRWD",
+        "FTNT",
+        "OKTA",
+        "PANW",
+        "QLYS",
+        "RPD",
+        "S",
+        "TENB",
+        "VRNS",
+        "ZS"
+      ]
+    },
+    {
+      "theme": "Datacenter REITs",
+      "tickers": [
+        "AMT",
+        "CCI",
+        "DLR",
+        "EQIX",
+        "IRM"
+      ]
+    },
+    {
+      "theme": "Defensives",
+      "tickers": [
+        "CL",
+        "COST",
+        "GIS",
+        "JNJ",
+        "KMB",
+        "KO",
+        "MCD",
+        "MDLZ",
+        "MO",
+        "PEP",
+        "PG",
+        "WMT"
+      ]
+    },
+    {
+      "theme": "EV & Autonomy",
+      "tickers": [
+        "F",
+        "GM",
+        "LCID",
+        "LI",
+        "NIO",
+        "RIVN",
+        "TSLA",
+        "XPEV"
+      ]
+    },
+    {
+      "theme": "Energy",
+      "tickers": [
+        "COP",
+        "CVX",
+        "DVN",
+        "EOG",
+        "FANG",
+        "HAL",
+        "KMI",
+        "MPC",
+        "OXY",
+        "PSX",
+        "SLB",
+        "VLO",
+        "WMB",
+        "XOM"
+      ]
+    },
+    {
+      "theme": "Financials",
+      "tickers": [
+        "APO",
+        "AXP",
+        "BAC",
+        "BLK",
+        "BX",
+        "C",
+        "COF",
+        "GS",
+        "JPM",
+        "KKR",
+        "MS",
+        "SCHW",
+        "USB",
+        "WFC"
+      ]
+    },
+    {
+      "theme": "Fintech & Payments",
+      "tickers": [
+        "AFRM",
+        "FIS",
+        "GPN",
+        "HOOD",
+        "MA",
+        "NU",
+        "PYPL",
+        "SOFI",
+        "TOST",
+        "V"
+      ]
+    },
+    {
+      "theme": "Industrials",
+      "tickers": [
+        "CAT",
+        "CMI",
+        "DE",
+        "ETN",
+        "GE",
+        "ITW",
+        "MMM",
+        "PH",
+        "UNP",
+        "UPS"
+      ]
+    },
+    {
+      "theme": "Materials & Uranium",
+      "tickers": [
+        "APD",
+        "CCJ",
+        "DNN",
+        "FCX",
+        "LIN",
+        "NEM",
+        "NXE",
+        "UEC"
+      ]
+    },
+    {
+      "theme": "Medical Devices",
+      "tickers": [
+        "ABT",
+        "BFLY",
+        "BSX",
+        "DXCM",
+        "EW",
+        "MDT",
+        "PODD",
+        "SYK"
+      ]
+    },
+    {
+      "theme": "Mega-cap Platforms",
+      "tickers": [
+        "AAPL",
+        "AMZN",
+        "GOOGL",
+        "META",
+        "MSFT",
+        "NVDA"
+      ]
+    },
+    {
+      "theme": "Optics & Photonics",
+      "tickers": [
+        "AAOI",
+        "CIEN",
+        "COHR",
+        "FN",
+        "IPGP",
+        "LITE",
+        "NVMI",
+        "POET"
+      ]
+    },
+    {
+      "theme": "Quantum",
+      "tickers": [
+        "ARQQ",
+        "INFQ",
+        "IONQ",
+        "LAES",
+        "QBTS",
+        "QUBT",
+        "RGTI"
+      ]
+    },
+    {
+      "theme": "Robotics & Automation",
+      "tickers": [
+        "ABBNY",
+        "CGNX",
+        "EMR",
+        "HON",
+        "ISRG",
+        "NDSN",
+        "OMCL",
+        "PTC",
+        "ROK",
+        "SERV",
+        "SYM",
+        "ZBRA"
+      ]
+    },
+    {
       "theme": "Semiconductors",
       "tickers": [
         "ADI",
@@ -906,98 +1205,12 @@
         "NOW",
         "ORCL",
         "PATH",
+        "PLTR",
         "SNOW",
         "TEAM",
         "TWLO",
         "VEEV",
         "WDAY"
-      ]
-    },
-    {
-      "theme": "Cybersecurity",
-      "tickers": [
-        "CHKP",
-        "CRWD",
-        "FTNT",
-        "OKTA",
-        "PANW",
-        "QLYS",
-        "RPD",
-        "S",
-        "TENB",
-        "VRNS",
-        "ZS"
-      ]
-    },
-    {
-      "theme": "Robotics & Automation",
-      "tickers": [
-        "ABBNY",
-        "CGNX",
-        "EMR",
-        "HON",
-        "ISRG",
-        "NDSN",
-        "OMCL",
-        "PTC",
-        "ROK",
-        "SERV",
-        "SYM",
-        "ZBRA"
-      ]
-    },
-    {
-      "theme": "AI Power & Datacenter",
-      "tickers": [
-        "BWXT",
-        "CEG",
-        "CEG",
-        "ETN",
-        "GEV",
-        "LEU",
-        "NNE",
-        "NRG",
-        "OKLO",
-        "PWR",
-        "SMR",
-        "TLN",
-        "VRT",
-        "VST"
-      ]
-    },
-    {
-      "theme": "Datacenter REITs",
-      "tickers": [
-        "AMT",
-        "CCI",
-        "DLR",
-        "EQIX",
-        "IRM"
-      ]
-    },
-    {
-      "theme": "Optics & Photonics",
-      "tickers": [
-        "AAOI",
-        "CIEN",
-        "COHR",
-        "FN",
-        "IPGP",
-        "LITE",
-        "NVMI",
-        "POET"
-      ]
-    },
-    {
-      "theme": "Quantum",
-      "tickers": [
-        "ARQQ",
-        "INFQ",
-        "IONQ",
-        "LAES",
-        "QBTS",
-        "QUBT",
-        "RGTI"
       ]
     },
     {
@@ -1017,219 +1230,6 @@
         "RDW",
         "RKLB",
         "RTX"
-      ]
-    },
-    {
-      "theme": "Biotech",
-      "tickers": [
-        "ALNY",
-        "AMGN",
-        "BIIB",
-        "BMRN",
-        "EXEL",
-        "GILD",
-        "INCY",
-        "IONS",
-        "MRNA",
-        "NBIX",
-        "REGN",
-        "SRPT",
-        "UTHR",
-        "VRTX"
-      ]
-    },
-    {
-      "theme": "AI Healthcare & Diagnostics",
-      "tickers": [
-        "ABSI",
-        "CAI",
-        "CERT",
-        "GH",
-        "NEO",
-        "PSNL",
-        "RLAY",
-        "RXRX",
-        "SDGR",
-        "TEM",
-        "VCYT",
-        "WGS"
-      ]
-    },
-    {
-      "theme": "Medical Devices",
-      "tickers": [
-        "ABT",
-        "BFLY",
-        "BSX",
-        "DXCM",
-        "EW",
-        "MDT",
-        "PODD",
-        "SYK"
-      ]
-    },
-    {
-      "theme": "Financials",
-      "tickers": [
-        "APO",
-        "AXP",
-        "BAC",
-        "BLK",
-        "BX",
-        "C",
-        "COF",
-        "GS",
-        "JPM",
-        "KKR",
-        "MS",
-        "SCHW",
-        "USB",
-        "WFC"
-      ]
-    },
-    {
-      "theme": "Fintech & Payments",
-      "tickers": [
-        "AFRM",
-        "FIS",
-        "GPN",
-        "HOOD",
-        "MA",
-        "NU",
-        "PYPL",
-        "SOFI",
-        "TOST",
-        "V"
-      ]
-    },
-    {
-      "theme": "Energy",
-      "tickers": [
-        "COP",
-        "CVX",
-        "DVN",
-        "EOG",
-        "FANG",
-        "HAL",
-        "KMI",
-        "MPC",
-        "OXY",
-        "PSX",
-        "SLB",
-        "VLO",
-        "WMB",
-        "XOM"
-      ]
-    },
-    {
-      "theme": "Defensives",
-      "tickers": [
-        "CL",
-        "COST",
-        "GIS",
-        "JNJ",
-        "KMB",
-        "KO",
-        "MCD",
-        "MDLZ",
-        "MO",
-        "PEP",
-        "PG",
-        "WMT"
-      ]
-    },
-    {
-      "theme": "Consumer Momentum",
-      "tickers": [
-        "ABNB",
-        "AMZN",
-        "BKNG",
-        "CAVA",
-        "CMG",
-        "DECK",
-        "DKNG",
-        "LULU",
-        "NFLX",
-        "NKE",
-        "ONON",
-        "RH",
-        "SBUX"
-      ]
-    },
-    {
-      "theme": "EV & Autonomy",
-      "tickers": [
-        "F",
-        "GM",
-        "LCID",
-        "LI",
-        "NIO",
-        "RIVN",
-        "TSLA",
-        "XPEV"
-      ]
-    },
-    {
-      "theme": "China Tech",
-      "tickers": [
-        "BABA",
-        "BEKE",
-        "BIDU",
-        "JD",
-        "NTES",
-        "PDD",
-        "TCEHY",
-        "TME"
-      ]
-    },
-    {
-      "theme": "Industrials",
-      "tickers": [
-        "CAT",
-        "CMI",
-        "DE",
-        "ETN",
-        "GE",
-        "ITW",
-        "MMM",
-        "PH",
-        "UNP",
-        "UPS"
-      ]
-    },
-    {
-      "theme": "Materials & Uranium",
-      "tickers": [
-        "APD",
-        "CCJ",
-        "DNN",
-        "FCX",
-        "LIN",
-        "NEM",
-        "NXE",
-        "UEC"
-      ]
-    },
-    {
-      "theme": "Crypto-linked",
-      "tickers": [
-        "CLSK",
-        "COIN",
-        "HUT",
-        "MARA",
-        "MSTR",
-        "RIOT"
-      ]
-    },
-    {
-      "theme": "Mega-cap Platforms",
-      "tickers": [
-        "AAPL",
-        "AMZN",
-        "GOOGL",
-        "META",
-        "MSFT",
-        "NVDA"
       ]
     }
   ],
@@ -3782,6 +3782,20 @@
       "nh20": false,
       "nl20": false
     },
+    "PLTR": {
+      "close": 131.53,
+      "d1": 7.0,
+      "d5": -2.46,
+      "d21": 22.62,
+      "d63": -8.08,
+      "dist50": -0.1,
+      "atr": -0.0,
+      "rvol": 0.97,
+      "a50": false,
+      "a200": false,
+      "nh20": false,
+      "nl20": false
+    },
     "PODD": {
       "close": 165.0,
       "d1": 4.18,
@@ -4792,7 +4806,7 @@
     }
   },
   "macro_structure": {
-    "updated_at": "2026-07-28T03:20:04Z",
+    "updated_at": "2026-07-28T03:21:31Z",
     "system_health": {
       "data_status": "ok",
       "last_close": "2026-07-27"
@@ -4825,8 +4839,8 @@
     "absolute_trend": {
       "spy_vs_200sma_pct": 6.22,
       "trend_score": 1,
-      "breadth_pct200": 55.7,
-      "breadth_pct50": 50.0,
+      "breadth_pct200": 55.5,
+      "breadth_pct50": 49.8,
       "breadth_score": 1
     },
     "score_history": [
@@ -5266,8 +5280,8 @@
       },
       {
         "ticker": "BTC-USD",
-        "spread_1m": -0.742,
-        "spread_3m": -20.387
+        "spread_1m": -0.697,
+        "spread_3m": -20.349
       }
     ]
   },
@@ -5677,7 +5691,7 @@
     },
     {
       "tk": "MSFT",
-      "theme": "Software Infrastructure",
+      "theme": "Mega-cap Platforms",
       "date": "2026-07-29"
     },
     {
@@ -5883,6 +5897,11 @@
     {
       "tk": "ON",
       "theme": "Semiconductors",
+      "date": "2026-08-03"
+    },
+    {
+      "tk": "PLTR",
+      "theme": "Software Infrastructure",
       "date": "2026-08-03"
     },
     {
@@ -6422,7 +6441,7 @@
     },
     {
       "tk": "NVDA",
-      "theme": "Semiconductors",
+      "theme": "Mega-cap Platforms",
       "date": "2026-08-26"
     },
     {
