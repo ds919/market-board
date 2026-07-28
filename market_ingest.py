@@ -311,15 +311,18 @@ def status(score, delta):
 # ------------------------------------------------------------------ assemble
 
 # ------------------------------------------------------------------ macro risk engine
-def _close_series(conn, ticker):
+def _close_series(conn, ticker, as_of=None):
     df = load_prices(conn, ticker)
-    return None if df is None or df.empty else df["close"]
+    if df is None or df.empty:
+        return None
+    c = df["close"]
+    return c if as_of is None else c[c.index <= pd.Timestamp(as_of)]
 
-def _ratio_signal(conn, num, den, inverted=False):
+def _ratio_signal(conn, num, den, inverted=False, as_of=None):
     """5/21 EMA crossover on a date-aligned price ratio. Returns dict or None.
     Date alignment matters: BTC-USD trades 7d/wk vs 5 for equities, so we inner-
     join on common dates before computing the ratio and its EMAs."""
-    a, b = _close_series(conn, num), _close_series(conn, den)
+    a, b = _close_series(conn, num, as_of), _close_series(conn, den, as_of)
     if a is None or b is None:
         return None
     j = pd.concat([a, b], axis=1, join="inner").dropna()
@@ -364,7 +367,7 @@ def _agreement(macro_status, breadth_regime):
     b = "on" if "ON" in br else "off" if "OFF" in br else "neutral"
     return m == b
 
-def build_macro_structure(conn, breadth_pct200, breadth_pct50=None, breadth_regime=None):
+def build_macro_structure(conn, breadth_pct200, breadth_pct50=None, breadth_regime=None, as_of=None):
     import datetime as _dt
     RATIOS = [("RSP", "SPY", False, "Market Breadth"),
               ("XLY", "XLP", False, "Consumer Demand"),
@@ -376,15 +379,15 @@ def build_macro_structure(conn, breadth_pct200, breadth_pct50=None, breadth_regi
     ratios = []
     total = 0
     for num, den, inv, label in RATIOS:
-        sig = _ratio_signal(conn, num, den, inv)
+        sig = _ratio_signal(conn, num, den, inv, as_of)
         if sig:
             sig["label"] = label
             sig["inverted"] = inv
             ratios.append(sig)
             total += sig["weighted_score"]
 
-    vix = _close_series(conn, "^VIX")
-    vix3 = _close_series(conn, "^VIX3M")
+    vix = _close_series(conn, "^VIX", as_of)
+    vix3 = _close_series(conn, "^VIX3M", as_of)
     vix_close = round(float(vix.iloc[-1]), 3) if vix is not None and len(vix) else None
     vix3_close = round(float(vix3.iloc[-1]), 3) if vix3 is not None and len(vix3) else None
     backwardated = vix_close is not None and vix3_close is not None and vix_close > vix3_close
@@ -400,7 +403,7 @@ def build_macro_structure(conn, breadth_pct200, breadth_pct50=None, breadth_regi
     # Four of the seven ratios are equity-vs-equity and are scale-invariant to the
     # market's direction: RSP/SPY can rise during a selloff. These two inputs anchor
     # the score to whether the market is actually going UP.
-    spy_s = _close_series(conn, "SPY")
+    spy_s = _close_series(conn, "SPY", as_of)
     trend_score = 0
     spy_vs_200 = None
     if spy_s is not None and len(spy_s) > 200:
@@ -440,8 +443,8 @@ def build_macro_structure(conn, breadth_pct200, breadth_pct50=None, breadth_regi
     def _ema(sr, n): return sr.ewm(span=n, adjust=False).mean()
     def _ret(sr, n): return (sr.iloc[-1] / sr.iloc[-1 - n] - 1) * 100 if len(sr) > n else None
 
-    spy = _close_series(conn, "SPY"); qqq = _close_series(conn, "QQQ")
-    iwm = _close_series(conn, "IWM"); btc = _close_series(conn, "BTC-USD")
+    spy = _close_series(conn, "SPY", as_of); qqq = _close_series(conn, "QQQ", as_of)
+    iwm = _close_series(conn, "IWM", as_of); btc = _close_series(conn, "BTC-USD", as_of)
     spy_r21 = _ret(spy, 21) if spy is not None else None
     r_rsp = next((r for r in ratios if r["pair"] == "RSP/SPY"), None)
     r_hyg = next((r for r in ratios if r["pair"] == "HYG/IEI"), None)
@@ -455,6 +458,7 @@ def build_macro_structure(conn, breadth_pct200, breadth_pct50=None, breadth_regi
             ("RSP/SPY 5>21 EMA", bool(r_rsp and r_rsp["direction"] == "up"))]))
     if qqq is not None and len(qqq) > 60:
         qdf = load_prices(conn, "QQQ")
+        qdf = qdf if as_of is None else qdf[qdf.index <= pd.Timestamp(as_of)]
         qatr = _atr14(qdf).iloc[-1]
         q21r = _ret(qqq, 21)
         engines.append(_checks("QQQ", [
@@ -469,6 +473,7 @@ def build_macro_structure(conn, breadth_pct200, breadth_pct50=None, breadth_regi
             ("21d return > SPY", i21r is not None and spy_r21 is not None and i21r > spy_r21)]))
     if btc is not None and len(btc) > 60:
         bdf = load_prices(conn, "BTC-USD")
+        bdf = bdf if as_of is None else bdf[bdf.index <= pd.Timestamp(as_of)]
         batr = _atr14(bdf).iloc[-1]
         engines.append(_checks("BTC", [
             ("Close > 21d EMA", btc.iloc[-1] > _ema(btc, 21).iloc[-1]),
@@ -480,7 +485,7 @@ def build_macro_structure(conn, breadth_pct200, breadth_pct50=None, breadth_regi
     if spy is not None:
         spy21, spy63 = _ret(spy, 21), _ret(spy, 63)
         for t in ["RSP", "QQQ", "IWM", "BTC-USD"]:
-            sr = _close_series(conn, t)
+            sr = _close_series(conn, t, as_of)
             if sr is None:
                 continue
             a21, a63 = _ret(sr, 21), _ret(sr, 63)
@@ -490,7 +495,7 @@ def build_macro_structure(conn, breadth_pct200, breadth_pct50=None, breadth_regi
 
     # ---- freshness ----
     conn.execute("CREATE TABLE IF NOT EXISTS macro_scores (d TEXT PRIMARY KEY, score REAL)")
-    today_iso = _dt.date.today().isoformat()
+    today_iso = (pd.Timestamp(as_of).date().isoformat() if as_of else _dt.date.today().isoformat())
     conn.execute("INSERT OR REPLACE INTO macro_scores VALUES (?,?)", (today_iso, float(total)))
     conn.commit()
     hist_rows = conn.execute("SELECT d, score FROM macro_scores ORDER BY d DESC LIMIT 60").fetchall()
@@ -507,7 +512,7 @@ def build_macro_structure(conn, breadth_pct200, breadth_pct50=None, breadth_regi
             pass
 
     return {
-        "updated_at": _dt.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "updated_at": _dt.datetime.now(_dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "system_health": {"data_status": "stale" if stale else "ok", "last_close": last_d},
         "global_regime": {"status": status, "score": total, "delta_1d": score_delta,
                           "min": -10, "max": 10,
@@ -526,6 +531,62 @@ def build_macro_structure(conn, breadth_pct200, breadth_pct50=None, breadth_regi
         "asset_engines": engines,
         "relative_valuation": relval,
     }
+
+
+def historical_breadth(conn, as_of, tickers):
+    """% of universe above its 200-DMA as of a past date. Recomputed from raw
+    prices -- must NOT use today's snapshot, or the score would be using future
+    information."""
+    ts = pd.Timestamp(as_of)
+    above = 0
+    total = 0
+    for t in tickers:
+        c = _close_series(conn, t, as_of)
+        if c is None or len(c) < 200:
+            continue
+        sma = c.rolling(200).mean().iloc[-1]
+        if not _v(sma):
+            continue
+        total += 1
+        if c.iloc[-1] > sma:
+            above += 1
+    return (100.0 * above / total) if total else None
+
+def replay(conn, start):
+    """Recompute the macro score for every trading day from `start` to the last
+    stored close, writing results into macro_scores. Every input is truncated to
+    each date -- no lookahead."""
+    import datetime as _dt
+    spy = _close_series(conn, "SPY")
+    if spy is None:
+        print("[replay] no SPY data"); return
+    dates = [d for d in spy.index if d >= pd.Timestamp(start)]
+    if not dates:
+        print(f"[replay] no trading days on/after {start}"); return
+    names = [t for t in universe() if t not in NON_MEMBERS]
+    conn.execute("CREATE TABLE IF NOT EXISTS macro_scores (d TEXT PRIMARY KEY, score REAL)")
+    print(f"[replay] {len(dates)} trading days from {dates[0].date()} to {dates[-1].date()}")
+    print(f"{'date':<12}{'score':>7}  {'status':<20}{'intermkt':>9}{'vix':>5}{'trend':>6}{'brdth':>6}")
+    print("-" * 70)
+    rows = []
+    for d in dates:
+        b200 = historical_breadth(conn, d, names)
+        try:
+            ms = build_macro_structure(conn, b200, None, None, as_of=d)
+        except Exception as e:
+            print(f"{str(d.date()):<12}  build failed: {e}")
+            continue
+        g = ms["global_regime"]; c = g["components"]
+        rows.append((d.date().isoformat(), g["score"]))
+        print(f"{str(d.date()):<12}{g['score']:>7.2f}  {g['status']:<20}"
+              f"{c['intermarket']:>9.2f}{c['vix']:>5}{c['trend']:>6}{c['breadth']:>6}")
+    for d_iso, sc in rows:
+        conn.execute("INSERT OR REPLACE INTO macro_scores VALUES (?,?)", (d_iso, float(sc)))
+    conn.commit()
+    print(f"\n[replay] wrote {len(rows)} scores to macro_scores")
+    if len(rows) > 1:
+        first, last = rows[0][1], rows[-1][1]
+        print(f"[replay] {rows[0][0]} {first:+.2f}  ->  {rows[-1][0]} {last:+.2f}   (change {last-first:+.2f})")
 
 def dispatch_webhook(prev_status, new_status, payload):
     """POST a regime-shift alert to WEBHOOK_URL if set. Never crashes the run."""
@@ -848,6 +909,8 @@ def main():
     ap.add_argument("--selftest", action="store_true", help="synthetic data, no network")
     ap.add_argument("--verify", nargs="+", metavar="TICKER",
                     help="audit calc chain for given tickers vs the DB (read-only)")
+    ap.add_argument("--replay", metavar="YYYY-MM-DD",
+                    help="recompute macro scores from this date forward (no lookahead)")
     ap.add_argument("--add", metavar="TICKER", help="add a ticker (needs --theme)")
     ap.add_argument("--remove", metavar="TICKER", help="remove a ticker from all themes")
     ap.add_argument("--theme", metavar="NAME", help="theme name for --add")
@@ -859,6 +922,12 @@ def main():
 
     if args.verify:
         verify(args.verify)
+        return
+
+    if args.replay:
+        conn = sqlite3.connect(DB_PATH)
+        replay(conn, args.replay)
+        conn.close()
         return
 
     if args.add or args.remove:
