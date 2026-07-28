@@ -441,16 +441,31 @@ def build_macro_structure(conn, breadth_pct200, breadth_pct50=None, breadth_regi
     # striping when overlaid on SPX). The LABEL is driven by a short EMA of the
     # score instead; the raw score stays visible for the daily read. Only PRIOR
     # dates are used, so this is lookahead-free during replay.
-    SMOOTH_SPAN = 5
+    # ASYMMETRIC SMOOTHING. A single span forces one trade-off: fast enough to
+    # catch deterioration early, or slow enough to stop the label striping. We do
+    # not need symmetry -- for a drawdown-first mandate the correct bias is FAST
+    # DOWN / SLOW UP: react quickly when risk is rising, re-engage reluctantly.
+    # Symmetric span=5 delayed the Feb-2025 risk-off warning by about a week;
+    # span=3 on the way down recovers most of that, while span=8 on the way up
+    # keeps the regime blocks readable and deliberately slows re-entry.
+    SPAN_DOWN, SPAN_UP = 3, 8
+    SMOOTH_SPAN = SPAN_DOWN  # reported; the active span depends on direction
     raw_score = total
     try:
         conn.execute("CREATE TABLE IF NOT EXISTS macro_scores (d TEXT PRIMARY KEY, score REAL)")
+        conn.execute("CREATE TABLE IF NOT EXISTS macro_smooth (d TEXT PRIMARY KEY, s REAL)")
         cutoff = (pd.Timestamp(as_of).date().isoformat() if as_of else _dt.date.today().isoformat())
-        prior = conn.execute(
-            "SELECT score FROM macro_scores WHERE d < ? ORDER BY d DESC LIMIT ?",
-            (cutoff, SMOOTH_SPAN * 3)).fetchall()
-        hist = [float(x[0]) for x in reversed(prior)] + [float(total)]
-        smooth = float(pd.Series(hist).ewm(span=SMOOTH_SPAN, adjust=False).mean().iloc[-1])
+        prev_sm = conn.execute(
+            "SELECT s FROM macro_smooth WHERE d < ? ORDER BY d DESC LIMIT 1", (cutoff,)).fetchone()
+        if prev_sm is None:
+            smooth = float(total)
+        else:
+            prev = float(prev_sm[0])
+            span = SPAN_DOWN if float(total) < prev else SPAN_UP
+            alpha = 2.0 / (span + 1.0)
+            smooth = prev + alpha * (float(total) - prev)
+        conn.execute("INSERT OR REPLACE INTO macro_smooth VALUES (?,?)", (cutoff, float(smooth)))
+        conn.commit()
     except Exception:
         smooth = float(total)
     total = round(smooth, 2)
@@ -552,10 +567,30 @@ def build_macro_structure(conn, breadth_pct200, breadth_pct50=None, breadth_regi
     # ---- freshness ----
     conn.execute("CREATE TABLE IF NOT EXISTS macro_state (k TEXT PRIMARY KEY, v TEXT)")
     conn.execute("INSERT OR REPLACE INTO macro_state VALUES ('label', ?)", (status,))
+    conn.execute("CREATE TABLE IF NOT EXISTS macro_hist "
+                 "(d TEXT PRIMARY KEY, raw REAL, smooth REAL, status TEXT)")
+    _hd = (pd.Timestamp(as_of).date().isoformat() if as_of else _dt.date.today().isoformat())
+    conn.execute("INSERT OR REPLACE INTO macro_hist VALUES (?,?,?,?)",
+                 (_hd, float(raw_score), float(total), status))
     conn.execute("CREATE TABLE IF NOT EXISTS macro_scores (d TEXT PRIMARY KEY, score REAL)")
     today_iso = (pd.Timestamp(as_of).date().isoformat() if as_of else _dt.date.today().isoformat())
     conn.execute("INSERT OR REPLACE INTO macro_scores VALUES (?,?)", (today_iso, float(total)))
     conn.commit()
+    # regime history joined to SPX, for the overlay chart on the Macro tab
+    regime_history = []
+    try:
+        hrows = conn.execute(
+            "SELECT d, raw, smooth, status FROM macro_hist ORDER BY d DESC LIMIT 260").fetchall()
+        spx_px = _close_series(conn, "SPY", as_of)
+        for d_, rw, sm, st in reversed(hrows):
+            ts = pd.Timestamp(d_)
+            px = float(spx_px.loc[ts]) if spx_px is not None and ts in spx_px.index else None
+            regime_history.append({"d": d_, "score": round(float(sm), 2),
+                                   "raw": round(float(rw), 2), "status": st,
+                                   "spx": round(px, 2) if px is not None else None})
+    except Exception as e:
+        print(f"[macro] regime_history unavailable: {e}")
+
     hist_rows = conn.execute("SELECT d, score FROM macro_scores ORDER BY d DESC LIMIT 60").fetchall()
     score_history = [{"d": d, "score": sc} for d, sc in reversed(hist_rows)]
     score_delta = round(float(total) - float(score_history[-2]["score"]), 2) if len(score_history) > 1 else 0
@@ -573,7 +608,7 @@ def build_macro_structure(conn, breadth_pct200, breadth_pct50=None, breadth_regi
         "updated_at": _dt.datetime.now(_dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "system_health": {"data_status": "stale" if stale else "ok", "last_close": last_d},
         "global_regime": {"status": status, "score": total, "raw_score": round(raw_score, 2),
-                          "smooth_span": SMOOTH_SPAN, "delta_1d": score_delta,
+                          "smooth_span": {"down": SPAN_DOWN, "up": SPAN_UP}, "delta_1d": score_delta,
                           "min": -10, "max": 10,
                           "breadth_engine_regime": breadth_regime,
                           "components": {"intermarket": ratio_component, "vix": vix_score,
@@ -586,6 +621,7 @@ def build_macro_structure(conn, breadth_pct200, breadth_pct50=None, breadth_regi
                            "breadth_pct50": round(breadth_pct50, 1) if breadth_pct50 is not None else None,
                            "breadth_score": breadth_score},
         "score_history": score_history,
+        "regime_history": regime_history,
         "intermarket_ratios": ratios,
         "volatility": {"vix_close": vix_close, "vix3m_close": vix3_close, "backwardated": bool(backwardated), "score": vix_score},
         "asset_engines": engines,
@@ -642,6 +678,9 @@ def replay(conn, start):
     if not dates:
         print(f"[replay] no trading days on/after {start}"); return
     names = [t for t in universe() if t not in NON_MEMBERS]
+    conn.execute("CREATE TABLE IF NOT EXISTS macro_smooth (d TEXT PRIMARY KEY, s REAL)")
+    conn.execute("DELETE FROM macro_smooth WHERE d >= ?", (str(pd.Timestamp(start).date()),))
+    conn.commit()
     print("[replay] precomputing breadth matrix...")
     pct_series = breadth_matrix(conn, names)
     conn.execute("CREATE TABLE IF NOT EXISTS macro_scores (d TEXT PRIMARY KEY, score REAL)")
