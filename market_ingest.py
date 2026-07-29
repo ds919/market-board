@@ -516,7 +516,12 @@ def build_macro_structure(conn, breadth_pct200, breadth_pct50=None, breadth_regi
     # HYSTERESIS: the score must clear a threshold by `hyst` to ENTER a regime,
     # but only fall back through it to EXIT. Without this the label flips on
     # decimal noise around a boundary (35 changes in 300 days).
-    hyst = 0.4
+    # PER-BAND HYSTERESIS. The score spends a lot of time near +5.0, so a single
+    # narrow buffer produced repeated Full<->Moderate flips (July 2025 flipped 4x
+    # in 3 weeks). A wider buffer at the top band kills that churn; the risk-off
+    # boundary keeps a narrow buffer so defensive signals stay responsive.
+    HYST = {"Full Risk-On": 0.8, "Moderate Risk-On": 0.4, "Full Risk-Off": 0.3}
+    hyst = HYST["Moderate Risk-On"]   # reported default
     prev_lab = None
     try:
         _r = conn.execute("SELECT v FROM macro_state WHERE k='label'").fetchone()
@@ -533,15 +538,23 @@ def build_macro_structure(conn, breadth_pct200, breadth_pct50=None, breadth_regi
     raw_status = _band(total)
     status = raw_status
     if prev_lab and raw_status != prev_lab:
-        # require an extra `hyst` of margin to move away from the previous label
-        if raw_status == "Full Risk-On"     and total < B_FULL_ON + hyst:   status = prev_lab
-        elif raw_status == "Moderate Risk-On" and total < B_MOD_ON + hyst:  status = prev_lab
-        elif raw_status == "Full Risk-Off"  and total > B_FULL_OFF - hyst:  status = prev_lab
-        elif raw_status == "Neutral / Choppy":
-            # leaving a stronger regime requires clearing the boundary by hyst too
-            if prev_lab in ("Full Risk-On", "Moderate Risk-On") and total > B_MOD_ON - hyst:
+        h_on   = HYST["Full Risk-On"]
+        h_mod  = HYST["Moderate Risk-On"]
+        h_off  = HYST["Full Risk-Off"]
+        # entering a regime requires clearing its threshold by that band's buffer
+        if raw_status == "Full Risk-On"       and total < B_FULL_ON + h_on:   status = prev_lab
+        elif raw_status == "Moderate Risk-On":
+            # dropping OUT of Full Risk-On also needs the wide buffer, so the
+            # top band does not oscillate on decimal moves
+            if prev_lab == "Full Risk-On" and total > B_FULL_ON - h_on:
                 status = prev_lab
-            elif prev_lab == "Full Risk-Off" and total < B_FULL_OFF + hyst:
+            elif total < B_MOD_ON + h_mod:
+                status = prev_lab
+        elif raw_status == "Full Risk-Off"    and total > B_FULL_OFF - h_off: status = prev_lab
+        elif raw_status == "Neutral / Choppy":
+            if prev_lab in ("Full Risk-On", "Moderate Risk-On") and total > B_MOD_ON - h_mod:
+                status = prev_lab
+            elif prev_lab == "Full Risk-Off" and total < B_FULL_OFF + h_off:
                 status = prev_lab
 
     # expose the split so the UI can show what is actually driving the score
@@ -647,6 +660,33 @@ def build_macro_structure(conn, breadth_pct200, breadth_pct50=None, breadth_regi
         except Exception:
             pass
 
+    # Exit-quality flag: leaving Full Risk-Off while the intermarket component is
+    # still falling means the all-clear came from trend/breadth/vol, not from
+    # cross-asset confirmation. Seen on 2025-03-21 and 2025-11-25.
+    exit_unconfirmed = False
+    try:
+        prow = conn.execute(
+            "SELECT status, raw FROM macro_hist WHERE d < ? ORDER BY d DESC LIMIT 1",
+            ((pd.Timestamp(as_of).date().isoformat() if as_of else _dt.date.today().isoformat()),)
+        ).fetchone()
+        if prow and prow[0] == "Full Risk-Off" and status != "Full Risk-Off":
+            prev_im = conn.execute(
+                "SELECT intermarket FROM macro_components WHERE d < ? ORDER BY d DESC LIMIT 1",
+                ((pd.Timestamp(as_of).date().isoformat() if as_of else _dt.date.today().isoformat()),)
+            ).fetchone()
+            if prev_im and ratio_component < float(prev_im[0]):
+                exit_unconfirmed = True
+    except Exception:
+        pass
+    try:
+        conn.execute("CREATE TABLE IF NOT EXISTS macro_components (d TEXT PRIMARY KEY, intermarket REAL)")
+        conn.execute("INSERT OR REPLACE INTO macro_components VALUES (?,?)",
+                     ((pd.Timestamp(as_of).date().isoformat() if as_of else _dt.date.today().isoformat()),
+                      float(ratio_component)))
+        conn.commit()
+    except Exception:
+        pass
+
     return {
         "updated_at": _dt.datetime.now(_dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "system_health": {"data_status": "stale" if stale else "ok", "last_close": last_d},
@@ -654,9 +694,10 @@ def build_macro_structure(conn, breadth_pct200, breadth_pct50=None, breadth_regi
                           "smooth_span": {"down": SPAN_DOWN, "up": SPAN_UP}, "delta_1d": score_delta,
                           "min": -11, "max": 10,
                           "breadth_engine_regime": breadth_regime,
+                          "exit_unconfirmed": exit_unconfirmed,
                           "components": {"intermarket": ratio_component, "vix": vix_score,
                                          "trend": trend_score, "breadth": breadth_score},
-                          "bands": {"full_on": B_FULL_ON, "moderate_on": B_MOD_ON, "full_off": B_FULL_OFF, "hysteresis": hyst},
+                          "bands": {"full_on": B_FULL_ON, "moderate_on": B_MOD_ON, "full_off": B_FULL_OFF, "hysteresis": HYST},
                           "raw_status": raw_status,
                           "agrees": _agreement(status, breadth_regime)},
         "absolute_trend": {"spy_vs_200sma_pct": spy_vs_200, "trend_score": trend_score,

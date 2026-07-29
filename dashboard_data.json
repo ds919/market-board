@@ -4802,7 +4802,7 @@
     }
   },
   "macro_structure": {
-    "updated_at": "2026-07-29T04:23:11Z",
+    "updated_at": "2026-07-29T04:26:01Z",
     "system_health": {
       "data_status": "ok",
       "last_close": "2026-07-27"
@@ -4819,6 +4819,7 @@
       "min": -11,
       "max": 10,
       "breadth_engine_regime": "NEUTRAL",
+      "exit_unconfirmed": false,
       "components": {
         "intermarket": -0.35,
         "vix": 0,
@@ -4829,7 +4830,11 @@
         "full_on": 5.0,
         "moderate_on": 3.5,
         "full_off": -3.0,
-        "hysteresis": 0.4
+        "hysteresis": {
+          "Full Risk-On": 0.8,
+          "Moderate Risk-On": 0.4,
+          "Full Risk-Off": 0.3
+        }
       },
       "raw_status": "Neutral / Choppy",
       "agrees": true,
@@ -5103,28 +5108,28 @@
         "d": "2025-07-18",
         "score": 4.83,
         "raw": 4.66,
-        "status": "Moderate Risk-On",
+        "status": "Full Risk-On",
         "spx": 620.7
       },
       {
         "d": "2025-07-21",
         "score": 4.86,
         "raw": 4.97,
-        "status": "Moderate Risk-On",
+        "status": "Full Risk-On",
         "spx": 621.88
       },
       {
         "d": "2025-07-22",
         "score": 5.07,
         "raw": 5.8,
-        "status": "Moderate Risk-On",
+        "status": "Full Risk-On",
         "spx": 621.97
       },
       {
         "d": "2025-07-23",
         "score": 5.34,
         "raw": 6.29,
-        "status": "Moderate Risk-On",
+        "status": "Full Risk-On",
         "spx": 627.26
       },
       {
@@ -5152,7 +5157,7 @@
         "d": "2025-07-29",
         "score": 4.88,
         "raw": 4.16,
-        "status": "Moderate Risk-On",
+        "status": "Full Risk-On",
         "spx": 628.3
       },
       {
@@ -6426,14 +6431,14 @@
         "d": "2026-04-20",
         "score": 5.54,
         "raw": 7.26,
-        "status": "Full Risk-On",
+        "status": "Moderate Risk-On",
         "spx": 706.9
       },
       {
         "d": "2026-04-21",
         "score": 5.5,
         "raw": 5.46,
-        "status": "Full Risk-On",
+        "status": "Moderate Risk-On",
         "spx": 702.27
       },
       {
@@ -6475,35 +6480,35 @@
         "d": "2026-04-29",
         "score": 4.89,
         "raw": 4.22,
-        "status": "Moderate Risk-On",
+        "status": "Full Risk-On",
         "spx": 709.75
       },
       {
         "d": "2026-04-30",
         "score": 5.13,
         "raw": 6.0,
-        "status": "Moderate Risk-On",
+        "status": "Full Risk-On",
         "spx": 716.81
       },
       {
         "d": "2026-05-01",
         "score": 5.01,
         "raw": 4.89,
-        "status": "Moderate Risk-On",
+        "status": "Full Risk-On",
         "spx": 718.8
       },
       {
         "d": "2026-05-04",
         "score": 4.99,
         "raw": 4.97,
-        "status": "Moderate Risk-On",
+        "status": "Full Risk-On",
         "spx": 716.16
       },
       {
         "d": "2026-05-05",
         "score": 5.29,
         "raw": 6.34,
-        "status": "Moderate Risk-On",
+        "status": "Full Risk-On",
         "spx": 721.91
       },
       {
@@ -6538,14 +6543,14 @@
         "d": "2026-05-12",
         "score": 4.8,
         "raw": 4.29,
-        "status": "Moderate Risk-On",
+        "status": "Full Risk-On",
         "spx": 736.28
       },
       {
         "d": "2026-05-13",
         "score": 4.49,
         "raw": 4.19,
-        "status": "Moderate Risk-On",
+        "status": "Full Risk-On",
         "spx": 740.4
       },
       {
@@ -7124,8 +7129,8 @@
       },
       {
         "ticker": "BTC-USD",
-        "spread_1m": 1.504,
-        "spread_3m": -18.242
+        "spread_1m": 1.637,
+        "spread_3m": -18.131
       }
     ]
   },
