@@ -1,3 +1,10 @@
 market.db
 venv/
 __pycache__/
+agent.py
+autonomous_agent.py
+true_quant_agent.py
+download_data.py
+*_historical_data.csv
+alt_market_data.csv
+df[ema_filter]
