@@ -4802,25 +4802,25 @@
     }
   },
   "macro_structure": {
-    "updated_at": "2026-07-29T04:16:19Z",
+    "updated_at": "2026-07-29T04:23:11Z",
     "system_health": {
       "data_status": "ok",
       "last_close": "2026-07-27"
     },
     "global_regime": {
       "status": "Neutral / Choppy",
-      "score": 1.73,
+      "score": 1.65,
       "raw_score": 2.46,
       "smooth_span": {
         "down": 3,
         "up": 8
       },
-      "delta_1d": 0.21,
+      "delta_1d": -0.81,
       "min": -11,
       "max": 10,
       "breadth_engine_regime": "NEUTRAL",
       "components": {
-        "intermarket": -0.27,
+        "intermarket": -0.35,
         "vix": 0,
         "trend": 1,
         "breadth": 1
@@ -4853,19 +4853,19 @@
       },
       {
         "d": "2026-05-05",
-        "score": 5.34
+        "score": 6.34
       },
       {
         "d": "2026-05-06",
-        "score": 5.42
+        "score": 6.42
       },
       {
         "d": "2026-05-07",
-        "score": 4.81
+        "score": 5.81
       },
       {
         "d": "2026-05-08",
-        "score": 4.72
+        "score": 5.72
       },
       {
         "d": "2026-05-11",
@@ -4885,15 +4885,15 @@
       },
       {
         "d": "2026-05-15",
-        "score": 3.14
+        "score": 4.14
       },
       {
         "d": "2026-05-18",
-        "score": 2.56
+        "score": 3.56
       },
       {
         "d": "2026-05-19",
-        "score": 1.91
+        "score": 2.91
       },
       {
         "d": "2026-05-20",
@@ -4901,43 +4901,43 @@
       },
       {
         "d": "2026-05-21",
-        "score": 2.29
+        "score": 3.29
       },
       {
         "d": "2026-05-22",
-        "score": 2.95
+        "score": 3.95
       },
       {
         "d": "2026-05-26",
-        "score": 4.12
+        "score": 5.12
       },
       {
         "d": "2026-05-27",
-        "score": 4.75
+        "score": 5.75
       },
       {
         "d": "2026-05-28",
-        "score": 4.44
+        "score": 5.44
       },
       {
         "d": "2026-05-29",
-        "score": 4.7
+        "score": 5.7
       },
       {
         "d": "2026-06-01",
-        "score": 5.03
+        "score": 6.03
       },
       {
         "d": "2026-06-02",
-        "score": 4.71
+        "score": 5.71
       },
       {
         "d": "2026-06-03",
-        "score": 3.49
+        "score": 4.49
       },
       {
         "d": "2026-06-04",
-        "score": 3.89
+        "score": 4.89
       },
       {
         "d": "2026-06-05",
@@ -4945,11 +4945,11 @@
       },
       {
         "d": "2026-06-08",
-        "score": 2.48
+        "score": 1.48
       },
       {
         "d": "2026-06-09",
-        "score": 2.79
+        "score": 1.79
       },
       {
         "d": "2026-06-10",
@@ -4957,7 +4957,7 @@
       },
       {
         "d": "2026-06-11",
-        "score": 3.18
+        "score": 2.18
       },
       {
         "d": "2026-06-12",
@@ -4965,15 +4965,15 @@
       },
       {
         "d": "2026-06-15",
-        "score": 4.06
+        "score": 5.06
       },
       {
         "d": "2026-06-16",
-        "score": 4.6
+        "score": 5.6
       },
       {
         "d": "2026-06-17",
-        "score": 3.97
+        "score": 2.97
       },
       {
         "d": "2026-06-18",
@@ -4981,7 +4981,7 @@
       },
       {
         "d": "2026-06-22",
-        "score": 4.14
+        "score": 5.14
       },
       {
         "d": "2026-06-23",
@@ -4989,23 +4989,23 @@
       },
       {
         "d": "2026-06-24",
-        "score": 3.14
+        "score": 4.14
       },
       {
         "d": "2026-06-25",
-        "score": 2.37
+        "score": 3.37
       },
       {
         "d": "2026-06-26",
-        "score": 2.06
+        "score": 3.06
       },
       {
         "d": "2026-06-29",
-        "score": 2.68
+        "score": 3.68
       },
       {
         "d": "2026-06-30",
-        "score": 3.26
+        "score": 4.26
       },
       {
         "d": "2026-07-01",
@@ -5013,27 +5013,27 @@
       },
       {
         "d": "2026-07-02",
-        "score": 4.28
+        "score": 5.28
       },
       {
         "d": "2026-07-06",
-        "score": 4.52
+        "score": 5.52
       },
       {
         "d": "2026-07-07",
-        "score": 4.19
+        "score": 5.19
       },
       {
         "d": "2026-07-08",
-        "score": 3.85
+        "score": 4.85
       },
       {
         "d": "2026-07-09",
-        "score": 4.3
+        "score": 5.3
       },
       {
         "d": "2026-07-10",
-        "score": 3.73
+        "score": 4.73
       },
       {
         "d": "2026-07-13",
@@ -5065,7 +5065,7 @@
       },
       {
         "d": "2026-07-22",
-        "score": 2.81
+        "score": 1.81
       },
       {
         "d": "2026-07-23",
@@ -5077,129 +5077,129 @@
       },
       {
         "d": "2026-07-27",
-        "score": 1.52
+        "score": 2.46
       },
       {
         "d": "2026-07-28",
-        "score": 1.73
+        "score": 1.65
       }
     ],
     "regime_history": [
       {
         "d": "2025-07-16",
-        "score": 5.13,
-        "raw": 4.85,
+        "score": 5.25,
+        "raw": 4.86,
         "status": "Full Risk-On",
         "spx": 617.38
       },
       {
         "d": "2025-07-17",
-        "score": 4.95,
+        "score": 5.0,
         "raw": 4.76,
-        "status": "Moderate Risk-On",
+        "status": "Full Risk-On",
         "spx": 621.16
       },
       {
         "d": "2025-07-18",
-        "score": 4.8,
+        "score": 4.83,
         "raw": 4.66,
         "status": "Moderate Risk-On",
         "spx": 620.7
       },
       {
         "d": "2025-07-21",
-        "score": 4.39,
-        "raw": 3.97,
+        "score": 4.86,
+        "raw": 4.97,
         "status": "Moderate Risk-On",
         "spx": 621.88
       },
       {
         "d": "2025-07-22",
-        "score": 4.48,
-        "raw": 4.8,
+        "score": 5.07,
+        "raw": 5.8,
         "status": "Moderate Risk-On",
         "spx": 621.97
       },
       {
         "d": "2025-07-23",
-        "score": 4.66,
-        "raw": 5.29,
+        "score": 5.34,
+        "raw": 6.29,
         "status": "Moderate Risk-On",
         "spx": 627.26
       },
       {
         "d": "2025-07-24",
-        "score": 4.79,
-        "raw": 5.27,
-        "status": "Moderate Risk-On",
+        "score": 5.55,
+        "raw": 6.27,
+        "status": "Full Risk-On",
         "spx": 627.47
       },
       {
         "d": "2025-07-25",
-        "score": 5.02,
+        "score": 5.6,
         "raw": 5.79,
-        "status": "Moderate Risk-On",
+        "status": "Full Risk-On",
         "spx": 630.12
       },
       {
         "d": "2025-07-28",
-        "score": 4.8,
-        "raw": 4.58,
-        "status": "Moderate Risk-On",
+        "score": 5.59,
+        "raw": 5.58,
+        "status": "Full Risk-On",
         "spx": 629.96
       },
       {
         "d": "2025-07-29",
-        "score": 4.48,
+        "score": 4.88,
         "raw": 4.16,
         "status": "Moderate Risk-On",
         "spx": 628.3
       },
       {
         "d": "2025-07-30",
-        "score": 3.35,
-        "raw": 2.22,
+        "score": 4.05,
+        "raw": 3.22,
         "status": "Moderate Risk-On",
         "spx": 627.51
       },
       {
         "d": "2025-07-31",
-        "score": 2.29,
+        "score": 2.64,
         "raw": 1.23,
         "status": "Neutral / Choppy",
         "spx": 625.15
       },
       {
         "d": "2025-08-01",
-        "score": 0.4,
+        "score": 0.57,
         "raw": -1.49,
         "status": "Neutral / Choppy",
         "spx": 614.91
       },
       {
         "d": "2025-08-04",
-        "score": -0.14,
+        "score": -0.05,
         "raw": -0.67,
         "status": "Neutral / Choppy",
         "spx": 624.25
       },
       {
         "d": "2025-08-05",
-        "score": -0.82,
+        "score": -0.77,
         "raw": -1.5,
         "status": "Neutral / Choppy",
         "spx": 621.09
       },
       {
         "d": "2025-08-06",
-        "score": -0.78,
+        "score": -0.75,
         "raw": -0.67,
         "status": "Neutral / Choppy",
         "spx": 625.85
       },
       {
         "d": "2025-08-07",
-        "score": -1.05,
+        "score": -1.03,
         "raw": -1.31,
         "status": "Neutral / Choppy",
         "spx": 625.32
@@ -5213,14 +5213,14 @@
       },
       {
         "d": "2025-08-11",
-        "score": -1.11,
+        "score": -1.1,
         "raw": -0.82,
         "status": "Neutral / Choppy",
         "spx": 628.95
       },
       {
         "d": "2025-08-12",
-        "score": -0.68,
+        "score": -0.67,
         "raw": 0.83,
         "status": "Neutral / Choppy",
         "spx": 635.65
@@ -5241,658 +5241,658 @@
       },
       {
         "d": "2025-08-15",
-        "score": 0.83,
-        "raw": 1.73,
+        "score": 1.05,
+        "raw": 2.73,
         "status": "Neutral / Choppy",
         "spx": 636.39
       },
       {
         "d": "2025-08-18",
-        "score": 1.29,
+        "score": 1.46,
         "raw": 2.9,
         "status": "Neutral / Choppy",
         "spx": 636.25
       },
       {
         "d": "2025-08-19",
-        "score": 1.51,
+        "score": 1.65,
         "raw": 2.29,
         "status": "Neutral / Choppy",
         "spx": 632.8
       },
       {
         "d": "2025-08-20",
-        "score": 1.37,
+        "score": 1.44,
         "raw": 1.23,
         "status": "Neutral / Choppy",
         "spx": 631.12
       },
       {
         "d": "2025-08-21",
-        "score": 1.45,
+        "score": 1.5,
         "raw": 1.74,
         "status": "Neutral / Choppy",
         "spx": 628.59
       },
       {
         "d": "2025-08-22",
-        "score": 2.0,
+        "score": 2.04,
         "raw": 3.91,
         "status": "Neutral / Choppy",
         "spx": 638.24
       },
       {
         "d": "2025-08-25",
-        "score": 2.46,
+        "score": 2.49,
         "raw": 4.07,
         "status": "Neutral / Choppy",
         "spx": 635.43
       },
       {
         "d": "2025-08-26",
-        "score": 2.84,
+        "score": 2.86,
         "raw": 4.16,
         "status": "Neutral / Choppy",
         "spx": 638.09
       },
       {
         "d": "2025-08-27",
-        "score": 3.15,
+        "score": 3.17,
         "raw": 4.25,
         "status": "Neutral / Choppy",
         "spx": 639.54
       },
       {
         "d": "2025-08-28",
-        "score": 3.43,
+        "score": 3.45,
         "raw": 4.42,
         "status": "Neutral / Choppy",
         "spx": 641.81
       },
       {
         "d": "2025-08-29",
-        "score": 3.25,
-        "raw": 3.07,
+        "score": 3.59,
+        "raw": 4.07,
         "status": "Neutral / Choppy",
         "spx": 637.98
       },
       {
         "d": "2025-09-02",
-        "score": 2.68,
+        "score": 2.85,
         "raw": 2.11,
         "status": "Neutral / Choppy",
         "spx": 633.25
       },
       {
         "d": "2025-09-03",
-        "score": 2.07,
-        "raw": 1.46,
+        "score": 2.65,
+        "raw": 2.46,
         "status": "Neutral / Choppy",
         "spx": 636.69
       },
       {
         "d": "2025-09-04",
-        "score": 2.07,
-        "raw": 2.09,
+        "score": 2.75,
+        "raw": 3.09,
         "status": "Neutral / Choppy",
         "spx": 642.01
       },
       {
         "d": "2025-09-05",
-        "score": 1.83,
-        "raw": 1.59,
+        "score": 2.67,
+        "raw": 2.59,
         "status": "Neutral / Choppy",
         "spx": 640.15
       },
       {
         "d": "2025-09-08",
-        "score": 1.8,
+        "score": 2.22,
         "raw": 1.76,
         "status": "Neutral / Choppy",
         "spx": 641.72
       },
       {
         "d": "2025-09-09",
-        "score": 1.64,
+        "score": 1.85,
         "raw": 1.49,
         "status": "Neutral / Choppy",
         "spx": 643.2
       },
       {
         "d": "2025-09-10",
-        "score": 1.43,
+        "score": 1.53,
         "raw": 1.21,
         "status": "Neutral / Choppy",
         "spx": 645.06
       },
       {
         "d": "2025-09-11",
-        "score": 1.71,
+        "score": 1.8,
         "raw": 2.72,
         "status": "Neutral / Choppy",
         "spx": 650.42
       },
       {
         "d": "2025-09-12",
-        "score": 1.9,
+        "score": 1.97,
         "raw": 2.57,
         "status": "Neutral / Choppy",
         "spx": 650.21
       },
       {
         "d": "2025-09-15",
-        "score": 1.97,
+        "score": 2.02,
         "raw": 2.22,
         "status": "Neutral / Choppy",
         "spx": 653.67
       },
       {
         "d": "2025-09-16",
-        "score": 2.06,
+        "score": 2.09,
         "raw": 2.34,
         "status": "Neutral / Choppy",
         "spx": 652.77
       },
       {
         "d": "2025-09-17",
-        "score": 2.13,
-        "raw": 2.38,
+        "score": 2.38,
+        "raw": 3.38,
         "status": "Neutral / Choppy",
         "spx": 651.96
       },
       {
         "d": "2025-09-18",
-        "score": 2.31,
+        "score": 2.51,
         "raw": 2.96,
         "status": "Neutral / Choppy",
         "spx": 655.0
       },
       {
         "d": "2025-09-19",
-        "score": 2.49,
+        "score": 2.64,
         "raw": 3.09,
         "status": "Neutral / Choppy",
         "spx": 658.25
       },
       {
         "d": "2025-09-22",
-        "score": 2.59,
+        "score": 2.71,
         "raw": 2.97,
         "status": "Neutral / Choppy",
         "spx": 661.36
       },
       {
         "d": "2025-09-23",
-        "score": 2.6,
+        "score": 2.66,
         "raw": 2.61,
         "status": "Neutral / Choppy",
         "spx": 657.76
       },
       {
         "d": "2025-09-24",
-        "score": 2.56,
-        "raw": 2.52,
+        "score": 2.85,
+        "raw": 3.52,
         "status": "Neutral / Choppy",
         "spx": 655.67
       },
       {
         "d": "2025-09-25",
-        "score": 2.18,
+        "score": 2.33,
         "raw": 1.8,
         "status": "Neutral / Choppy",
         "spx": 652.64
       },
       {
         "d": "2025-09-26",
-        "score": 1.91,
-        "raw": 1.64,
+        "score": 2.4,
+        "raw": 2.64,
         "status": "Neutral / Choppy",
         "spx": 656.38
       },
       {
         "d": "2025-09-29",
-        "score": 1.92,
-        "raw": 1.96,
+        "score": 2.52,
+        "raw": 2.96,
         "status": "Neutral / Choppy",
         "spx": 658.23
       },
       {
         "d": "2025-09-30",
-        "score": 1.94,
-        "raw": 1.99,
+        "score": 2.63,
+        "raw": 2.99,
         "status": "Neutral / Choppy",
         "spx": 660.71
       },
       {
         "d": "2025-10-01",
-        "score": 2.01,
-        "raw": 2.26,
+        "score": 2.77,
+        "raw": 3.26,
         "status": "Neutral / Choppy",
         "spx": 662.96
       },
       {
         "d": "2025-10-02",
-        "score": 2.13,
-        "raw": 2.54,
+        "score": 2.94,
+        "raw": 3.54,
         "status": "Neutral / Choppy",
         "spx": 663.72
       },
       {
         "d": "2025-10-03",
-        "score": 2.36,
-        "raw": 3.19,
+        "score": 3.22,
+        "raw": 4.19,
         "status": "Neutral / Choppy",
         "spx": 663.71
       },
       {
         "d": "2025-10-06",
-        "score": 2.59,
-        "raw": 3.38,
+        "score": 3.47,
+        "raw": 4.38,
         "status": "Neutral / Choppy",
         "spx": 666.09
       },
       {
         "d": "2025-10-07",
-        "score": 2.45,
-        "raw": 2.31,
+        "score": 3.39,
+        "raw": 3.31,
         "status": "Neutral / Choppy",
         "spx": 663.62
       },
       {
         "d": "2025-10-08",
-        "score": 2.29,
-        "raw": 2.14,
+        "score": 3.27,
+        "raw": 3.14,
         "status": "Neutral / Choppy",
         "spx": 667.58
       },
       {
         "d": "2025-10-09",
-        "score": 1.76,
-        "raw": 1.22,
+        "score": 2.74,
+        "raw": 2.22,
         "status": "Neutral / Choppy",
         "spx": 665.65
       },
       {
         "d": "2025-10-10",
-        "score": 0.35,
+        "score": 0.84,
         "raw": -1.06,
         "status": "Neutral / Choppy",
         "spx": 647.65
       },
       {
         "d": "2025-10-13",
-        "score": -0.2,
+        "score": 0.05,
         "raw": -0.74,
         "status": "Neutral / Choppy",
         "spx": 657.59
       },
       {
         "d": "2025-10-14",
-        "score": -0.93,
+        "score": -0.81,
         "raw": -1.67,
         "status": "Neutral / Choppy",
         "spx": 656.79
       },
       {
         "d": "2025-10-15",
-        "score": -1.3,
+        "score": -1.24,
         "raw": -1.67,
         "status": "Neutral / Choppy",
         "spx": 659.7
       },
       {
         "d": "2025-10-16",
-        "score": -1.68,
-        "raw": -2.06,
+        "score": -2.15,
+        "raw": -3.06,
         "status": "Neutral / Choppy",
         "spx": 655.21
       },
       {
         "d": "2025-10-17",
-        "score": -2.02,
+        "score": -2.25,
         "raw": -2.35,
         "status": "Neutral / Choppy",
         "spx": 658.93
       },
       {
         "d": "2025-10-20",
-        "score": -1.73,
+        "score": -1.91,
         "raw": -0.71,
         "status": "Neutral / Choppy",
         "spx": 665.78
       },
       {
         "d": "2025-10-21",
-        "score": -1.47,
+        "score": -1.61,
         "raw": -0.59,
         "status": "Neutral / Choppy",
         "spx": 665.77
       },
       {
         "d": "2025-10-22",
-        "score": -1.25,
+        "score": -1.36,
         "raw": -0.46,
         "status": "Neutral / Choppy",
         "spx": 662.31
       },
       {
         "d": "2025-10-23",
-        "score": -0.96,
+        "score": -1.05,
         "raw": 0.05,
         "status": "Neutral / Choppy",
         "spx": 666.24
       },
       {
         "d": "2025-10-24",
-        "score": -0.66,
-        "raw": 0.4,
+        "score": -0.5,
+        "raw": 1.4,
         "status": "Neutral / Choppy",
         "spx": 671.69
       },
       {
         "d": "2025-10-27",
-        "score": -0.12,
-        "raw": 1.74,
+        "score": 0.22,
+        "raw": 2.74,
         "status": "Neutral / Choppy",
         "spx": 679.61
       },
       {
         "d": "2025-10-28",
-        "score": 0.32,
-        "raw": 1.89,
+        "score": 0.81,
+        "raw": 2.89,
         "status": "Neutral / Choppy",
         "spx": 681.41
       },
       {
         "d": "2025-10-29",
-        "score": 0.71,
-        "raw": 2.08,
+        "score": 1.32,
+        "raw": 3.08,
         "status": "Neutral / Choppy",
         "spx": 681.74
       },
       {
         "d": "2025-10-30",
-        "score": 0.91,
-        "raw": 1.62,
+        "score": 1.61,
+        "raw": 2.62,
         "status": "Neutral / Choppy",
         "spx": 674.24
       },
       {
         "d": "2025-10-31",
-        "score": 1.07,
-        "raw": 1.63,
+        "score": 1.83,
+        "raw": 2.63,
         "status": "Neutral / Choppy",
         "spx": 676.46
       },
       {
         "d": "2025-11-03",
-        "score": 1.15,
-        "raw": 1.42,
+        "score": 1.96,
+        "raw": 2.42,
         "status": "Neutral / Choppy",
         "spx": 677.73
       },
       {
         "d": "2025-11-04",
-        "score": 0.55,
+        "score": 0.96,
         "raw": -0.05,
         "status": "Neutral / Choppy",
         "spx": 669.69
       },
       {
         "d": "2025-11-05",
-        "score": 0.53,
-        "raw": 0.51,
+        "score": 1.08,
+        "raw": 1.51,
         "status": "Neutral / Choppy",
         "spx": 672.01
       },
       {
         "d": "2025-11-06",
-        "score": 0.12,
+        "score": 0.39,
         "raw": -0.3,
         "status": "Neutral / Choppy",
         "spx": 664.8
       },
       {
         "d": "2025-11-07",
-        "score": -0.39,
+        "score": -0.25,
         "raw": -0.89,
         "status": "Neutral / Choppy",
         "spx": 665.46
       },
       {
         "d": "2025-11-10",
-        "score": -0.4,
+        "score": -0.34,
         "raw": -0.42,
         "status": "Neutral / Choppy",
         "spx": 675.84
       },
       {
         "d": "2025-11-11",
-        "score": -0.32,
-        "raw": -0.02,
+        "score": -0.04,
+        "raw": 0.98,
         "status": "Neutral / Choppy",
         "spx": 677.39
       },
       {
         "d": "2025-11-12",
-        "score": -0.28,
-        "raw": -0.15,
+        "score": 0.16,
+        "raw": 0.85,
         "status": "Neutral / Choppy",
         "spx": 677.76
       },
       {
         "d": "2025-11-13",
-        "score": -0.9,
+        "score": -0.68,
         "raw": -1.52,
         "status": "Neutral / Choppy",
         "spx": 666.52
       },
       {
         "d": "2025-11-14",
-        "score": -1.12,
+        "score": -1.01,
         "raw": -1.33,
         "status": "Neutral / Choppy",
         "spx": 666.41
       },
       {
         "d": "2025-11-17",
-        "score": -1.74,
+        "score": -1.68,
         "raw": -2.36,
         "status": "Neutral / Choppy",
         "spx": 660.2
       },
       {
         "d": "2025-11-18",
-        "score": -2.32,
-        "raw": -2.91,
+        "score": -2.8,
+        "raw": -3.91,
         "status": "Neutral / Choppy",
         "spx": 654.66
       },
       {
         "d": "2025-11-19",
-        "score": -2.94,
+        "score": -3.18,
         "raw": -3.56,
         "status": "Neutral / Choppy",
         "spx": 657.19
       },
       {
         "d": "2025-11-20",
-        "score": -3.54,
+        "score": -3.66,
         "raw": -4.14,
         "status": "Full Risk-Off",
         "spx": 647.17
       },
       {
         "d": "2025-11-21",
-        "score": -3.54,
+        "score": -3.63,
         "raw": -3.53,
         "status": "Full Risk-Off",
         "spx": 653.61
       },
       {
         "d": "2025-11-24",
-        "score": -3.34,
+        "score": -3.41,
         "raw": -2.66,
         "status": "Full Risk-Off",
         "spx": 663.24
       },
       {
         "d": "2025-11-25",
-        "score": -2.63,
-        "raw": -0.12,
-        "status": "Full Risk-Off",
+        "score": -2.46,
+        "raw": 0.88,
+        "status": "Neutral / Choppy",
         "spx": 669.47
       },
       {
         "d": "2025-11-26",
-        "score": -1.98,
-        "raw": 0.29,
+        "score": -1.63,
+        "raw": 1.29,
         "status": "Neutral / Choppy",
         "spx": 674.1
       },
       {
         "d": "2025-11-28",
-        "score": -1.2,
-        "raw": 1.53,
+        "score": -0.7,
+        "raw": 2.53,
         "status": "Neutral / Choppy",
         "spx": 677.77
       },
       {
         "d": "2025-12-01",
-        "score": -0.56,
-        "raw": 1.66,
+        "score": 0.04,
+        "raw": 2.66,
         "status": "Neutral / Choppy",
         "spx": 674.68
       },
       {
         "d": "2025-12-02",
-        "score": -0.06,
-        "raw": 1.71,
+        "score": 0.64,
+        "raw": 2.71,
         "status": "Neutral / Choppy",
         "spx": 675.93
       },
       {
         "d": "2025-12-03",
-        "score": 0.57,
-        "raw": 2.79,
+        "score": 1.34,
+        "raw": 3.79,
         "status": "Neutral / Choppy",
         "spx": 678.27
       },
       {
         "d": "2025-12-04",
-        "score": 1.36,
-        "raw": 4.1,
+        "score": 2.17,
+        "raw": 5.1,
         "status": "Neutral / Choppy",
         "spx": 678.77
       },
       {
         "d": "2025-12-05",
-        "score": 2.03,
-        "raw": 4.36,
+        "score": 2.88,
+        "raw": 5.36,
         "status": "Neutral / Choppy",
         "spx": 680.06
       },
       {
         "d": "2025-12-08",
-        "score": 2.58,
-        "raw": 4.53,
+        "score": 3.47,
+        "raw": 5.53,
         "status": "Neutral / Choppy",
         "spx": 678.01
       },
       {
         "d": "2025-12-09",
-        "score": 2.92,
-        "raw": 4.09,
+        "score": 3.83,
+        "raw": 5.09,
         "status": "Neutral / Choppy",
         "spx": 677.43
       },
       {
         "d": "2025-12-10",
-        "score": 3.33,
+        "score": 4.04,
         "raw": 4.76,
-        "status": "Neutral / Choppy",
+        "status": "Moderate Risk-On",
         "spx": 681.92
       },
       {
         "d": "2025-12-11",
-        "score": 3.9,
+        "score": 4.45,
         "raw": 5.89,
         "status": "Moderate Risk-On",
         "spx": 683.51
       },
       {
         "d": "2025-12-12",
-        "score": 4.05,
+        "score": 4.48,
         "raw": 4.61,
         "status": "Moderate Risk-On",
         "spx": 676.16
       },
       {
         "d": "2025-12-15",
-        "score": 4.16,
+        "score": 4.5,
         "raw": 4.54,
         "status": "Moderate Risk-On",
         "spx": 675.14
       },
       {
         "d": "2025-12-16",
-        "score": 4.09,
+        "score": 4.26,
         "raw": 4.02,
         "status": "Moderate Risk-On",
         "spx": 673.29
       },
       {
         "d": "2025-12-17",
-        "score": 3.82,
+        "score": 3.9,
         "raw": 3.54,
         "status": "Moderate Risk-On",
         "spx": 665.88
       },
       {
         "d": "2025-12-18",
-        "score": 3.64,
+        "score": 3.68,
         "raw": 3.47,
         "status": "Moderate Risk-On",
         "spx": 670.91
       },
       {
         "d": "2025-12-19",
-        "score": 3.8,
+        "score": 3.83,
         "raw": 4.33,
         "status": "Moderate Risk-On",
         "spx": 676.99
       },
       {
         "d": "2025-12-22",
-        "score": 3.95,
+        "score": 3.98,
         "raw": 4.5,
         "status": "Moderate Risk-On",
         "spx": 681.21
       },
       {
         "d": "2025-12-23",
-        "score": 4.04,
+        "score": 4.06,
         "raw": 4.36,
         "status": "Moderate Risk-On",
         "spx": 684.32
       },
       {
         "d": "2025-12-24",
-        "score": 4.09,
+        "score": 4.11,
         "raw": 4.26,
         "status": "Moderate Risk-On",
         "spx": 686.73
       },
       {
         "d": "2025-12-26",
-        "score": 4.21,
+        "score": 4.22,
         "raw": 4.62,
         "status": "Moderate Risk-On",
         "spx": 686.66
       },
       {
         "d": "2025-12-29",
-        "score": 4.03,
+        "score": 4.04,
         "raw": 3.85,
         "status": "Moderate Risk-On",
         "spx": 684.21
@@ -5906,14 +5906,14 @@
       },
       {
         "d": "2025-12-31",
-        "score": 3.72,
+        "score": 3.73,
         "raw": 3.49,
         "status": "Moderate Risk-On",
         "spx": 678.32
       },
       {
         "d": "2026-01-02",
-        "score": 3.73,
+        "score": 3.74,
         "raw": 3.77,
         "status": "Moderate Risk-On",
         "spx": 679.56
@@ -6032,875 +6032,875 @@
       },
       {
         "d": "2026-01-28",
-        "score": 2.28,
-        "raw": 2.06,
+        "score": 2.62,
+        "raw": 3.06,
         "status": "Neutral / Choppy",
         "spx": 691.74
       },
       {
         "d": "2026-01-29",
-        "score": 2.02,
-        "raw": 1.76,
+        "score": 2.65,
+        "raw": 2.76,
         "status": "Neutral / Choppy",
         "spx": 690.37
       },
       {
         "d": "2026-01-30",
-        "score": 1.44,
+        "score": 1.76,
         "raw": 0.86,
         "status": "Neutral / Choppy",
         "spx": 688.31
       },
       {
         "d": "2026-02-02",
-        "score": 1.28,
-        "raw": 1.12,
+        "score": 1.84,
+        "raw": 2.12,
         "status": "Neutral / Choppy",
         "spx": 691.73
       },
       {
         "d": "2026-02-03",
-        "score": 1.24,
-        "raw": 1.2,
+        "score": 1.92,
+        "raw": 2.2,
         "status": "Neutral / Choppy",
         "spx": 685.89
       },
       {
         "d": "2026-02-04",
-        "score": 1.27,
-        "raw": 1.36,
+        "score": 1.14,
+        "raw": 0.36,
         "status": "Neutral / Choppy",
         "spx": 682.56
       },
       {
         "d": "2026-02-05",
-        "score": 0.27,
+        "score": 0.21,
         "raw": -0.72,
         "status": "Neutral / Choppy",
         "spx": 674.04
       },
       {
         "d": "2026-02-06",
-        "score": -0.16,
+        "score": -0.19,
         "raw": -0.59,
         "status": "Neutral / Choppy",
         "spx": 686.97
       },
       {
         "d": "2026-02-09",
-        "score": 0.11,
-        "raw": 1.05,
+        "score": 0.31,
+        "raw": 2.05,
         "status": "Neutral / Choppy",
         "spx": 690.28
       },
       {
         "d": "2026-02-10",
-        "score": 0.33,
-        "raw": 1.11,
+        "score": 0.71,
+        "raw": 2.11,
         "status": "Neutral / Choppy",
         "spx": 688.46
       },
       {
         "d": "2026-02-11",
-        "score": 0.49,
+        "score": 0.79,
         "raw": 1.06,
         "status": "Neutral / Choppy",
         "spx": 688.3
       },
       {
         "d": "2026-02-12",
-        "score": 0.1,
+        "score": 0.25,
         "raw": -0.29,
         "status": "Neutral / Choppy",
         "spx": 677.67
       },
       {
         "d": "2026-02-13",
-        "score": -0.44,
+        "score": -0.37,
         "raw": -0.99,
         "status": "Neutral / Choppy",
         "spx": 678.15
       },
       {
         "d": "2026-02-17",
-        "score": -0.74,
+        "score": -0.71,
         "raw": -1.04,
         "status": "Neutral / Choppy",
         "spx": 679.24
       },
       {
         "d": "2026-02-18",
-        "score": -0.56,
+        "score": -0.54,
         "raw": 0.06,
         "status": "Neutral / Choppy",
         "spx": 682.66
       },
       {
         "d": "2026-02-19",
-        "score": -0.66,
+        "score": -0.65,
         "raw": -0.76,
         "status": "Neutral / Choppy",
         "spx": 680.86
       },
       {
         "d": "2026-02-20",
-        "score": -0.47,
-        "raw": 0.19,
+        "score": -0.24,
+        "raw": 1.19,
         "status": "Neutral / Choppy",
         "spx": 685.79
       },
       {
         "d": "2026-02-23",
-        "score": -1.01,
+        "score": -0.89,
         "raw": -1.55,
         "status": "Neutral / Choppy",
         "spx": 678.78
       },
       {
         "d": "2026-02-24",
-        "score": -0.92,
+        "score": -0.83,
         "raw": -0.61,
         "status": "Neutral / Choppy",
         "spx": 683.72
       },
       {
         "d": "2026-02-25",
-        "score": -0.8,
+        "score": -0.73,
         "raw": -0.39,
         "status": "Neutral / Choppy",
         "spx": 689.49
       },
       {
         "d": "2026-02-26",
-        "score": -0.69,
+        "score": -0.63,
         "raw": -0.28,
         "status": "Neutral / Choppy",
         "spx": 685.66
       },
       {
         "d": "2026-02-27",
-        "score": -0.67,
-        "raw": -0.59,
+        "score": -0.4,
+        "raw": 0.41,
         "status": "Neutral / Choppy",
         "spx": 682.36
       },
       {
         "d": "2026-03-02",
-        "score": -1.23,
-        "raw": -1.8,
+        "score": -0.6,
+        "raw": -0.8,
         "status": "Neutral / Choppy",
         "spx": 682.75
       },
       {
         "d": "2026-03-03",
-        "score": -1.61,
-        "raw": -1.99,
+        "score": -1.8,
+        "raw": -2.99,
         "status": "Neutral / Choppy",
         "spx": 676.73
       },
       {
         "d": "2026-03-04",
-        "score": -1.5,
-        "raw": -1.11,
+        "score": -1.42,
+        "raw": -0.11,
         "status": "Neutral / Choppy",
         "spx": 681.51
       },
       {
         "d": "2026-03-05",
-        "score": -2.41,
+        "score": -2.37,
         "raw": -3.31,
         "status": "Neutral / Choppy",
         "spx": 677.71
       },
       {
         "d": "2026-03-06",
-        "score": -3.26,
-        "raw": -4.11,
-        "status": "Neutral / Choppy",
+        "score": -3.74,
+        "raw": -5.11,
+        "status": "Full Risk-Off",
         "spx": 668.83
       },
       {
         "d": "2026-03-09",
-        "score": -3.77,
-        "raw": -4.28,
+        "score": -4.51,
+        "raw": -5.28,
         "status": "Full Risk-Off",
         "spx": 674.68
       },
       {
         "d": "2026-03-10",
-        "score": -4.25,
+        "score": -4.62,
         "raw": -4.74,
         "status": "Full Risk-Off",
         "spx": 673.6
       },
       {
         "d": "2026-03-11",
-        "score": -4.5,
+        "score": -4.68,
         "raw": -4.74,
         "status": "Full Risk-Off",
         "spx": 672.75
       },
       {
         "d": "2026-03-12",
-        "score": -4.71,
-        "raw": -4.92,
+        "score": -5.3,
+        "raw": -5.92,
         "status": "Full Risk-Off",
         "spx": 662.54
       },
       {
         "d": "2026-03-13",
-        "score": -5.01,
+        "score": -5.31,
         "raw": -5.31,
         "status": "Full Risk-Off",
         "spx": 658.79
       },
       {
         "d": "2026-03-16",
-        "score": -4.99,
+        "score": -5.22,
         "raw": -4.94,
         "status": "Full Risk-Off",
         "spx": 665.49
       },
       {
         "d": "2026-03-17",
-        "score": -4.88,
-        "raw": -4.48,
+        "score": -4.84,
+        "raw": -3.48,
         "status": "Full Risk-Off",
         "spx": 667.24
       },
       {
         "d": "2026-03-18",
-        "score": -4.74,
+        "score": -4.71,
         "raw": -4.26,
         "status": "Full Risk-Off",
         "spx": 657.93
       },
       {
         "d": "2026-03-19",
-        "score": -4.32,
+        "score": -4.3,
         "raw": -2.85,
         "status": "Full Risk-Off",
         "spx": 656.31
       },
       {
         "d": "2026-03-20",
-        "score": -4.41,
+        "score": -4.4,
         "raw": -4.5,
         "status": "Full Risk-Off",
         "spx": 646.9
       },
       {
         "d": "2026-03-23",
-        "score": -4.16,
-        "raw": -3.27,
+        "score": -4.37,
+        "raw": -4.27,
         "status": "Full Risk-Off",
         "spx": 653.7
       },
       {
         "d": "2026-03-24",
-        "score": -3.74,
-        "raw": -2.3,
+        "score": -4.13,
+        "raw": -3.3,
         "status": "Full Risk-Off",
         "spx": 651.5
       },
       {
         "d": "2026-03-25",
-        "score": -3.16,
-        "raw": -1.13,
+        "score": -3.24,
+        "raw": -0.13,
         "status": "Full Risk-Off",
         "spx": 655.13
       },
       {
         "d": "2026-03-26",
-        "score": -2.67,
+        "score": -2.73,
         "raw": -0.94,
         "status": "Full Risk-Off",
         "spx": 643.43
       },
       {
         "d": "2026-03-27",
-        "score": -2.5,
+        "score": -2.55,
         "raw": -1.92,
         "status": "Neutral / Choppy",
         "spx": 632.46
       },
       {
         "d": "2026-03-30",
-        "score": -2.37,
+        "score": -2.41,
         "raw": -1.91,
         "status": "Neutral / Choppy",
         "spx": 630.35
       },
       {
         "d": "2026-03-31",
-        "score": -2.37,
+        "score": -2.4,
         "raw": -2.36,
         "status": "Neutral / Choppy",
         "spx": 648.67
       },
       {
         "d": "2026-04-01",
-        "score": -2.39,
-        "raw": -2.41,
+        "score": -2.18,
+        "raw": -1.41,
         "status": "Neutral / Choppy",
         "spx": 653.56
       },
       {
         "d": "2026-04-02",
-        "score": -2.59,
-        "raw": -2.8,
+        "score": -2.09,
+        "raw": -1.8,
         "status": "Neutral / Choppy",
         "spx": 654.14
       },
       {
         "d": "2026-04-06",
-        "score": -2.55,
-        "raw": -2.4,
+        "score": -1.94,
+        "raw": -1.4,
         "status": "Neutral / Choppy",
         "spx": 657.24
       },
       {
         "d": "2026-04-07",
-        "score": -2.3,
-        "raw": -1.43,
+        "score": -2.18,
+        "raw": -2.43,
         "status": "Neutral / Choppy",
         "spx": 657.53
       },
       {
         "d": "2026-04-08",
-        "score": -1.55,
-        "raw": 1.07,
+        "score": -1.24,
+        "raw": 2.07,
         "status": "Neutral / Choppy",
         "spx": 674.27
       },
       {
         "d": "2026-04-09",
-        "score": -0.63,
-        "raw": 2.6,
+        "score": -0.16,
+        "raw": 3.6,
         "status": "Neutral / Choppy",
         "spx": 678.16
       },
       {
         "d": "2026-04-10",
-        "score": 0.13,
-        "raw": 2.78,
+        "score": 0.71,
+        "raw": 3.78,
         "status": "Neutral / Choppy",
         "spx": 677.71
       },
       {
         "d": "2026-04-13",
-        "score": 0.88,
-        "raw": 3.52,
+        "score": 1.56,
+        "raw": 4.52,
         "status": "Neutral / Choppy",
         "spx": 684.34
       },
       {
         "d": "2026-04-14",
-        "score": 1.99,
-        "raw": 5.89,
+        "score": 2.74,
+        "raw": 6.89,
         "status": "Neutral / Choppy",
         "spx": 692.68
       },
       {
         "d": "2026-04-15",
-        "score": 2.91,
-        "raw": 6.1,
+        "score": 3.71,
+        "raw": 7.1,
         "status": "Neutral / Choppy",
         "spx": 698.14
       },
       {
         "d": "2026-04-16",
-        "score": 3.6,
-        "raw": 6.02,
-        "status": "Neutral / Choppy",
+        "score": 4.45,
+        "raw": 7.02,
+        "status": "Moderate Risk-On",
         "spx": 699.86
       },
       {
         "d": "2026-04-17",
-        "score": 4.17,
-        "raw": 6.18,
+        "score": 5.05,
+        "raw": 7.18,
         "status": "Moderate Risk-On",
         "spx": 708.32
       },
       {
         "d": "2026-04-20",
-        "score": 4.64,
-        "raw": 6.26,
-        "status": "Moderate Risk-On",
+        "score": 5.54,
+        "raw": 7.26,
+        "status": "Full Risk-On",
         "spx": 706.9
       },
       {
         "d": "2026-04-21",
-        "score": 4.55,
-        "raw": 4.46,
-        "status": "Moderate Risk-On",
+        "score": 5.5,
+        "raw": 5.46,
+        "status": "Full Risk-On",
         "spx": 702.27
       },
       {
         "d": "2026-04-22",
-        "score": 5.03,
-        "raw": 6.7,
-        "status": "Moderate Risk-On",
+        "score": 5.99,
+        "raw": 7.7,
+        "status": "Full Risk-On",
         "spx": 709.38
       },
       {
         "d": "2026-04-23",
-        "score": 4.89,
-        "raw": 4.75,
-        "status": "Moderate Risk-On",
+        "score": 5.87,
+        "raw": 5.75,
+        "status": "Full Risk-On",
         "spx": 706.63
       },
       {
         "d": "2026-04-24",
-        "score": 5.24,
-        "raw": 6.47,
-        "status": "Moderate Risk-On",
+        "score": 6.23,
+        "raw": 7.47,
+        "status": "Full Risk-On",
         "spx": 712.11
       },
       {
         "d": "2026-04-27",
-        "score": 5.46,
-        "raw": 6.25,
+        "score": 6.45,
+        "raw": 7.25,
         "status": "Full Risk-On",
         "spx": 713.33
       },
       {
         "d": "2026-04-28",
-        "score": 4.56,
-        "raw": 3.65,
-        "status": "Moderate Risk-On",
+        "score": 5.55,
+        "raw": 4.65,
+        "status": "Full Risk-On",
         "spx": 709.86
       },
       {
         "d": "2026-04-29",
-        "score": 3.89,
-        "raw": 3.22,
+        "score": 4.89,
+        "raw": 4.22,
         "status": "Moderate Risk-On",
         "spx": 709.75
       },
       {
         "d": "2026-04-30",
-        "score": 4.14,
-        "raw": 5.0,
+        "score": 5.13,
+        "raw": 6.0,
         "status": "Moderate Risk-On",
         "spx": 716.81
       },
       {
         "d": "2026-05-01",
-        "score": 4.3,
+        "score": 5.01,
         "raw": 4.89,
         "status": "Moderate Risk-On",
         "spx": 718.8
       },
       {
         "d": "2026-05-04",
-        "score": 4.45,
+        "score": 4.99,
         "raw": 4.97,
         "status": "Moderate Risk-On",
         "spx": 716.16
       },
       {
         "d": "2026-05-05",
-        "score": 4.65,
-        "raw": 5.34,
+        "score": 5.29,
+        "raw": 6.34,
         "status": "Moderate Risk-On",
         "spx": 721.91
       },
       {
         "d": "2026-05-06",
-        "score": 4.82,
-        "raw": 5.42,
-        "status": "Moderate Risk-On",
+        "score": 5.54,
+        "raw": 6.42,
+        "status": "Full Risk-On",
         "spx": 731.94
       },
       {
         "d": "2026-05-07",
-        "score": 4.82,
-        "raw": 4.81,
-        "status": "Moderate Risk-On",
+        "score": 5.6,
+        "raw": 5.81,
+        "status": "Full Risk-On",
         "spx": 729.7
       },
       {
         "d": "2026-05-08",
-        "score": 4.77,
-        "raw": 4.72,
-        "status": "Moderate Risk-On",
+        "score": 5.63,
+        "raw": 5.72,
+        "status": "Full Risk-On",
         "spx": 735.72
       },
       {
         "d": "2026-05-11",
-        "score": 4.82,
+        "score": 5.31,
         "raw": 4.99,
-        "status": "Moderate Risk-On",
+        "status": "Full Risk-On",
         "spx": 737.4
       },
       {
         "d": "2026-05-12",
-        "score": 4.55,
+        "score": 4.8,
         "raw": 4.29,
         "status": "Moderate Risk-On",
         "spx": 736.28
       },
       {
         "d": "2026-05-13",
-        "score": 4.37,
+        "score": 4.49,
         "raw": 4.19,
         "status": "Moderate Risk-On",
         "spx": 740.4
       },
       {
         "d": "2026-05-14",
-        "score": 3.98,
+        "score": 4.04,
         "raw": 3.58,
         "status": "Moderate Risk-On",
         "spx": 746.25
       },
       {
         "d": "2026-05-15",
-        "score": 3.56,
-        "raw": 3.14,
+        "score": 4.06,
+        "raw": 4.14,
         "status": "Moderate Risk-On",
         "spx": 737.27
       },
       {
         "d": "2026-05-18",
-        "score": 3.06,
-        "raw": 2.56,
-        "status": "Neutral / Choppy",
+        "score": 3.81,
+        "raw": 3.56,
+        "status": "Moderate Risk-On",
         "spx": 736.75
       },
       {
         "d": "2026-05-19",
-        "score": 2.48,
-        "raw": 1.91,
-        "status": "Neutral / Choppy",
+        "score": 3.36,
+        "raw": 2.91,
+        "status": "Moderate Risk-On",
         "spx": 731.84
       },
       {
         "d": "2026-05-20",
-        "score": 2.23,
+        "score": 2.67,
         "raw": 1.98,
         "status": "Neutral / Choppy",
         "spx": 739.35
       },
       {
         "d": "2026-05-21",
-        "score": 2.25,
-        "raw": 2.29,
+        "score": 2.81,
+        "raw": 3.29,
         "status": "Neutral / Choppy",
         "spx": 740.81
       },
       {
         "d": "2026-05-22",
-        "score": 2.4,
-        "raw": 2.95,
+        "score": 3.06,
+        "raw": 3.95,
         "status": "Neutral / Choppy",
         "spx": 743.72
       },
       {
         "d": "2026-05-26",
-        "score": 2.78,
-        "raw": 4.12,
+        "score": 3.52,
+        "raw": 5.12,
         "status": "Neutral / Choppy",
         "spx": 748.66
       },
       {
         "d": "2026-05-27",
-        "score": 3.22,
-        "raw": 4.75,
-        "status": "Neutral / Choppy",
+        "score": 4.01,
+        "raw": 5.75,
+        "status": "Moderate Risk-On",
         "spx": 748.53
       },
       {
         "d": "2026-05-28",
-        "score": 3.49,
-        "raw": 4.44,
-        "status": "Neutral / Choppy",
+        "score": 4.33,
+        "raw": 5.44,
+        "status": "Moderate Risk-On",
         "spx": 752.66
       },
       {
         "d": "2026-05-29",
-        "score": 3.76,
-        "raw": 4.7,
-        "status": "Neutral / Choppy",
+        "score": 4.64,
+        "raw": 5.7,
+        "status": "Moderate Risk-On",
         "spx": 754.54
       },
       {
         "d": "2026-06-01",
-        "score": 4.04,
-        "raw": 5.03,
+        "score": 4.95,
+        "raw": 6.03,
         "status": "Moderate Risk-On",
         "spx": 756.59
       },
       {
         "d": "2026-06-02",
-        "score": 4.19,
-        "raw": 4.71,
+        "score": 5.12,
+        "raw": 5.71,
         "status": "Moderate Risk-On",
         "spx": 757.62
       },
       {
         "d": "2026-06-03",
-        "score": 3.84,
-        "raw": 3.49,
+        "score": 4.8,
+        "raw": 4.49,
         "status": "Moderate Risk-On",
         "spx": 752.3
       },
       {
         "d": "2026-06-04",
-        "score": 3.85,
-        "raw": 3.89,
+        "score": 4.82,
+        "raw": 4.89,
         "status": "Moderate Risk-On",
         "spx": 755.14
       },
       {
         "d": "2026-06-05",
-        "score": 2.92,
+        "score": 3.4,
         "raw": 1.98,
-        "status": "Neutral / Choppy",
+        "status": "Moderate Risk-On",
         "spx": 735.65
       },
       {
         "d": "2026-06-08",
-        "score": 2.7,
-        "raw": 2.48,
+        "score": 2.44,
+        "raw": 1.48,
         "status": "Neutral / Choppy",
         "spx": 737.32
       },
       {
         "d": "2026-06-09",
-        "score": 2.72,
-        "raw": 2.79,
+        "score": 2.12,
+        "raw": 1.79,
         "status": "Neutral / Choppy",
         "spx": 735.16
       },
       {
         "d": "2026-06-10",
-        "score": 2.15,
+        "score": 1.85,
         "raw": 1.59,
         "status": "Neutral / Choppy",
         "spx": 723.57
       },
       {
         "d": "2026-06-11",
-        "score": 2.38,
-        "raw": 3.18,
+        "score": 1.93,
+        "raw": 2.18,
         "status": "Neutral / Choppy",
         "spx": 735.86
       },
       {
         "d": "2026-06-12",
-        "score": 2.61,
+        "score": 2.26,
         "raw": 3.41,
         "status": "Neutral / Choppy",
         "spx": 739.84
       },
       {
         "d": "2026-06-15",
-        "score": 2.93,
-        "raw": 4.06,
+        "score": 2.88,
+        "raw": 5.06,
         "status": "Neutral / Choppy",
         "spx": 752.89
       },
       {
         "d": "2026-06-16",
-        "score": 3.3,
-        "raw": 4.6,
+        "score": 3.48,
+        "raw": 5.6,
         "status": "Neutral / Choppy",
         "spx": 748.4
       },
       {
         "d": "2026-06-17",
-        "score": 3.45,
-        "raw": 3.97,
+        "score": 3.23,
+        "raw": 2.97,
         "status": "Neutral / Choppy",
         "spx": 739.06
       },
       {
         "d": "2026-06-18",
-        "score": 3.56,
+        "score": 3.39,
         "raw": 3.96,
         "status": "Neutral / Choppy",
         "spx": 746.74
       },
       {
         "d": "2026-06-22",
-        "score": 3.69,
-        "raw": 4.14,
+        "score": 3.78,
+        "raw": 5.14,
         "status": "Neutral / Choppy",
         "spx": 744.39
       },
       {
         "d": "2026-06-23",
-        "score": 3.7,
+        "score": 3.76,
         "raw": 3.74,
         "status": "Neutral / Choppy",
         "spx": 733.58
       },
       {
         "d": "2026-06-24",
-        "score": 3.42,
-        "raw": 3.14,
+        "score": 3.84,
+        "raw": 4.14,
         "status": "Neutral / Choppy",
         "spx": 733.24
       },
       {
         "d": "2026-06-25",
-        "score": 2.9,
-        "raw": 2.37,
+        "score": 3.61,
+        "raw": 3.37,
         "status": "Neutral / Choppy",
         "spx": 734.3
       },
       {
         "d": "2026-06-26",
-        "score": 2.48,
-        "raw": 2.06,
+        "score": 3.33,
+        "raw": 3.06,
         "status": "Neutral / Choppy",
         "spx": 728.99
       },
       {
         "d": "2026-06-29",
-        "score": 2.52,
-        "raw": 2.68,
+        "score": 3.41,
+        "raw": 3.68,
         "status": "Neutral / Choppy",
         "spx": 741.0
       },
       {
         "d": "2026-06-30",
-        "score": 2.69,
-        "raw": 3.26,
+        "score": 3.6,
+        "raw": 4.26,
         "status": "Neutral / Choppy",
         "spx": 746.77
       },
       {
         "d": "2026-07-01",
-        "score": 2.93,
+        "score": 3.64,
         "raw": 3.77,
         "status": "Neutral / Choppy",
         "spx": 745.76
       },
       {
         "d": "2026-07-02",
-        "score": 3.23,
-        "raw": 4.28,
-        "status": "Neutral / Choppy",
+        "score": 4.0,
+        "raw": 5.28,
+        "status": "Moderate Risk-On",
         "spx": 744.78
       },
       {
         "d": "2026-07-06",
-        "score": 3.52,
-        "raw": 4.52,
-        "status": "Neutral / Choppy",
+        "score": 4.34,
+        "raw": 5.52,
+        "status": "Moderate Risk-On",
         "spx": 751.28
       },
       {
         "d": "2026-07-07",
-        "score": 3.67,
-        "raw": 4.19,
-        "status": "Neutral / Choppy",
+        "score": 4.53,
+        "raw": 5.19,
+        "status": "Moderate Risk-On",
         "spx": 747.71
       },
       {
         "d": "2026-07-08",
-        "score": 3.71,
-        "raw": 3.85,
-        "status": "Neutral / Choppy",
+        "score": 4.6,
+        "raw": 4.85,
+        "status": "Moderate Risk-On",
         "spx": 745.4
       },
       {
         "d": "2026-07-09",
-        "score": 3.84,
-        "raw": 4.3,
-        "status": "Neutral / Choppy",
+        "score": 4.76,
+        "raw": 5.3,
+        "status": "Moderate Risk-On",
         "spx": 751.71
       },
       {
         "d": "2026-07-10",
-        "score": 3.78,
-        "raw": 3.73,
-        "status": "Neutral / Choppy",
+        "score": 4.74,
+        "raw": 4.73,
+        "status": "Moderate Risk-On",
         "spx": 754.95
       },
       {
         "d": "2026-07-13",
-        "score": 3.6,
+        "score": 4.08,
         "raw": 3.42,
-        "status": "Neutral / Choppy",
+        "status": "Moderate Risk-On",
         "spx": 749.17
       },
       {
         "d": "2026-07-14",
-        "score": 3.58,
+        "score": 3.82,
         "raw": 3.55,
-        "status": "Neutral / Choppy",
+        "status": "Moderate Risk-On",
         "spx": 751.83
       },
       {
         "d": "2026-07-15",
-        "score": 3.58,
+        "score": 3.7,
         "raw": 3.58,
-        "status": "Neutral / Choppy",
+        "status": "Moderate Risk-On",
         "spx": 754.81
       },
       {
         "d": "2026-07-16",
-        "score": 3.57,
+        "score": 3.63,
         "raw": 3.57,
-        "status": "Neutral / Choppy",
+        "status": "Moderate Risk-On",
         "spx": 750.72
       },
       {
         "d": "2026-07-17",
-        "score": 3.47,
+        "score": 3.5,
         "raw": 3.37,
-        "status": "Neutral / Choppy",
+        "status": "Moderate Risk-On",
         "spx": 743.29
       },
       {
         "d": "2026-07-20",
-        "score": 3.21,
+        "score": 3.23,
         "raw": 2.95,
-        "status": "Neutral / Choppy",
+        "status": "Moderate Risk-On",
         "spx": 742.09
       },
       {
         "d": "2026-07-21",
         "score": 3.17,
         "raw": 3.12,
-        "status": "Neutral / Choppy",
+        "status": "Moderate Risk-On",
         "spx": 748.28
       },
       {
         "d": "2026-07-22",
-        "score": 2.99,
-        "raw": 2.81,
+        "score": 2.49,
+        "raw": 1.81,
         "status": "Neutral / Choppy",
         "spx": 747.41
       },
       {
         "d": "2026-07-23",
-        "score": 2.52,
+        "score": 2.27,
         "raw": 2.05,
         "status": "Neutral / Choppy",
         "spx": 738.18
       },
       {
         "d": "2026-07-24",
-        "score": 1.25,
+        "score": 1.13,
         "raw": -0.02,
         "status": "Neutral / Choppy",
         "spx": 738.93
       },
       {
         "d": "2026-07-27",
-        "score": 1.52,
+        "score": 1.42,
         "raw": 2.46,
         "status": "Neutral / Choppy",
         "spx": 739.09
       },
       {
         "d": "2026-07-28",
-        "score": 1.73,
+        "score": 1.65,
         "raw": 2.46,
         "status": "Neutral / Choppy",
         "spx": null
@@ -7124,8 +7124,8 @@
       },
       {
         "ticker": "BTC-USD",
-        "spread_1m": 1.555,
-        "spread_3m": -18.199
+        "spread_1m": 1.504,
+        "spread_3m": -18.242
       }
     ]
   },
