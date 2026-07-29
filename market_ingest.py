@@ -47,7 +47,11 @@ MACRO_SYMS = [s for s, _ in MACRO_ETFS]
 # Macro Risk Engine inputs (Sec.2 of spec). Most already exist in the index/
 # sector/macro lists; these are the genuinely new ones. Excluded from breadth.
 MACRO_STRUCT_EXTRA = [("BTC-USD", "Bitcoin"), ("IEI", "3-7Y Treasuries"),
-                      ("CPER", "Copper"), ("^VIX", "VIX"), ("^VIX3M", "VIX 3M")]
+                      ("CPER", "Copper"),
+                      # volatility term structure: front to back, plus vol-of-vol
+                      ("^VIX9D", "VIX 9-Day"), ("^VIX", "VIX 30-Day"),
+                      ("^VIX3M", "VIX 3-Month"), ("^VIX6M", "VIX 6-Month"),
+                      ("^VVIX", "Vol of VIX")]
 MACRO_STRUCT_SYMS = [s for s, _ in MACRO_STRUCT_EXTRA]
 NON_MEMBERS = set(INDEX_SYMS) | set(SECTOR_SYMS) | set(MACRO_SYMS) | set(MACRO_STRUCT_SYMS)
 
@@ -387,17 +391,56 @@ def build_macro_structure(conn, breadth_pct200, breadth_pct50=None, breadth_regi
             ratios.append(sig)
             total += sig["weighted_score"]
 
-    vix = _close_series(conn, "^VIX", as_of)
-    vix3 = _close_series(conn, "^VIX3M", as_of)
-    vix_close = round(float(vix.iloc[-1]), 3) if vix is not None and len(vix) else None
-    vix3_close = round(float(vix3.iloc[-1]), 3) if vix3 is not None and len(vix3) else None
-    backwardated = vix_close is not None and vix3_close is not None and vix_close > vix3_close
-    vix_score = 0
-    if vix_close is not None:
-        if backwardated:
-            vix_score = -1          # term-structure stress overrides level
+    # ---- VOLATILITY TERM STRUCTURE ----------------------------------------
+    # Read the curve as a SHAPE (9D -> 30D -> 3M -> 6M) rather than one pair.
+    # In calm markets the curve is upward-sloping (contango): near-dated vol is
+    # cheaper than far-dated. Stress inverts it from the FRONT first, so counting
+    # how many segments are inverted grades severity instead of just flagging it.
+    # VVIX (vol-of-vol) falling is a separate calming signal.
+    def _last(t):
+        c = _close_series(conn, t, as_of)
+        return round(float(c.iloc[-1]), 3) if c is not None and len(c) else None
+
+    v9, vix_close, vix3_close, v6m = _last("^VIX9D"), _last("^VIX"), _last("^VIX3M"), _last("^VIX6M")
+    vvix_s = _close_series(conn, "^VVIX", as_of)
+    vvix_close = round(float(vvix_s.iloc[-1]), 3) if vvix_s is not None and len(vvix_s) else None
+    vvix_10d = (round(float(vvix_s.iloc[-11]), 3)
+                if vvix_s is not None and len(vvix_s) > 11 else None)
+
+    # each adjacent pair: True when in contango (healthy)
+    segs = []
+    for a, b, lbl in ((v9, vix_close, "9D<30D"), (vix_close, vix3_close, "30D<3M"),
+                      (vix3_close, v6m, "3M<6M")):
+        segs.append({"pair": lbl, "ok": (a is not None and b is not None and a < b),
+                     "known": a is not None and b is not None})
+    known = [x for x in segs if x["known"]]
+    inverted = sum(1 for x in known if not x["ok"])
+    backwardated = inverted > 0
+
+    if not known:
+        curve = "unknown"
+        vix_score = 0
+    else:
+        # front-end inversion is the earliest and most reliable stress tell
+        front_inv = (not segs[0]["ok"]) and segs[0]["known"]
+        if inverted == 0:
+            curve = "contango"
+        elif inverted >= 2:
+            curve = "backwardated"
         else:
-            vix_score = 1 if vix_close < 15.0 else (-1 if vix_close > 20.0 else 0)
+            curve = "front-inverted" if front_inv else "flat"
+
+        if curve == "backwardated":
+            vix_score = -2          # multiple segments inverted = severe stress
+        elif curve in ("front-inverted", "flat"):
+            vix_score = -1
+        else:
+            # curve healthy -> fall back to the absolute level
+            vix_score = 1 if (vix_close is not None and vix_close < 15.0) else (
+                        -1 if (vix_close is not None and vix_close > 20.0) else 0)
+            # vol-of-vol calming is a mild confirmation, capped at +1 overall
+            if vvix_close is not None and vvix_10d is not None and vvix_close < vvix_10d:
+                vix_score = min(1, vix_score + 1)
     total += vix_score
 
     # ---- ABSOLUTE components (the fix for rotation masquerading as risk appetite) ----
@@ -609,7 +652,7 @@ def build_macro_structure(conn, breadth_pct200, breadth_pct50=None, breadth_regi
         "system_health": {"data_status": "stale" if stale else "ok", "last_close": last_d},
         "global_regime": {"status": status, "score": total, "raw_score": round(raw_score, 2),
                           "smooth_span": {"down": SPAN_DOWN, "up": SPAN_UP}, "delta_1d": score_delta,
-                          "min": -10, "max": 10,
+                          "min": -11, "max": 10,
                           "breadth_engine_regime": breadth_regime,
                           "components": {"intermarket": ratio_component, "vix": vix_score,
                                          "trend": trend_score, "breadth": breadth_score},
@@ -623,7 +666,10 @@ def build_macro_structure(conn, breadth_pct200, breadth_pct50=None, breadth_regi
         "score_history": score_history,
         "regime_history": regime_history,
         "intermarket_ratios": ratios,
-        "volatility": {"vix_close": vix_close, "vix3m_close": vix3_close, "backwardated": bool(backwardated), "score": vix_score},
+        "volatility": {"vix9d": v9, "vix_close": vix_close, "vix3m_close": vix3_close,
+                       "vix6m": v6m, "vvix": vvix_close, "vvix_10d_ago": vvix_10d,
+                       "curve": curve, "segments": segs, "inverted_segments": inverted,
+                       "backwardated": bool(backwardated), "score": vix_score},
         "asset_engines": engines,
         "relative_valuation": relval,
     }

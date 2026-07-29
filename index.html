@@ -633,6 +633,52 @@ function regimeChart(hist){
   </section>`;
 }
 
+function volCurve(vol){
+  if(!vol || !vol.segments) return "";
+  const tenors = [["9D", vol.vix9d], ["30D", vol.vix_close], ["3M", vol.vix3m_close], ["6M", vol.vix6m]]
+                 .filter(t => t[1] !== null && t[1] !== undefined);
+  if(tenors.length < 2) return "";
+  const W = 420, H = 150, PL = 34, PR = 14, PT = 16, PB = 26;
+  const iw = W-PL-PR, ih = H-PT-PB;
+  const vals = tenors.map(t => t[1]);
+  const lo = Math.min(...vals), hi = Math.max(...vals);
+  const pad = (hi-lo)*0.25 || 1;
+  const yl = lo-pad, yh = hi+pad;
+  const X = i => PL + (i/(tenors.length-1))*iw;
+  const Y = v => PT + ih - ((v-yl)/(yh-yl))*ih;
+  const stroke = vol.curve === "contango" ? "var(--pos,#4cd08a)"
+               : vol.curve === "backwardated" ? "var(--neg,#e8746f)" : "#e0b341";
+  const pts = tenors.map((t,i) => `${X(i).toFixed(1)},${Y(t[1]).toFixed(1)}`).join(" ");
+  const dots = tenors.map((t,i) =>
+    `<circle cx="${X(i).toFixed(1)}" cy="${Y(t[1]).toFixed(1)}" r="3" fill="${stroke}"/>
+     <text x="${X(i).toFixed(1)}" y="${(Y(t[1])-9).toFixed(1)}" text-anchor="middle" font-size="9.5" fill="var(--fg)">${t[1].toFixed(1)}</text>
+     <text x="${X(i).toFixed(1)}" y="${H-8}" text-anchor="middle" font-size="9.5" fill="var(--muted)">${t[0]}</text>`).join("");
+  const label = {contango:"CONTANGO (calm)", "front-inverted":"FRONT INVERTED (early stress)",
+                 flat:"FLAT / MIXED", backwardated:"BACKWARDATED (stress)", unknown:"—"}[vol.curve] || vol.curve;
+  const chk = ok => ok ? '<span class="pos">✓</span>' : '<span class="neg">✗</span>';
+  const vvixTxt = (vol.vvix !== null && vol.vvix !== undefined)
+    ? `VVIX ${vol.vvix.toFixed(1)}${vol.vvix_10d_ago ? ` <span class="dim" style="color:var(--muted)">vs ${vol.vvix_10d_ago.toFixed(1)} 10d ago</span> ${vol.vvix < vol.vvix_10d_ago ? '<span class="pos">falling</span>' : '<span class="neg">rising</span>'}` : ""}`
+    : "";
+  return `
+  <section class="panel">
+    <div class="phead">Volatility Term Structure <span class="r">9D · 30D · 3M · 6M</span></div>
+    <div class="pbody" style="display:flex;gap:22px;flex-wrap:wrap;align-items:flex-start">
+      <svg viewBox="0 0 ${W} ${H}" style="width:100%;max-width:${W}px;height:auto">
+        <polyline points="${pts}" fill="none" stroke="${stroke}" stroke-width="2"/>
+        ${dots}
+      </svg>
+      <div style="flex:1;min-width:220px">
+        <div style="font-size:13px;font-weight:700;margin-bottom:8px" class="${vol.curve==='contango'?'pos':vol.curve==='backwardated'?'neg':''}">${label}</div>
+        ${vol.segments.map(sg => `<div style="font-size:12.5px;padding:2px 0">${sg.known?chk(sg.ok):'<span class="flat">—</span>'} ${sg.pair} <span class="dim" style="color:var(--muted)">${sg.known?(sg.ok?"contango":"inverted"):"n/a"}</span></div>`).join("")}
+        <div style="font-size:12px;margin-top:9px">${vvixTxt}</div>
+        <div style="font-size:11.5px;margin-top:9px;color:var(--muted)">
+          Curve inverts from the front first. One inverted segment = early stress (−1);
+          two or more = broad stress (−2). A healthy curve falls back to the VIX level.</div>
+      </div>
+    </div>
+  </section>`;
+}
+
 function viewMacroStructure(d){
   const ms = d.macro_structure;
   if(!ms) return emptyPanel("Macro Structure", "no macro data in this JSON — re-run market_ingest.py (new tickers need --backfill)");
@@ -651,7 +697,7 @@ function viewMacroStructure(d){
         ${g.delta_1d ? `<span class="${g.delta_1d>0?'pos':'neg'}" style="font-size:12px">(${g.delta_1d>0?'+':''}${g.delta_1d} 1D)</span>` : ""}
         <span class="dim" style="color:var(--muted);font-size:12px">(${g.min} to +${g.max}${g.bands ? `; risk-on ≥ ${g.bands.moderate_on}` : ""})</span></div>
       <div style="font-size:13px" class="mono">VIX ${vol.vix_close ?? "—"}${vol.vix3m_close ? ` / 3M ${vol.vix3m_close}` : ""}
-        ${vol.backwardated ? '<span class="neg" style="font-weight:700"> BACKWARDATED</span>' : ""} → ${sc(vol.score)}</div>
+        ${vol.curve && vol.curve !== "contango" ? `<span class="neg" style="font-weight:700"> ${vol.curve.toUpperCase()}</span>` : vol.curve === "contango" ? '<span class="pos"> contango</span>' : ""} → ${sc(vol.score)}</div>
       ${sparkline(ms.score_history, g.min, g.max)}
     </div>
     <div class="pbody" style="border-top:1px solid var(--line);display:flex;gap:22px;flex-wrap:wrap;font-size:12.5px">
@@ -713,7 +759,7 @@ function viewMacroStructure(d){
     </div>
   </section>`;
 
-  return banner + regimeChart(ms.regime_history) + cards + table;
+  return banner + regimeChart(ms.regime_history) + volCurve(ms.volatility) + cards + table;
 }
 
 function emptyPanel(title, msg){
