@@ -550,9 +550,23 @@ def build_macro_structure(conn, breadth_pct200, breadth_pct50=None, breadth_regi
     HYST = {"Full Risk-On": 0.8, "Moderate Risk-On": 0.4, "Full Risk-Off": 0.3}
     hyst = HYST["Moderate Risk-On"]   # reported default
     prev_lab = None
+    prev_run = 0            # consecutive sessions the previous label has held
     try:
-        _r = conn.execute("SELECT v FROM macro_state WHERE k='label'").fetchone()
-        prev_lab = _r[0] if _r else None
+        conn.execute("CREATE TABLE IF NOT EXISTS macro_hist "
+                     "(d TEXT PRIMARY KEY, raw REAL, smooth REAL, status TEXT)")
+        _cut = (pd.Timestamp(as_of).date().isoformat() if as_of else _dt.date.today().isoformat())
+        _hrows = conn.execute(
+            "SELECT status FROM macro_hist WHERE d < ? ORDER BY d DESC LIMIT 60", (_cut,)).fetchall()
+        if _hrows:
+            prev_lab = _hrows[0][0]
+            for (_st,) in _hrows:
+                if _st == prev_lab:
+                    prev_run += 1
+                else:
+                    break
+        else:
+            _r = conn.execute("SELECT v FROM macro_state WHERE k='label'").fetchone()
+            prev_lab = _r[0] if _r else None
     except Exception:
         pass
 
@@ -562,9 +576,21 @@ def build_macro_structure(conn, breadth_pct200, breadth_pct50=None, breadth_regi
         if x > B_FULL_OFF:    return "Neutral / Choppy"
         return "Full Risk-Off"
 
+    # MINIMUM DWELL. 2022 exposed the real failure mode: in a grinding decline the
+    # score oscillates around -3.0 and the label flipped in/out of Full Risk-Off
+    # ~14 times in a year (three times in eight days in Feb 2022). Widening the
+    # hysteresis buffer cannot fix that -- the score genuinely crossed back and
+    # forth by more than the buffer. A dwell floor does: once Full Risk-Off is
+    # entered it holds for MIN_DWELL_OFF sessions regardless of score. This costs
+    # nothing in 2020 or 2025, where every episode ran far longer than the floor.
+    MIN_DWELL_OFF = 10
     raw_status = _band(total)
     status = raw_status
-    if prev_lab and raw_status != prev_lab:
+    dwell_held = False
+    if prev_lab == "Full Risk-Off" and raw_status != "Full Risk-Off" and prev_run < MIN_DWELL_OFF:
+        status = "Full Risk-Off"
+        dwell_held = True
+    if (not dwell_held) and prev_lab and raw_status != prev_lab:
         h_on   = HYST["Full Risk-On"]
         h_mod  = HYST["Moderate Risk-On"]
         h_off  = HYST["Full Risk-Off"]
@@ -746,7 +772,8 @@ def build_macro_structure(conn, breadth_pct200, breadth_pct50=None, breadth_regi
                           "components": {"intermarket": ratio_component, "vix": vix_score,
                                          "trend": trend_score, "breadth": breadth_score},
                           "bands": {"full_on": B_FULL_ON, "moderate_on": B_MOD_ON, "full_off": B_FULL_OFF, "hysteresis": HYST},
-                          "raw_status": raw_status,
+                          "raw_status": raw_status, "dwell_held": dwell_held,
+                          "min_dwell_off": MIN_DWELL_OFF, "prev_run_days": prev_run,
                           "agrees": _agreement(status, breadth_regime)},
         "absolute_trend": {"spy_vs_200sma_pct": spy_vs_200, "trend_score": trend_score,
                            "breadth_pct200": round(breadth_pct200, 1) if breadth_pct200 is not None else None,
@@ -934,9 +961,11 @@ def calibrate(conn, exclude_warmup=True):
     def flips(fon, mon, foff):
         lab = pd.cut(ser, [-99, foff, mon, fon, 99], labels=["off","neutral","mod","full"])
         return int((lab != lab.shift()).sum() - 1)
-    print(f"\n  regime changes over the window:  current {flips(7.0,3.5,-3.0)}   "
-          f"recommended {flips(full_on,mod_on,full_off)}")
-    print("  (fewer = less whipsaw; a hysteresis buffer would cut this further)")
+    print(f"\n  raw band crossings (NO smoothing/hysteresis/dwell applied):")
+    print(f"    current bands {flips(7.0,3.5,-3.0)}   recommended {flips(full_on,mod_on,full_off)}")
+    print("    NOTE: these are NOT comparable to the regime-change count from --replay,")
+    print("    which applies asymmetric smoothing, per-band hysteresis and the dwell")
+    print("    floor. Use the band levels below; ignore these crossing counts.")
 
 
 def _store_detail(conn, d_iso, payload):

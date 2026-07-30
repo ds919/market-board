@@ -6,7 +6,7 @@
 <title>Market Board</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
     --bg:#e7ecf1; --panel:#ffffff; --chrome:#0f2137; --chrome-2:#16304d;
@@ -16,22 +16,28 @@
     --pill-bad-bg:#fbe1e1; --pill-bad-ink:#c1352f;
     --pill-warn-bg:#fbeecd; --pill-warn-ink:#9a6a10;
     --pill-neut-bg:#e7edf3; --pill-neut-ink:#5b6b7c;
+    --panel2:#f4f7fa; --row-alt:#f7f9fb; --row-hover:#eef3f8;
     --sans:'Inter',system-ui,-apple-system,sans-serif;
-    --mono:'IBM Plex Mono',ui-monospace,'SF Mono',Menlo,monospace;
+    --mono:'Roboto Mono','IBM Plex Mono',ui-monospace,'SF Mono',Menlo,monospace;
   }
   [data-theme="dark"]{
-    --bg:#0a1522; --panel:#0f1f31; --chrome:#0b1728; --chrome-2:#14283f;
-    --ink:#e6edf4; --muted:#8697a8; --label:#5f7387; --line:#1d3147;
-    --pill-good-bg:#123a26; --pill-good-ink:#4cd08a;
-    --pill-bad-bg:#3d1a1a; --pill-bad-ink:#e8746f;
-    --pill-warn-bg:#3a2f12; --pill-warn-ink:#e0b049;
-    --pill-neut-bg:#1a2c3f; --pill-neut-ink:#93a6b8;
+    /* terminal palette: near-black charcoal, neon data accents */
+    --bg:#0c0c0e; --panel:#141417; --panel2:#1a1a1e; --chrome:#0a0a0c; --chrome-2:#17171b;
+    --ink:#e8eaed; --muted:#7d8590; --label:#5c636d; --line:#26262b;
+    --pos:#3ddc84; --neg:#ff5c57; --flat:#7d8590; --accent:#38bdf8;
+    --row-alt:#17171a; --row-hover:#1f1f25;
+    --pill-good-bg:#0e2f1e; --pill-good-ink:#3ddc84;
+    --pill-bad-bg:#331413; --pill-bad-ink:#ff5c57;
+    --pill-warn-bg:#332a10; --pill-warn-ink:#f5c451;
+    --pill-neut-bg:#1e1e24; --pill-neut-ink:#9aa4b0;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:13px;line-height:1.3;
     -webkit-font-smoothing:antialiased;padding-bottom:40px;transition:background .2s}
   .mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
-  .pos{color:var(--pos)} .neg{color:var(--neg)} .flat{color:var(--flat)}
+  td.num,th{font-family:var(--mono);font-variant-numeric:tabular-nums;letter-spacing:-.1px}
+  td.name{font-family:var(--mono)}
+  .pos{color:var(--pos);font-weight:500} .neg{color:var(--neg);font-weight:500} .flat{color:var(--flat)}
 
   /* ---------- top chrome ---------- */
   header{background:var(--chrome);color:#cdd9e6;position:sticky;top:0;z-index:10}
@@ -61,7 +67,7 @@
   .row{display:grid;gap:14px}
   .row.two-6040{grid-template-columns:1.55fr 1fr}
   .row.two-5050{grid-template-columns:1fr 1fr}
-  .panel{background:var(--panel);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+  .panel{box-shadow:0 0 0 1px var(--line);border-radius:10px;background:var(--panel);border:1px solid var(--line);border-radius:8px;overflow:hidden}
   .phead{background:var(--chrome);color:#aebfd0;display:flex;justify-content:space-between;align-items:center;
     padding:9px 14px;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase}
   .phead .r{color:#6f8299;font-weight:600;letter-spacing:.6px}
@@ -143,7 +149,13 @@
     .breadth{grid-template-columns:1fr;gap:0}
     .pbody{padding:10px}
     /* tables: trim to what fits a thumb-scrollable screen */
-    th,td{padding:8px 5px;font-size:12px}
+  th,td{padding:8px 10px;border:0;border-bottom:1px solid transparent}
+  tbody tr:nth-child(even), table tr:nth-child(even){background:var(--row-alt)}
+  table tr:hover{background:var(--row-hover)}
+  table{border-collapse:collapse;width:100%}
+  th{position:sticky;top:0;background:var(--panel);z-index:1;
+     font-size:10px;letter-spacing:.6px;text-transform:uppercase;color:var(--label);
+     border-bottom:1px solid var(--line);font-weight:600}
     td.name .cnt{display:none}
     td.rank{width:16px;font-size:10px}
     td.score{font-size:13px}
@@ -733,6 +745,9 @@ function viewMacroStructure(d){
       ${g.components ? `
         <div><span class="dim" style="color:var(--muted)">Drivers</span>
           <span class="mono" style="font-size:11.5px"> intermarket ${sc(g.components.intermarket)} · vix ${sc(g.components.vix)} · trend ${sc(g.components.trend)} · breadth ${sc(g.components.breadth)}</span></div>` : ""}
+      ${g.dwell_held ? `
+        <div><span class="warn" style="color:var(--pill-warn-ink,#f5c451);font-weight:700">⏱ DWELL HOLD</span>
+          <span class="dim" style="color:var(--muted);font-size:11.5px"> — risk-off held ${g.prev_run_days}/${g.min_dwell_off} sessions; score alone would have exited</span></div>` : ""}
       ${g.exit_unconfirmed ? `
         <div><span class="neg" style="font-weight:700">⚠ EXIT UNCONFIRMED</span>
           <span class="dim" style="color:var(--muted);font-size:11.5px"> — left risk-off while cross-asset signals kept falling</span></div>` : ""}

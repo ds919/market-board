@@ -486,14 +486,14 @@ d,raw,smooth,status
 2021-12-02,-2.28,-2.53,Neutral / Choppy
 2021-12-03,-4.14,-3.33,Full Risk-Off
 2021-12-06,-2.44,-3.13,Full Risk-Off
-2021-12-07,-0.26,-2.5,Neutral / Choppy
-2021-12-08,1.39,-1.63,Neutral / Choppy
-2021-12-09,-0.54,-1.39,Neutral / Choppy
-2021-12-10,1.29,-0.79,Neutral / Choppy
-2021-12-13,-0.66,-0.76,Neutral / Choppy
-2021-12-14,-0.68,-0.75,Neutral / Choppy
-2021-12-15,0.47,-0.48,Neutral / Choppy
-2021-12-16,-0.46,-0.47,Neutral / Choppy
+2021-12-07,-0.26,-2.5,Full Risk-Off
+2021-12-08,1.39,-1.63,Full Risk-Off
+2021-12-09,-0.54,-1.39,Full Risk-Off
+2021-12-10,1.29,-0.79,Full Risk-Off
+2021-12-13,-0.66,-0.76,Full Risk-Off
+2021-12-14,-0.68,-0.75,Full Risk-Off
+2021-12-15,0.47,-0.48,Full Risk-Off
+2021-12-16,-0.46,-0.47,Full Risk-Off
 2021-12-17,-1.14,-0.81,Neutral / Choppy
 2021-12-20,-1.26,-1.03,Neutral / Choppy
 2021-12-21,-1.68,-1.36,Neutral / Choppy
@@ -535,7 +535,7 @@ d,raw,smooth,status
 2022-02-11,-3.71,-2.86,Neutral / Choppy
 2022-02-14,-3.78,-3.32,Full Risk-Off
 2022-02-15,-1.66,-2.95,Full Risk-Off
-2022-02-16,-1.52,-2.63,Neutral / Choppy
+2022-02-16,-1.52,-2.63,Full Risk-Off
 2022-02-17,-4.6,-3.62,Full Risk-Off
 2022-02-18,-5.18,-4.4,Full Risk-Off
 2022-02-22,-5.74,-5.07,Full Risk-Off
@@ -733,15 +733,15 @@ d,raw,smooth,status
 2022-11-25,-2.97,-2.82,Neutral / Choppy
 2022-11-28,-4.36,-3.59,Full Risk-Off
 2022-11-29,-4.15,-3.87,Full Risk-Off
-2022-11-30,1.6,-2.65,Neutral / Choppy
-2022-12-01,1.73,-1.68,Neutral / Choppy
-2022-12-02,2.49,-0.75,Neutral / Choppy
-2022-12-05,-2.81,-1.78,Neutral / Choppy
-2022-12-06,-3.06,-2.42,Neutral / Choppy
-2022-12-07,-3.68,-3.05,Neutral / Choppy
-2022-12-08,-2.97,-3.03,Neutral / Choppy
-2022-12-09,-3.29,-3.16,Neutral / Choppy
-2022-12-12,-3.37,-3.27,Neutral / Choppy
+2022-11-30,1.6,-2.65,Full Risk-Off
+2022-12-01,1.73,-1.68,Full Risk-Off
+2022-12-02,2.49,-0.75,Full Risk-Off
+2022-12-05,-2.81,-1.78,Full Risk-Off
+2022-12-06,-3.06,-2.42,Full Risk-Off
+2022-12-07,-3.68,-3.05,Full Risk-Off
+2022-12-08,-2.97,-3.03,Full Risk-Off
+2022-12-09,-3.29,-3.16,Full Risk-Off
+2022-12-12,-3.37,-3.27,Full Risk-Off
 2022-12-13,0.7,-2.38,Neutral / Choppy
 2022-12-14,-3.35,-2.87,Neutral / Choppy
 2022-12-15,-3.74,-3.3,Full Risk-Off
@@ -843,8 +843,8 @@ d,raw,smooth,status
 2023-05-05,-2.15,-3.69,Full Risk-Off
 2023-05-08,-2.57,-3.44,Full Risk-Off
 2023-05-09,-2.4,-3.21,Full Risk-Off
-2023-05-10,-0.86,-2.69,Neutral / Choppy
-2023-05-11,-3.04,-2.86,Neutral / Choppy
+2023-05-10,-0.86,-2.69,Full Risk-Off
+2023-05-11,-3.04,-2.86,Full Risk-Off
 2023-05-12,-3.74,-3.3,Full Risk-Off
 2023-05-15,-1.5,-2.9,Full Risk-Off
 2023-05-16,-3.6,-3.25,Full Risk-Off
@@ -1162,9 +1162,9 @@ d,raw,smooth,status
 2024-08-13,-3.27,-3.81,Full Risk-Off
 2024-08-14,-2.02,-3.41,Full Risk-Off
 2024-08-15,-1.09,-2.9,Full Risk-Off
-2024-08-16,-0.21,-2.3,Neutral / Choppy
-2024-08-19,0.68,-1.64,Neutral / Choppy
-2024-08-20,0.88,-1.08,Neutral / Choppy
+2024-08-16,-0.21,-2.3,Full Risk-Off
+2024-08-19,0.68,-1.64,Full Risk-Off
+2024-08-20,0.88,-1.08,Full Risk-Off
 2024-08-21,1.54,-0.5,Neutral / Choppy
 2024-08-22,2.14,0.09,Neutral / Choppy
 2024-08-23,3.18,0.78,Neutral / Choppy
@@ -1482,13 +1482,13 @@ d,raw,smooth,status
 2025-11-20,-4.14,-3.66,Full Risk-Off
 2025-11-21,-3.53,-3.63,Full Risk-Off
 2025-11-24,-2.66,-3.41,Full Risk-Off
-2025-11-25,0.88,-2.46,Neutral / Choppy
-2025-11-26,1.29,-1.63,Neutral / Choppy
-2025-11-28,2.53,-0.7,Neutral / Choppy
-2025-12-01,2.66,0.04,Neutral / Choppy
-2025-12-02,2.71,0.64,Neutral / Choppy
-2025-12-03,3.79,1.34,Neutral / Choppy
-2025-12-04,5.1,2.17,Neutral / Choppy
+2025-11-25,0.88,-2.46,Full Risk-Off
+2025-11-26,1.29,-1.63,Full Risk-Off
+2025-11-28,2.53,-0.7,Full Risk-Off
+2025-12-01,2.66,0.04,Full Risk-Off
+2025-12-02,2.71,0.64,Full Risk-Off
+2025-12-03,3.79,1.34,Full Risk-Off
+2025-12-04,5.1,2.17,Full Risk-Off
 2025-12-05,5.36,2.88,Neutral / Choppy
 2025-12-08,5.53,3.47,Neutral / Choppy
 2025-12-09,5.09,3.83,Neutral / Choppy
