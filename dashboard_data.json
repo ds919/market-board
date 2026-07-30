@@ -833,7 +833,7 @@
         "theme": "Semiconductors",
         "d1": -9.36,
         "r21": -37.4,
-        "r63": -26.0
+        "r63": -25.9
       },
       {
         "tk": "AMAT",
@@ -2247,9 +2247,9 @@
       "close": 107.01,
       "d1": -9.36,
       "d5": -22.1,
-      "d21": -37.44,
-      "d63": -26.01,
-      "dist50": -25.5,
+      "d21": -37.38,
+      "d63": -25.94,
+      "dist50": -25.4,
       "atr": -4.1,
       "rvol": 1.54,
       "a50": false,
@@ -4807,26 +4807,26 @@
     }
   },
   "macro_structure": {
-    "updated_at": "2026-07-30T04:14:00Z",
+    "updated_at": "2026-07-30T04:33:48Z",
     "system_health": {
       "data_status": "ok",
       "last_close": "2026-07-29"
     },
     "global_regime": {
       "status": "Neutral / Choppy",
-      "score": 1.15,
+      "score": 1.47,
       "raw_score": 0.87,
       "smooth_span": {
         "down": 3,
         "up": 8
       },
-      "delta_1d": -0.5,
+      "delta_1d": -0.58,
       "min": -11,
       "max": 10,
       "breadth_engine_regime": "NEUTRAL",
       "exit_unconfirmed": false,
       "components": {
-        "intermarket": 0.15,
+        "intermarket": 0.47,
         "vix": -1,
         "trend": 1,
         "breadth": 1
@@ -5079,19 +5079,19 @@
       },
       {
         "d": "2026-07-24",
-        "score": -0.02
+        "score": 1.75
       },
       {
         "d": "2026-07-27",
-        "score": 2.46
+        "score": 2.4
       },
       {
         "d": "2026-07-28",
-        "score": 1.65
+        "score": 2.05
       },
       {
         "d": "2026-07-29",
-        "score": 1.15
+        "score": 1.47
       }
     ],
     "regime_history": [
@@ -6889,28 +6889,28 @@
       },
       {
         "d": "2026-07-24",
-        "score": 1.13,
-        "raw": -0.02,
+        "score": 2.01,
+        "raw": 1.75,
         "status": "Neutral / Choppy",
         "spx": 738.93
       },
       {
         "d": "2026-07-27",
-        "score": 1.42,
-        "raw": 2.46,
+        "score": 2.1,
+        "raw": 2.4,
         "status": "Neutral / Choppy",
         "spx": 739.09
       },
       {
         "d": "2026-07-28",
-        "score": 1.65,
-        "raw": 2.46,
+        "score": 2.07,
+        "raw": 2.05,
         "status": "Neutral / Choppy",
         "spx": 740.86
       },
       {
         "d": "2026-07-29",
-        "score": 1.15,
+        "score": 1.47,
         "raw": 0.87,
         "status": "Neutral / Choppy",
         "spx": 729.46
@@ -7134,8 +7134,8 @@
       },
       {
         "ticker": "BTC-USD",
-        "spread_1m": 2.872,
-        "spread_3m": -15.697
+        "spread_1m": 2.884,
+        "spread_3m": -15.687
       }
     ]
   },
