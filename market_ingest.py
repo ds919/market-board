@@ -23,6 +23,7 @@ import pandas as pd
 DB_PATH   = "market.db"
 JSON_OUT  = "dashboard_data.json"
 REPLAY_CSV = "macro_replay.csv"
+HIST_CSV   = "macro_history.csv"   # committed to the repo; shared by local + Action
 UNIVERSE  = "UNIVERSE V1"
 BACKFILL_PERIOD = "2y"    # enough history for 200DMA + 52-week highs
 NIGHTLY_PERIOD  = "10d"   # small incremental pull
@@ -372,6 +373,28 @@ def _agreement(macro_status, breadth_regime):
     b = "on" if "ON" in br else "off" if "OFF" in br else "neutral"
     return m == b
 
+
+def _load_hist_csv():
+    """Regime history from the committed CSV. The GitHub Action runs against a
+    CACHED market.db that does not contain a locally-run --replay, so the DB
+    alone is not a reliable history store. The CSV travels with the repo, so
+    local runs and the Action always see the same history."""
+    try:
+        if os.path.exists(HIST_CSV):
+            df = pd.read_csv(HIST_CSV)
+            return {str(r["d"]): (float(r["raw"]), float(r["smooth"]), str(r["status"]))
+                    for _, r in df.iterrows()}
+    except Exception as e:
+        print(f"[hist] could not read {HIST_CSV}: {e}")
+    return {}
+
+def _save_hist_csv(rows):
+    try:
+        pd.DataFrame([{"d": d, "raw": v[0], "smooth": v[1], "status": v[2]}
+                      for d, v in sorted(rows.items())]).to_csv(HIST_CSV, index=False)
+    except Exception as e:
+        print(f"[hist] could not write {HIST_CSV}: {e}")
+
 def build_macro_structure(conn, breadth_pct200, breadth_pct50=None, breadth_regime=None, as_of=None):
     import datetime as _dt
     RATIOS = [("RSP", "SPY", False, "Market Breadth"),
@@ -635,10 +658,14 @@ def build_macro_structure(conn, breadth_pct200, breadth_pct50=None, breadth_regi
     # regime history joined to SPX, for the overlay chart on the Macro tab
     regime_history = []
     try:
-        hrows = conn.execute(
-            "SELECT d, raw, smooth, status FROM macro_hist ORDER BY d DESC LIMIT 260").fetchall()
+        merged = _load_hist_csv()
+        for d_, rw, sm, st in conn.execute(
+                "SELECT d, raw, smooth, status FROM macro_hist").fetchall():
+            merged[str(d_)] = (float(rw), float(sm), str(st))   # DB wins on overlap
+        _save_hist_csv(merged)
+        hrows = [(d, v[0], v[1], v[2]) for d, v in sorted(merged.items())][-260:]
         spx_px = _close_series(conn, "SPY", as_of)
-        for d_, rw, sm, st in reversed(hrows):
+        for d_, rw, sm, st in hrows:
             ts = pd.Timestamp(d_)
             px = float(spx_px.loc[ts]) if spx_px is not None and ts in spx_px.index else None
             regime_history.append({"d": d_, "score": round(float(sm), 2),
