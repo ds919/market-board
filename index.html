@@ -581,11 +581,37 @@ function sparkline(hist, lo, hi){
   </svg>`;
 }
 
+let chartRange = 260;   // sessions shown; null = all
+
+function setChartRange(n){
+  chartRange = n;
+  const host = document.getElementById("regimeChartHost");
+  if(host && DATA) host.innerHTML = regimeChartInner(DATA.macro_structure.regime_history);
+}
+
 function regimeChart(hist){
   if(!hist || hist.length < 5) return "";
-  const pts = hist.filter(h => h.spx !== null && h.spx !== undefined);
+  const opts = [[130,"6M"],[260,"1Y"],[520,"2Y"],[null,"All"]]
+    .filter(o => o[0] === null || o[0] <= Math.max(hist.length, 130));
+  return `
+  <section class="panel">
+    <div class="phead">SPX vs Regime
+      <span class="r">
+        ${opts.map(o => `<button onclick="setChartRange(${o[0]})"
+           style="background:none;border:1px solid var(--line);color:var(--muted);
+                  border-radius:5px;padding:2px 7px;margin-left:4px;font-size:10.5px;
+                  font-family:inherit;cursor:pointer">${o[1]}</button>`).join("")}
+      </span></div>
+    <div class="pbody" id="regimeChartHost" style="overflow-x:auto">${regimeChartInner(hist)}</div>
+  </section>`;
+}
+
+function regimeChartInner(hist){
+  if(!hist || hist.length < 5) return "";
+  let pts = hist.filter(h => h.spx !== null && h.spx !== undefined);
+  if(chartRange && pts.length > chartRange) pts = pts.slice(-chartRange);
   if(pts.length < 5) return "";
-  const W = 900, H = 260, PL = 46, PR = 12, PT = 14, PB = 26;
+  const W = Math.max(900, Math.min(2400, pts.length * 3.4)), H = 260, PL = 46, PR = 12, PT = 14, PB = 26;
   const iw = W - PL - PR, ih = H - PT - PB;
   const px = pts.map(p => p.spx);
   const lo = Math.min(...px), hi = Math.max(...px);
@@ -615,10 +641,8 @@ function regimeChart(hist){
   ).join("");
 
   return `
-  <section class="panel">
-    <div class="phead">SPX vs Regime <span class="r">${pts.length} SESSIONS · BACKGROUND = REGIME</span></div>
-    <div class="pbody" style="overflow-x:auto">
-      <svg viewBox="0 0 ${W} ${H}" style="width:100%;min-width:560px;height:auto;display:block">
+      <div class="dim" style="color:var(--muted);font-size:11px;margin-bottom:4px">${pts.length} sessions · ${pts[0].d} → ${pts[pts.length-1].d} · background = regime</div>
+      <svg viewBox="0 0 ${W} ${H}" style="width:100%;min-width:${Math.min(1600, Math.max(560, pts.length*2.2)).toFixed(0)}px;height:auto;display:block">
         ${bands}${ticks}
         <polyline points="${line}" fill="none" stroke="var(--fg,#e6edf3)" stroke-width="1.6"/>
         ${xl}
@@ -628,9 +652,7 @@ function regimeChart(hist){
         <span><span style="display:inline-block;width:10px;height:10px;background:var(--muted,#3a4a5e);opacity:.16;margin-right:5px"></span>Neutral</span>
         <span><span style="display:inline-block;width:10px;height:10px;background:var(--neg,#8c3630);opacity:.34;margin-right:5px"></span>Risk-Off</span>
         <span class="dim" style="color:var(--muted)">line = SPY close</span>
-      </div>
-    </div>
-  </section>`;
+      </div>`;
 }
 
 function volCurve(vol){

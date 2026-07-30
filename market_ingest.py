@@ -25,7 +25,11 @@ JSON_OUT  = "dashboard_data.json"
 REPLAY_CSV = "macro_replay.csv"
 HIST_CSV   = "macro_history.csv"   # committed to the repo; shared by local + Action
 UNIVERSE  = "UNIVERSE V1"
-BACKFILL_PERIOD = "2y"    # enough history for 200DMA + 52-week highs
+BACKFILL_PERIOD = os.environ.get("BACKFILL_PERIOD", "7y")
+# 7y reaches back through the 2020 COVID crash -- the only genuine bear market
+# available for testing the regime engine. Scores are only valid ~200 trading
+# days after the pull start (the 200DMA warmup), so 7y gives clean scores from
+# roughly 2020 onward. Override with e.g. BACKFILL_PERIOD=max or 2y.
 NIGHTLY_PERIOD  = "10d"   # small incremental pull
 
 INDEX_ETFS = [("SPY", "SPX"), ("QQQ", "NDX"), ("IWM", "R2K"),
@@ -663,7 +667,7 @@ def build_macro_structure(conn, breadth_pct200, breadth_pct50=None, breadth_regi
                 "SELECT d, raw, smooth, status FROM macro_hist").fetchall():
             merged[str(d_)] = (float(rw), float(sm), str(st))   # DB wins on overlap
         _save_hist_csv(merged)
-        hrows = [(d, v[0], v[1], v[2]) for d, v in sorted(merged.items())][-260:]
+        hrows = [(d, v[0], v[1], v[2]) for d, v in sorted(merged.items())][-1600:]
         spx_px = _close_series(conn, "SPY", as_of)
         for d_, rw, sm, st in hrows:
             ts = pd.Timestamp(d_)
@@ -713,6 +717,23 @@ def build_macro_structure(conn, breadth_pct200, breadth_pct50=None, breadth_regi
         conn.commit()
     except Exception:
         pass
+
+    _dstamp = (pd.Timestamp(as_of).date().isoformat() if as_of else _dt.date.today().isoformat())
+    _spx_now = None
+    try:
+        _sp = _close_series(conn, "SPY", as_of)
+        _spx_now = round(float(_sp.iloc[-1]), 2) if _sp is not None and len(_sp) else None
+    except Exception:
+        pass
+    _store_detail(conn, _dstamp, {
+        "score": total, "raw": raw_score, "status": status, "spx": _spx_now,
+        "vix": vix_score, "trend": trend_score, "breadth": breadth_score,
+        "intermarket": ratio_component, "curve": curve,
+        "vix9d": v9, "vix30d": vix_close, "vix3m": vix3_close, "vix6m": v6m, "vvix": vvix_close,
+        "breadth_pct200": breadth_pct200, "spy_vs_200": spy_vs_200,
+        "ratios": [{"pair": r["pair"], "value": r["value"], "direction": r["direction"],
+                    "weight": r.get("weight"), "weighted_score": r.get("weighted_score")}
+                   for r in ratios]})
 
     return {
         "updated_at": _dt.datetime.now(_dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
@@ -916,6 +937,56 @@ def calibrate(conn, exclude_warmup=True):
     print(f"\n  regime changes over the window:  current {flips(7.0,3.5,-3.0)}   "
           f"recommended {flips(full_on,mod_on,full_off)}")
     print("  (fewer = less whipsaw; a hysteresis buffer would cut this further)")
+
+
+def _store_detail(conn, d_iso, payload):
+    """Full per-date component detail, so the composite score is auditable and
+    exportable. One JSON blob per date keeps the schema stable as inputs change."""
+    try:
+        conn.execute("CREATE TABLE IF NOT EXISTS macro_detail (d TEXT PRIMARY KEY, j TEXT)")
+        conn.execute("INSERT OR REPLACE INTO macro_detail VALUES (?,?)", (d_iso, json.dumps(payload)))
+    except Exception as e:
+        print(f"[detail] store failed: {e}")
+
+def export_excel(conn, out="macro_components.xlsx"):
+    """Excel workbook of every day's inputs and the resulting composite score."""
+    try:
+        import openpyxl  # noqa
+    except ImportError:
+        print("[export] pip install openpyxl"); return
+    try:
+        rows = conn.execute("SELECT d, j FROM macro_detail ORDER BY d").fetchall()
+    except Exception:
+        print("[export] no detail table yet -- run --replay (or a normal run) first"); return
+    if not rows:
+        print("[export] no detail stored -- run --replay first"); return
+    recs = []
+    for d_, j in rows:
+        try:
+            o = json.loads(j)
+        except Exception:
+            continue
+        rec = {"date": d_, "composite_score": o.get("score"), "raw_score": o.get("raw"),
+               "status": o.get("status"), "spx": o.get("spx"),
+               "vix_score": o.get("vix"), "trend_score": o.get("trend"),
+               "breadth_score": o.get("breadth"), "intermarket_total": o.get("intermarket"),
+               "curve": o.get("curve"), "vix9d": o.get("vix9d"), "vix30d": o.get("vix30d"),
+               "vix3m": o.get("vix3m"), "vix6m": o.get("vix6m"), "vvix": o.get("vvix"),
+               "breadth_pct200": o.get("breadth_pct200"), "spy_vs_200sma_pct": o.get("spy_vs_200")}
+        for r in o.get("ratios", []):
+            key = r["pair"].replace("/", "_").replace("-", "")
+            rec[f"{key}_value"] = r.get("value")
+            rec[f"{key}_dir"] = r.get("direction")
+            rec[f"{key}_conv"] = r.get("weight")
+            rec[f"{key}_score"] = r.get("weighted_score")
+        recs.append(rec)
+    df = pd.DataFrame(recs)
+    with pd.ExcelWriter(out, engine="openpyxl") as xl:
+        df.to_excel(xl, sheet_name="Daily Components", index=False)
+        cols = ["date", "composite_score", "status", "spx", "intermarket_total",
+                "vix_score", "trend_score", "breadth_score"]
+        df[[c for c in cols if c in df]].to_excel(xl, sheet_name="Summary", index=False)
+    print(f"[export] {len(df)} days x {len(df.columns)} fields -> {out}")
 
 def dispatch_webhook(prev_status, new_status, payload):
     """POST a regime-shift alert to WEBHOOK_URL if set. Never crashes the run."""
@@ -1238,6 +1309,8 @@ def main():
     ap.add_argument("--selftest", action="store_true", help="synthetic data, no network")
     ap.add_argument("--verify", nargs="+", metavar="TICKER",
                     help="audit calc chain for given tickers vs the DB (read-only)")
+    ap.add_argument("--export", action="store_true",
+                    help="write macro_components.xlsx from stored per-date detail")
     ap.add_argument("--calibrate", action="store_true",
                     help="recommend regime bands from replayed score history")
     ap.add_argument("--replay", metavar="YYYY-MM-DD",
@@ -1253,6 +1326,12 @@ def main():
 
     if args.verify:
         verify(args.verify)
+        return
+
+    if args.export:
+        conn = sqlite3.connect(DB_PATH)
+        export_excel(conn)
+        conn.close()
         return
 
     if args.calibrate:
