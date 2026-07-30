@@ -463,11 +463,23 @@ def build_macro_structure(conn, breadth_pct200, breadth_pct50=None, breadth_regi
             vix_score = -1
         else:
             # curve healthy -> fall back to the absolute level
-            vix_score = 1 if (vix_close is not None and vix_close < 15.0) else (
-                        -1 if (vix_close is not None and vix_close > 20.0) else 0)
-            # vol-of-vol calming is a mild confirmation, capped at +1 overall
-            if vvix_close is not None and vvix_10d is not None and vvix_close < vvix_10d:
-                vix_score = min(1, vix_score + 1)
+            # CALM VOL IS NOT SCORED BULLISH. The --vixtest hypothesis test came
+            # back 4/4: forward SPX returns after STRESS readings beat those after
+            # CALM readings in every window, monotonically (stress > zero > calm),
+            # by +1.9pp at 21d and +5.2pp at 63d out-of-sample. Mechanism is the
+            # "volatility paradox" -- suppressed vol invites leverage, which
+            # precedes poor returns.
+            #
+            # Calm is therefore scored 0 rather than +1. NOT inverted to -1: full
+            # inversion is a larger claim than 4/4 on ~78 effective independent
+            # observations supports, and the engine is a CONCURRENT classifier --
+            # "vol is calm now" remains a true statement about present conditions.
+            vix_score = -1 if (vix_close is not None and vix_close > 20.0) else 0
+            # vol-of-vol falling no longer adds a positive; it only offsets an
+            # elevated-level penalty back toward neutral.
+            if (vix_score < 0 and vvix_close is not None and vvix_10d is not None
+                    and vvix_close < vvix_10d):
+                vix_score = 0
     total += vix_score
 
     # ---- ABSOLUTE components (the fix for rotation masquerading as risk appetite) ----
@@ -524,7 +536,7 @@ def build_macro_structure(conn, breadth_pct200, breadth_pct50=None, breadth_regi
     try:
         conn.execute("CREATE TABLE IF NOT EXISTS macro_scores (d TEXT PRIMARY KEY, score REAL)")
         conn.execute("CREATE TABLE IF NOT EXISTS macro_smooth (d TEXT PRIMARY KEY, s REAL)")
-        cutoff = (pd.Timestamp(as_of).date().isoformat() if as_of else _dt.date.today().isoformat())
+        cutoff = (pd.Timestamp(as_of).date().isoformat() if as_of else _session_date(conn))
         prev_sm = conn.execute(
             "SELECT s FROM macro_smooth WHERE d < ? ORDER BY d DESC LIMIT 1", (cutoff,)).fetchone()
         if prev_sm is None:
@@ -554,7 +566,7 @@ def build_macro_structure(conn, breadth_pct200, breadth_pct50=None, breadth_regi
     try:
         conn.execute("CREATE TABLE IF NOT EXISTS macro_hist "
                      "(d TEXT PRIMARY KEY, raw REAL, smooth REAL, status TEXT)")
-        _cut = (pd.Timestamp(as_of).date().isoformat() if as_of else _dt.date.today().isoformat())
+        _cut = (pd.Timestamp(as_of).date().isoformat() if as_of else _session_date(conn))
         _hrows = conn.execute(
             "SELECT status FROM macro_hist WHERE d < ? ORDER BY d DESC LIMIT 60", (_cut,)).fetchall()
         if _hrows:
@@ -583,13 +595,28 @@ def build_macro_structure(conn, breadth_pct200, breadth_pct50=None, breadth_regi
     # forth by more than the buffer. A dwell floor does: once Full Risk-Off is
     # entered it holds for MIN_DWELL_OFF sessions regardless of score. This costs
     # nothing in 2020 or 2025, where every episode ran far longer than the floor.
+    # NEUTRAL SLOPE. 53% of sessions land in Neutral, which is honest but not
+    # actionable. Rather than narrow the band (which would overclaim conviction),
+    # split it by the score's own direction over ~5 sessions. No predictive claim
+    # is made -- it only reports whether conditions are getting better or worse.
+    slope = None
+    try:
+        _cut2 = (pd.Timestamp(as_of).date().isoformat() if as_of else _session_date(conn))
+        _prev5 = conn.execute(
+            "SELECT smooth FROM macro_hist WHERE d < ? ORDER BY d DESC LIMIT 5", (_cut2,)).fetchall()
+        if len(_prev5) >= 3:
+            slope = round(float(total) - float(_prev5[-1][0]), 2)
+    except Exception:
+        pass
+
     MIN_DWELL_OFF = 10
     raw_status = _band(total)
     status = raw_status
     dwell_held = False
-    if prev_lab == "Full Risk-Off" and raw_status != "Full Risk-Off" and prev_run < MIN_DWELL_OFF:
+    if str(prev_lab) == "Full Risk-Off" and raw_status != "Full Risk-Off" and prev_run < MIN_DWELL_OFF:
         status = "Full Risk-Off"
         dwell_held = True
+    prev_lab = ("Neutral / Choppy" if str(prev_lab).startswith("Neutral") else prev_lab)
     if (not dwell_held) and prev_lab and raw_status != prev_lab:
         h_on   = HYST["Full Risk-On"]
         h_mod  = HYST["Moderate Risk-On"]
@@ -609,6 +636,20 @@ def build_macro_structure(conn, breadth_pct200, breadth_pct50=None, breadth_regi
                 status = prev_lab
             elif prev_lab == "Full Risk-Off" and total < B_FULL_OFF + h_off:
                 status = prev_lab
+
+    # Slope is reported as a SEPARATE readout, never folded into the label.
+    # Baking it in produced ~230 regime changes (from 96) because Improving and
+    # Deteriorating flip against each other every few sessions. As an adjacent
+    # indicator it cannot churn the regime series at all, and it still answers
+    # "are conditions getting better or worse inside Neutral?".
+    neutral_dir = None
+    if slope is not None:
+        if slope >= 0.35:
+            neutral_dir = "improving"
+        elif slope <= -0.35:
+            neutral_dir = "deteriorating"
+        else:
+            neutral_dir = "flat"
 
     # expose the split so the UI can show what is actually driving the score
     ratio_component = round(total - vix_score - trend_score - breadth_score, 2)
@@ -678,11 +719,11 @@ def build_macro_structure(conn, breadth_pct200, breadth_pct50=None, breadth_regi
     conn.execute("INSERT OR REPLACE INTO macro_state VALUES ('label', ?)", (status,))
     conn.execute("CREATE TABLE IF NOT EXISTS macro_hist "
                  "(d TEXT PRIMARY KEY, raw REAL, smooth REAL, status TEXT)")
-    _hd = (pd.Timestamp(as_of).date().isoformat() if as_of else _dt.date.today().isoformat())
+    _hd = (pd.Timestamp(as_of).date().isoformat() if as_of else _session_date(conn))
     conn.execute("INSERT OR REPLACE INTO macro_hist VALUES (?,?,?,?)",
                  (_hd, float(raw_score), float(total), status))
     conn.execute("CREATE TABLE IF NOT EXISTS macro_scores (d TEXT PRIMARY KEY, score REAL)")
-    today_iso = (pd.Timestamp(as_of).date().isoformat() if as_of else _dt.date.today().isoformat())
+    today_iso = (pd.Timestamp(as_of).date().isoformat() if as_of else _session_date(conn))
     conn.execute("INSERT OR REPLACE INTO macro_scores VALUES (?,?)", (today_iso, float(total)))
     conn.commit()
     # regime history joined to SPX, for the overlay chart on the Macro tab
@@ -724,12 +765,12 @@ def build_macro_structure(conn, breadth_pct200, breadth_pct50=None, breadth_regi
     try:
         prow = conn.execute(
             "SELECT status, raw FROM macro_hist WHERE d < ? ORDER BY d DESC LIMIT 1",
-            ((pd.Timestamp(as_of).date().isoformat() if as_of else _dt.date.today().isoformat()),)
+            ((pd.Timestamp(as_of).date().isoformat() if as_of else _session_date(conn)),)
         ).fetchone()
         if prow and prow[0] == "Full Risk-Off" and status != "Full Risk-Off":
             prev_im = conn.execute(
                 "SELECT intermarket FROM macro_components WHERE d < ? ORDER BY d DESC LIMIT 1",
-                ((pd.Timestamp(as_of).date().isoformat() if as_of else _dt.date.today().isoformat()),)
+                ((pd.Timestamp(as_of).date().isoformat() if as_of else _session_date(conn)),)
             ).fetchone()
             if prev_im and ratio_component < float(prev_im[0]):
                 exit_unconfirmed = True
@@ -738,13 +779,13 @@ def build_macro_structure(conn, breadth_pct200, breadth_pct50=None, breadth_regi
     try:
         conn.execute("CREATE TABLE IF NOT EXISTS macro_components (d TEXT PRIMARY KEY, intermarket REAL)")
         conn.execute("INSERT OR REPLACE INTO macro_components VALUES (?,?)",
-                     ((pd.Timestamp(as_of).date().isoformat() if as_of else _dt.date.today().isoformat()),
+                     ((pd.Timestamp(as_of).date().isoformat() if as_of else _session_date(conn)),
                       float(ratio_component)))
         conn.commit()
     except Exception:
         pass
 
-    _dstamp = (pd.Timestamp(as_of).date().isoformat() if as_of else _dt.date.today().isoformat())
+    _dstamp = (pd.Timestamp(as_of).date().isoformat() if as_of else _session_date(conn))
     _spx_now = None
     try:
         _sp = _close_series(conn, "SPY", as_of)
@@ -773,6 +814,7 @@ def build_macro_structure(conn, breadth_pct200, breadth_pct50=None, breadth_regi
                                          "trend": trend_score, "breadth": breadth_score},
                           "bands": {"full_on": B_FULL_ON, "moderate_on": B_MOD_ON, "full_off": B_FULL_OFF, "hysteresis": HYST},
                           "raw_status": raw_status, "dwell_held": dwell_held,
+                          "slope_5d": slope, "neutral_dir": neutral_dir,
                           "min_dwell_off": MIN_DWELL_OFF, "prev_run_days": prev_run,
                           "agrees": _agreement(status, breadth_regime)},
         "absolute_trend": {"spy_vs_200sma_pct": spy_vs_200, "trend_score": trend_score,
@@ -1017,6 +1059,188 @@ def export_excel(conn, out="macro_components.xlsx"):
         df[[c for c in cols if c in df]].to_excel(xl, sheet_name="Summary", index=False)
     print(f"[export] {len(df)} days x {len(df.columns)} fields -> {out}")
 
+
+def information_coefficient(conn, split="2024-01-01"):
+    """Which components actually carry forward-looking information?
+
+    Measures each component's Spearman rank correlation (the "information
+    coefficient") against FORWARD SPX returns at 5/21/63 days -- not concurrent
+    returns, which only tell you a component moves with the market and is
+    therefore confirmation rather than signal.
+
+    Reported IN-SAMPLE and OUT-OF-SAMPLE separately. This is the whole point: a
+    component that scores well in-sample and collapses out-of-sample is noise
+    that happened to fit, and the split is what exposes it.
+
+    TWO CAVEATS THAT LIMIT HOW HARD THESE NUMBERS CAN BE PUSHED:
+      1. Overlapping windows. Consecutive 21-day forward returns share 20 days,
+         so the effective independent sample is ~n/21, not n. With ~1650 days
+         that is roughly 79 independent observations -- enough to RANK components
+         loosely, nowhere near enough to justify precise fitted weights.
+      2. For macro/breadth signals an IC of 0.05-0.15 is considered good. Do not
+         expect large numbers, and expect several components to be statistically
+         indistinguishable from one another.
+
+    Use the output for COARSE TIERING (2x / 1x / 0.5x), never fitted coefficients.
+    """
+    try:
+        rows = conn.execute("SELECT d, j FROM macro_detail ORDER BY d").fetchall()
+    except Exception:
+        print("[ic] no detail table -- run --replay first"); return
+    if len(rows) < 300:
+        print(f"[ic] only {len(rows)} days stored -- run --replay 2020-01-01 first"); return
+
+    recs = {}
+    for d_, j in rows:
+        try:
+            o = json.loads(j)
+        except Exception:
+            continue
+        rec = {"score": o.get("score"), "raw": o.get("raw"),
+               "intermarket": o.get("intermarket"), "vix": o.get("vix"),
+               "trend": o.get("trend"), "breadth": o.get("breadth"),
+               "spx": o.get("spx")}
+        for r in o.get("ratios", []):
+            rec[r["pair"]] = r.get("weighted_score")
+        recs[pd.Timestamp(d_)] = rec
+    df = pd.DataFrame.from_dict(recs, orient="index").sort_index()
+
+    spx = _close_series(conn, "SPY")
+    if spx is None:
+        print("[ic] no SPY data"); return
+    px = spx.reindex(df.index).ffill()
+
+    horizons = [5, 21, 63]
+    for h in horizons:
+        df[f"fwd{h}"] = (px.shift(-h) / px - 1) * 100
+
+    comps = [c for c in df.columns
+             if c not in ("spx",) and not c.startswith("fwd")]
+    cut = pd.Timestamp(split)
+    ins, oos = df[df.index < cut], df[df.index >= cut]
+
+    def ic_of(frame, comp, h):
+        sub = frame[[comp, f"fwd{h}"]].dropna()
+        if len(sub) < 60 or sub[comp].nunique() < 3:
+            return None
+        return float(sub[comp].corr(sub[f"fwd{h}"], method="spearman"))
+
+    print(f"\n[ic] Spearman IC vs FORWARD SPX returns")
+    print(f"     in-sample  {ins.index.min().date()} -> {ins.index.max().date()}  ({len(ins)} days)")
+    print(f"     out-sample {oos.index.min().date()} -> {oos.index.max().date()}  ({len(oos)} days)")
+    print(f"     effective independent obs at 21d: ~{len(df)//21}")
+    print(f"     NOISE BANDS (|IC| below these is indistinguishable from zero):")
+    for h in horizons:
+        eff = max(len(df) // h, 2)
+        se = 1.0 / (eff ** 0.5)
+        print(f"       {h:>3}d: effective n ~{eff:<5} SE ~{se:.3f}   2-SE band +/-{2*se:.3f}")
+    print(f"     {len(comps)} components x {len(horizons)} horizons x 2 windows = "
+          f"{len(comps)*len(horizons)*2} tests -- expect several to exceed the band by chance.\n")
+    hdr = f"{'component':<24}" + "".join(f"{'IS '+str(h)+'d':>9}{'OOS '+str(h)+'d':>10}" for h in horizons) + "   verdict"
+    print(hdr); print("-" * len(hdr))
+
+    results = []
+    for c in comps:
+        cells, holds = [], []
+        for h in horizons:
+            a, b = ic_of(ins, c, h), ic_of(oos, c, h)
+            cells.append((a, b))
+            if a is not None and b is not None:
+                # "holds" = same sign in both windows and non-trivial magnitude
+                holds.append(abs(a) >= 0.05 and abs(b) >= 0.03 and (a > 0) == (b > 0))
+        n_hold = sum(holds)
+        verdict = "STRONG" if n_hold >= 2 else "weak" if n_hold == 1 else "noise"
+        line = f"{c:<24}"
+        for a, b in cells:
+            line += f"{('%.3f' % a) if a is not None else '  -':>9}{('%.3f' % b) if b is not None else '  -':>10}"
+        print(line + f"   {verdict}")
+        best = max((abs(a) for a, _ in cells if a is not None), default=0)
+        results.append((c, n_hold, best))
+
+    print("\n[ic] SUGGESTED COARSE TIERS (not fitted weights):")
+    for c, n_hold, _ in sorted(results, key=lambda r: -r[1]):
+        if c in ("score", "raw"):
+            continue     # composites, not inputs
+        tier = "2.0x" if n_hold >= 2 else "1.0x" if n_hold == 1 else "0.5x  (candidate to drop)"
+        print(f"     {c:<24} {tier}")
+    print("\n     'score'/'raw' are the composite itself -- shown as a benchmark:")
+    print("     if a single component beats the composite out-of-sample, the")
+    print("     weighting is diluting real signal with noise.")
+
+
+def vix_sign_test(conn, split="2024-01-01"):
+    """ONE pre-specified hypothesis, not a fishing expedition.
+
+    The IC analysis showed the vix component negative in every window at every
+    horizon -- sign-consistent across six cells, which is harder to obtain by
+    chance than any single large IC value. There is also a documented mechanism:
+    the "volatility paradox" (suppressed volatility encourages leverage, which
+    precedes poor forward returns). The engine currently scores CALM vol as
+    risk-on POSITIVE. If the sign is genuinely inverted, that is an error rather
+    than a weighting question.
+
+    This compares forward SPX returns conditioned on the vol component's sign,
+    in-sample and out-of-sample, and reports whether the pattern holds in BOTH.
+    """
+    try:
+        rows = conn.execute("SELECT d, j FROM macro_detail ORDER BY d").fetchall()
+    except Exception:
+        print("[vixtest] no detail -- run --replay first"); return
+    recs = {}
+    for d_, j in rows:
+        try:
+            o = json.loads(j)
+        except Exception:
+            continue
+        recs[pd.Timestamp(d_)] = {"vix": o.get("vix"), "curve": o.get("curve")}
+    df = pd.DataFrame.from_dict(recs, orient="index").sort_index()
+    spx = _close_series(conn, "SPY")
+    if spx is None or df.empty:
+        print("[vixtest] insufficient data"); return
+    px = spx.reindex(df.index).ffill()
+    for h in (21, 63):
+        df[f"fwd{h}"] = (px.shift(-h) / px - 1) * 100
+
+    cut = pd.Timestamp(split)
+    print(f"\n[vixtest] mean forward SPX return (%) by vol-component sign")
+    print(f"          split at {split}   (n shown per cell)\n")
+    hdr = f"{'vol component':<16}{'IS 21d':>12}{'OOS 21d':>12}{'IS 63d':>12}{'OOS 63d':>12}"
+    print(hdr); print("-" * len(hdr))
+    buckets = [("positive (calm)", lambda v: v > 0),
+               ("zero", lambda v: v == 0),
+               ("negative (stress)", lambda v: v < 0)]
+    table = {}
+    for label, fn in buckets:
+        line = f"{label:<16}"
+        for h in (21, 63):
+            for frame, _lbl in ((df[df.index < cut], "IS"), (df[df.index >= cut], "OOS")):
+                sub = frame[frame["vix"].apply(lambda v: fn(v) if pd.notna(v) else False)]
+                col = sub[f"fwd{h}"].dropna()
+                table[(label, h, _lbl)] = float(col.mean()) if len(col) else None
+        for h in (21, 63):
+            for _lbl in ("IS", "OOS"):
+                v = table.get((label, h, _lbl))
+                line += f"{('%+.2f' % v) if v is not None else '   -':>12}"
+        print(line)
+
+    print("\n[vixtest] verdict:")
+    holds = 0
+    for h in (21, 63):
+        for _lbl in ("IS", "OOS"):
+            calm = table.get(("positive (calm)", h, _lbl))
+            stress = table.get(("negative (stress)", h, _lbl))
+            if calm is not None and stress is not None and stress > calm:
+                holds += 1
+    print(f"          stress > calm forward returns in {holds}/4 windows")
+    if holds >= 3:
+        print("          -> supports INVERTING the vol sign (calm vol is not bullish).")
+    elif holds <= 1:
+        print("          -> does NOT support inverting. Current sign stands.")
+    else:
+        print("          -> inconclusive (2/4). Do not change the sign on this.")
+    print("          NOTE: forward-return differences of <1-2% over 21d are inside")
+    print("          the noise band given ~78 effective independent observations.")
+
 def dispatch_webhook(prev_status, new_status, payload):
     """POST a regime-shift alert to WEBHOOK_URL if set. Never crashes the run."""
     url = os.environ.get("WEBHOOK_URL", "").strip()
@@ -1033,8 +1257,20 @@ def dispatch_webhook(prev_status, new_status, payload):
     except Exception as e:
         print(f"[webhook] dispatch failed (non-fatal): {e}")
 
+
+def _session_date(conn):
+    """The board's as-of date = last EQUITY close, not max() across all tickers.
+    BTC-USD trades 24/7, so after ~20:00 ET (00:00 UTC) it already has a bar for
+    the next calendar day while equities are still on the prior session. Taking a
+    global max() let crypto drag the board date a day ahead."""
+    r = conn.execute("SELECT max(d) FROM prices WHERE ticker='SPY'").fetchone()
+    if r and r[0]:
+        return str(r[0])[:10]
+    r = conn.execute("SELECT max(d) FROM prices").fetchone()
+    return str(r[0])[:10] if r and r[0] else _dt.date.today().isoformat()
+
 def compute_and_emit(conn):
-    today = conn.execute("SELECT max(d) FROM prices").fetchone()[0]
+    today = _session_date(conn)
     if not today:
         raise SystemExit("no price data in DB -- run ingest first")
 
@@ -1338,6 +1574,12 @@ def main():
     ap.add_argument("--selftest", action="store_true", help="synthetic data, no network")
     ap.add_argument("--verify", nargs="+", metavar="TICKER",
                     help="audit calc chain for given tickers vs the DB (read-only)")
+    ap.add_argument("--vixtest", action="store_true",
+                    help="test whether the vol component's sign should be inverted")
+    ap.add_argument("--ic", action="store_true",
+                    help="information-coefficient analysis: which components predict forward SPX")
+    ap.add_argument("--ic-split", metavar="YYYY-MM-DD", default="2024-01-01",
+                    help="in-sample / out-of-sample boundary for --ic")
     ap.add_argument("--export", action="store_true",
                     help="write macro_components.xlsx from stored per-date detail")
     ap.add_argument("--calibrate", action="store_true",
@@ -1355,6 +1597,18 @@ def main():
 
     if args.verify:
         verify(args.verify)
+        return
+
+    if args.vixtest:
+        conn = sqlite3.connect(DB_PATH)
+        vix_sign_test(conn, args.ic_split)
+        conn.close()
+        return
+
+    if args.ic:
+        conn = sqlite3.connect(DB_PATH)
+        information_coefficient(conn, args.ic_split)
+        conn.close()
         return
 
     if args.export:

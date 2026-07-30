@@ -191,7 +191,6 @@
 <header>
   <div class="bar">
     <div class="logo">
-      <span class="mark">SMB</span>
       <div>
         <div class="title">MARKET BOARD</div>
         <div class="sub" id="metaline">loading…</div>
@@ -727,8 +726,16 @@ function viewMacroStructure(d){
     <div class="phead">Global Macro Regime <span class="r">${health.data_status === "stale" ? '<span class="neg">DATA STALE</span> · ' : ''}AS OF ${ms.updated_at}</span></div>
     <div class="pbody" style="display:flex;align-items:center;gap:18px;flex-wrap:wrap">
       <div class="big ${regCls}" style="font-size:26px;font-weight:800">${g.status}</div>
+      ${g.neutral_dir && g.neutral_dir !== "flat" ? `
+        <div style="font-size:12.5px;padding:3px 8px;border:1px solid var(--line);border-radius:6px"
+             title="direction of the composite score over ~5 sessions; not part of the regime label">
+          <span class="${g.neutral_dir==='improving'?'pos':'neg'}">
+            ${g.neutral_dir==='improving'?'▲':'▼'} ${g.neutral_dir}</span>
+          <span class="dim mono" style="color:var(--muted);font-size:11px"> 5d ${g.slope_5d>0?'+':''}${g.slope_5d}</span>
+        </div>` : ""}
       <div style="font-size:15px" class="mono">score ${g.score > 0 ? "+" + g.score : g.score}
         ${g.delta_1d ? `<span class="${g.delta_1d>0?'pos':'neg'}" style="font-size:12px">(${g.delta_1d>0?'+':''}${g.delta_1d} 1D)</span>` : ""}
+
         <span class="dim" style="color:var(--muted);font-size:12px">(${g.min} to +${g.max}${g.bands ? `; risk-on ≥ ${g.bands.moderate_on}, full ≥ ${g.bands.full_on}` : ""})</span></div>
       <div style="font-size:13px" class="mono">VIX ${vol.vix_close ?? "—"}${vol.vix3m_close ? ` / 3M ${vol.vix3m_close}` : ""}
         ${vol.curve && vol.curve !== "contango" ? `<span class="neg" style="font-weight:700"> ${vol.curve.toUpperCase()}</span>` : vol.curve === "contango" ? '<span class="pos"> contango</span>' : ""} → ${sc(vol.score)}</div>
