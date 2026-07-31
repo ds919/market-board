@@ -125,15 +125,24 @@ def load_universe_from_sheet(url):
         raise ValueError(f"sheet only yielded {total} tickers -- refusing, using fallback")
     return themes
 
+_THEMES_CACHE = {"v": None}
+
 def active_themes():
-    """THEMES to use this run: sheet if configured & healthy, else built-in fallback."""
+    """THEMES to use this run: sheet if configured & healthy, else built-in fallback.
+    CACHED for the process: this is called from universe() which is called per
+    replay date -- without the cache a 1,650-day replay issued 1,650 HTTP
+    requests to the published sheet."""
+    if _THEMES_CACHE["v"] is not None:
+        return _THEMES_CACHE["v"]
     if SHEET_CSV_URL:
         try:
             th = load_universe_from_sheet(SHEET_CSV_URL)
             print(f"[universe] loaded {sum(len(v) for v in th.values())} entries from sheet")
+            _THEMES_CACHE["v"] = th
             return th
         except Exception as e:
             print(f"[universe] sheet load failed ({e}); using built-in THEMES")
+    _THEMES_CACHE["v"] = THEMES
     return THEMES
 
 
@@ -749,12 +758,28 @@ def build_macro_structure(conn, breadth_pct200, breadth_pct50=None, breadth_regi
         # local 7y backfill -- if the price came from the DB, every date older than
         # the cache would lose its SPX, get filtered out, and the chart would
         # silently shrink. Anything the front end needs must live in the repo.
+        # unconfirmed exits, read from the per-date detail blob so the chart can
+        # mark them historically (the runtime flag only ever described "today")
+        unconf = set()
+        try:
+            for d_, j in conn.execute("SELECT d, j FROM macro_detail").fetchall():
+                try:
+                    if json.loads(j).get("exit_unconfirmed"):
+                        unconf.add(str(d_))
+                except Exception:
+                    pass
+        except Exception:
+            pass
+
         hrows = [(d, v[0], v[1], v[2], (v[3] if len(v) > 3 else None))
                  for d, v in sorted(merged.items())][-1600:]
         for d_, rw, sm, st, px in hrows:
-            regime_history.append({"d": d_, "score": round(float(sm), 2),
-                                   "raw": round(float(rw), 2), "status": st,
-                                   "spx": round(float(px), 2) if px is not None else None})
+            row = {"d": d_, "score": round(float(sm), 2),
+                   "raw": round(float(rw), 2), "status": st,
+                   "spx": round(float(px), 2) if px is not None else None}
+            if d_ in unconf:
+                row["unconfirmed_exit"] = True
+            regime_history.append(row)
     except Exception as e:
         print(f"[macro] regime_history unavailable: {e}")
 
@@ -762,8 +787,13 @@ def build_macro_structure(conn, breadth_pct200, breadth_pct50=None, breadth_regi
     # Breadth is DERIVED from the price matrix (not stored), so it is available
     # for the full 7y without any new storage. Theme scores come from the
     # theme_scores table, which has been accumulating since the board went live.
+    # These series are only consumed by the live JSON. Computing them per replay
+    # date meant rebuilding the whole breadth matrix ~1,650 times -- skip entirely
+    # when as_of is set.
     breadth_history = []
     try:
+        if as_of is not None:
+            raise StopIteration
         _names = [t for t in universe() if t not in NON_MEMBERS]
         _pct = breadth_matrix(conn, _names)
         if _pct is not None:
@@ -772,16 +802,22 @@ def build_macro_structure(conn, breadth_pct200, breadth_pct50=None, breadth_regi
                 _pct = _pct[_pct.index <= pd.Timestamp(as_of)]
             for d_, v in list(_pct.items())[-1600:]:
                 breadth_history.append({"d": d_.date().isoformat(), "pct200": round(float(v), 1)})
+    except StopIteration:
+        pass
     except Exception as e:
         print(f"[hist] breadth series unavailable: {e}")
 
     theme_history = {}
     try:
+        if as_of is not None:
+            raise StopIteration
         trows = conn.execute(
             "SELECT theme, d, score FROM theme_scores ORDER BY d").fetchall()
         for th, d_, sc in trows:
             theme_history.setdefault(th, []).append({"d": str(d_), "s": round(float(sc), 1)})
         theme_history = {k: v[-260:] for k, v in theme_history.items()}
+    except StopIteration:
+        pass
     except Exception as e:
         print(f"[hist] theme series unavailable: {e}")
 
@@ -836,6 +872,7 @@ def build_macro_structure(conn, breadth_pct200, breadth_pct50=None, breadth_regi
         "score": total, "raw": raw_score, "status": status, "spx": _spx_now,
         "vix": vix_score, "trend": trend_score, "breadth": breadth_score,
         "intermarket": ratio_component, "curve": curve,
+        "exit_unconfirmed": bool(exit_unconfirmed),
         "vix9d": v9, "vix30d": vix_close, "vix3m": vix3_close, "vix6m": v6m, "vvix": vvix_close,
         "breadth_pct200": breadth_pct200, "spy_vs_200": spy_vs_200,
         "ratios": [{"pair": r["pair"], "value": r["value"], "direction": r["direction"],

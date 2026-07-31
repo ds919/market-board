@@ -656,6 +656,9 @@ function scoreChart(hist, bands){
      <text x="${PL-5}" y="${(Y(v)+3).toFixed(1)}" text-anchor="end" font-size="9" fill="var(--muted)">${v>0?'+':''}${v}</text>`).join("");
 
   const line = pts.map((p,i)=>`${X(i).toFixed(1)},${Y(Math.max(lo,Math.min(hi,p.score))).toFixed(1)}`).join(" ");
+  const unconfS = pts.map((p,i) => p.unconfirmed_exit
+    ? `<line x1="${X(i).toFixed(1)}" y1="${PT}" x2="${X(i).toFixed(1)}" y2="${PT+ih}"
+             stroke="#f5c451" stroke-width="1.1" stroke-dasharray="3 3" opacity=".85"/>` : "").join("");
   const nLab = Math.min(7, Math.max(3, Math.floor(pts.length/40)));
   const idxs = Array.from({length:nLab},(_,k)=>Math.round(k*(pts.length-1)/(nLab-1)));
   const xl = idxs.map((i,k)=>`<text x="${X(i).toFixed(1)}" y="${H-6}" text-anchor="${k===0?'start':k===nLab-1?'end':'middle'}" font-size="9" fill="var(--muted)">${pts[i].d}</text>`).join("");
@@ -668,6 +671,7 @@ function scoreChart(hist, bands){
     <div class="pbody" style="overflow-x:auto">
       <svg viewBox="0 0 ${W} ${H}" style="width:100%;min-width:${Math.min(1600,Math.max(560,pts.length*2.2)).toFixed(0)}px;height:auto;display:block">
         ${zones}${gl}
+        ${unconfS}
         <polyline points="${line}" fill="none" stroke="var(--ink,#e8eaed)" stroke-width="1.5"/>
         <circle cx="${X(pts.length-1).toFixed(1)}" cy="${Y(Math.max(lo,Math.min(hi,last.score))).toFixed(1)}" r="3"
                 fill="${last.score>=B.moderate_on?'var(--pos,#3ddc84)':last.score<=B.full_off?'var(--neg,#ff5c57)':'var(--muted)'}"/>
@@ -675,6 +679,7 @@ function scoreChart(hist, bands){
       </svg>
       <div class="dim" style="color:var(--muted);font-size:11.5px;margin-top:6px">
         Green zones = risk-on bands (+${B.moderate_on} / +${B.full_on}), red = risk-off (${B.full_off}).
+        Amber dashed lines mark exits from Risk-Off that cross-asset signals did not confirm.
         Uses the same range buttons as the chart above. Note the label you see also
         reflects smoothing, hysteresis and the dwell floor, so it can lag a band crossing here.</div>
     </div>
@@ -727,6 +732,12 @@ function regimeChartInner(hist){
   ).join("");
 
   const line = pts.map((p,i) => `${X(i).toFixed(1)},${Y(p.spx).toFixed(1)}`).join(" ");
+  // dates where the engine left Full Risk-Off while cross-asset signals were
+  // still deteriorating -- previously visible only as a same-day banner
+  const unconf = pts.map((p,i) => p.unconfirmed_exit
+    ? `<line x1="${X(i).toFixed(1)}" y1="${PT}" x2="${X(i).toFixed(1)}" y2="${PT+ih}"
+             stroke="#f5c451" stroke-width="1.2" stroke-dasharray="3 3" opacity=".9"/>
+       <circle cx="${X(i).toFixed(1)}" cy="${(PT+6).toFixed(1)}" r="2.6" fill="#f5c451"/>` : "").join("");
   // y axis ticks
   const ticks = [0,0.5,1].map(f => {
     const v = yLo + f*(yHi-yLo);
@@ -747,12 +758,14 @@ function regimeChartInner(hist){
       <svg viewBox="0 0 ${W} ${H}" style="width:100%;min-width:${Math.min(1600, Math.max(560, pts.length*2.2)).toFixed(0)}px;height:auto;display:block">
         ${bands}${ticks}
         <polyline points="${line}" fill="none" stroke="var(--fg,#e6edf3)" stroke-width="1.6"/>
+        ${unconf}
         ${xl}
       </svg>
       <div style="display:flex;gap:16px;font-size:11.5px;margin-top:8px;flex-wrap:wrap">
         <span><span style="display:inline-block;width:10px;height:10px;background:var(--pos,#2f7d55);opacity:.34;margin-right:5px"></span>Risk-On</span>
         <span><span style="display:inline-block;width:10px;height:10px;background:var(--muted,#3a4a5e);opacity:.16;margin-right:5px"></span>Neutral</span>
         <span><span style="display:inline-block;width:10px;height:10px;background:var(--neg,#8c3630);opacity:.34;margin-right:5px"></span>Risk-Off</span>
+        <span><span style="display:inline-block;width:10px;height:10px;border-left:2px dashed #f5c451;margin-right:5px"></span>Unconfirmed exit</span>
         <span class="dim" style="color:var(--muted)">line = SPY close</span>
       </div>`;
 }
