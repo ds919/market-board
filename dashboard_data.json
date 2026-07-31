@@ -4807,7 +4807,7 @@
     }
   },
   "macro_structure": {
-    "updated_at": "2026-07-31T02:46:41Z",
+    "updated_at": "2026-07-31T02:57:59Z",
     "system_health": {
       "data_status": "ok",
       "last_close": "2026-07-30"
@@ -16519,8 +16519,8 @@
       },
       {
         "ticker": "BTC-USD",
-        "spread_1m": 0.802,
-        "spread_3m": -16.994
+        "spread_1m": 0.808,
+        "spread_3m": -16.989
       }
     ]
   },

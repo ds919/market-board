@@ -386,15 +386,20 @@ def _load_hist_csv():
     try:
         if os.path.exists(HIST_CSV):
             df = pd.read_csv(HIST_CSV)
-            return {str(r["d"]): (float(r["raw"]), float(r["smooth"]), str(r["status"]))
-                    for _, r in df.iterrows()}
+            out = {}
+            for _, r in df.iterrows():
+                spx = r["spx"] if "spx" in df.columns and pd.notna(r.get("spx")) else None
+                out[str(r["d"])] = (float(r["raw"]), float(r["smooth"]), str(r["status"]),
+                                    float(spx) if spx is not None else None)
+            return out
     except Exception as e:
         print(f"[hist] could not read {HIST_CSV}: {e}")
     return {}
 
 def _save_hist_csv(rows):
     try:
-        pd.DataFrame([{"d": d, "raw": v[0], "smooth": v[1], "status": v[2]}
+        pd.DataFrame([{"d": d, "raw": v[0], "smooth": v[1], "status": v[2],
+                       "spx": (v[3] if len(v) > 3 else None)}
                       for d, v in sorted(rows.items())]).to_csv(HIST_CSV, index=False)
     except Exception as e:
         print(f"[hist] could not write {HIST_CSV}: {e}")
@@ -730,18 +735,26 @@ def build_macro_structure(conn, breadth_pct200, breadth_pct50=None, breadth_regi
     regime_history = []
     try:
         merged = _load_hist_csv()
+        spx_px = _close_series(conn, "SPY", as_of)
         for d_, rw, sm, st in conn.execute(
                 "SELECT d, raw, smooth, status FROM macro_hist").fetchall():
-            merged[str(d_)] = (float(rw), float(sm), str(st))   # DB wins on overlap
-        _save_hist_csv(merged)
-        hrows = [(d, v[0], v[1], v[2]) for d, v in sorted(merged.items())][-1600:]
-        spx_px = _close_series(conn, "SPY", as_of)
-        for d_, rw, sm, st in hrows:
-            ts = pd.Timestamp(d_)
+            ts = pd.Timestamp(str(d_))
             px = float(spx_px.loc[ts]) if spx_px is not None and ts in spx_px.index else None
+            if px is None and str(d_) in merged and len(merged[str(d_)]) > 3:
+                px = merged[str(d_)][3]        # keep the price the CSV already carries
+            merged[str(d_)] = (float(rw), float(sm), str(st), px)
+        _save_hist_csv(merged)
+        # CRITICAL: the chart reads SPX from the CSV, not the DB. The GitHub Action
+        # runs against a CACHED database that may hold far less price history than a
+        # local 7y backfill -- if the price came from the DB, every date older than
+        # the cache would lose its SPX, get filtered out, and the chart would
+        # silently shrink. Anything the front end needs must live in the repo.
+        hrows = [(d, v[0], v[1], v[2], (v[3] if len(v) > 3 else None))
+                 for d, v in sorted(merged.items())][-1600:]
+        for d_, rw, sm, st, px in hrows:
             regime_history.append({"d": d_, "score": round(float(sm), 2),
                                    "raw": round(float(rw), 2), "status": st,
-                                   "spx": round(px, 2) if px is not None else None})
+                                   "spx": round(float(px), 2) if px is not None else None})
     except Exception as e:
         print(f"[macro] regime_history unavailable: {e}")
 

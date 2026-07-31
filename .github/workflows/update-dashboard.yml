@@ -53,6 +53,9 @@ jobs:
 
       - name: Run ingest
         env:
+          # keep the runner's cached DB deep enough that a cache miss rebuilds
+          # full history rather than a shallow 2y window
+          BACKFILL_PERIOD: "7y"
           SHEET_CSV_URL: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRxlgKVoEulfvoOhk8U3u9uoCUnTBqm2EjfeOMm5zKv1rMThXSFSP0ssKBh7-zB8YM49T_p88JtTBtq/pub?gid=1502660236&single=true&output=csv"
         run: python market_ingest.py
 
