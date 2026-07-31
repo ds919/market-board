@@ -252,10 +252,22 @@ const numSign = v => (v>0?"+":"")+Number(v).toFixed(1);
 const pillClass = st => ({DOMINANT:"good",STRONG:"good",NEUTRAL:"neut",WEAK:"warn",FADING:"bad",DETERIORATING:"bad"}[st]||"neut");
 const scoreColor = s => s>=75?"pos":s>=55?"":s>=35?"warn":"neg";
 
+function themeSpark(name){
+  const th = (DATA && DATA.macro_structure && DATA.macro_structure.theme_history) || {};
+  const pts = (th[name] || []).slice(-40);
+  if(pts.length < 4) return "";
+  const w = 54, h = 16, vals = pts.map(p => p.s);
+  const lo = Math.min(...vals), hi = Math.max(...vals), rng = (hi - lo) || 1;
+  const d = pts.map((p,i) => `${(i/(pts.length-1)*w).toFixed(1)},${(h - ((p.s-lo)/rng)*h).toFixed(1)}`).join(" ");
+  const up = vals[vals.length-1] >= vals[0];
+  return `<svg width="${w}" height="${h}" style="vertical-align:middle;margin-left:6px">
+    <polyline points="${d}" fill="none" stroke="${up?'var(--pos,#3ddc84)':'var(--neg,#ff5c57)'}" stroke-width="1.3"/></svg>`;
+}
+
 const themeRows = arr => arr.map(t=>`
     <tr>
       <td class="rank">${t.r}</td>
-      <td class="name">${t.name}<span class="cnt">${t.cnt}</span></td>
+      <td class="name">${t.name}<span class="cnt">${t.cnt}</span>${themeSpark(t.name)}</td>
       <td class="num score ${scoreColor(t.score)}">${t.score}</td>
       <td class="num ${cls(t.delta)}">${numSign(t.delta)}</td>
       <td class="st"><span class="pill ${pillClass(t.st)}">${t.st}</span></td>
@@ -339,7 +351,18 @@ function viewThemes(d){
 
 function viewBreadth(d){
   const rg = d.regime;
-  return `
+  const bh = (d.macro_structure && d.macro_structure.breadth_history) || [];
+  const bChart = bh.length > 20 ? `
+    <section class="panel">
+      <div class="phead">Breadth History <span class="r">% OF UNIVERSE ABOVE 200-DAY MA · ${bh.length} SESSIONS</span></div>
+      <div class="pbody">
+        ${miniLine(bh.map(p => ({d: p.d, v: p.pct200})), {min: 0, max: 100, ref: 50, color: "var(--pos,#3ddc84)"})}
+        <div class="dim" style="color:var(--muted);font-size:11.5px;margin-top:6px">
+          Dashed line = 50%. Sustained readings below it mark genuine deterioration;
+          the current snapshot alone cannot show whether breadth is building or eroding.</div>
+      </div>
+    </section>` : "";
+  return bChart + `
   <div class="row two-5050">
     <section class="panel">
       <div class="phead">Universe Breadth <span class="r">EX-BENCHMARK · ${d.tickers} NAMES</span></div>
@@ -602,8 +625,14 @@ function setChartRange(n){
 
 function regimeChart(hist){
   if(!hist || hist.length < 5) return "";
-  const opts = [[130,"6M"],[260,"1Y"],[520,"2Y"],[null,"All"]]
-    .filter(o => o[0] === null || o[0] <= Math.max(hist.length, 130));
+  // YTD = sessions since Jan 1 of the latest year in the series
+  let ytdN = null;
+  try {
+    const lastY = new Date(hist[hist.length-1].d).getUTCFullYear();
+    ytdN = hist.filter(h => new Date(h.d).getUTCFullYear() === lastY).length;
+  } catch(e){}
+  const opts = [[130,"6M"], [ytdN && ytdN > 5 ? ytdN : null, "YTD"], [260,"1Y"], [520,"2Y"], [null,"All"]]
+    .filter(o => o[1] === "YTD" ? (ytdN && ytdN > 5) : (o[0] === null || o[0] <= Math.max(hist.length, 130)));
   return `
   <section class="panel">
     <div class="phead">SPX vs Regime
@@ -647,8 +676,12 @@ function regimeChartInner(hist){
             <text x="${PL-6}" y="${(Y(v)+3).toFixed(1)}" text-anchor="end" font-size="9.5" fill="var(--muted)">${v.toFixed(0)}</text>`;
   }).join("");
   // x labels: first, middle, last
-  const xl = [0, Math.floor(pts.length/2), pts.length-1].map(i =>
-    `<text x="${X(i).toFixed(1)}" y="${H-8}" text-anchor="${i===0?'start':i===pts.length-1?'end':'middle'}" font-size="9.5" fill="var(--muted)">${pts[i].d}</text>`
+  // denser date axis: ~7 evenly spaced labels, plus tick marks
+  const nLab = Math.min(7, Math.max(3, Math.floor(pts.length / 40)));
+  const idxs = Array.from({length: nLab}, (_, k) => Math.round(k * (pts.length - 1) / (nLab - 1)));
+  const xl = idxs.map((i, k) =>
+    `<line x1="${X(i).toFixed(1)}" y1="${PT+ih}" x2="${X(i).toFixed(1)}" y2="${PT+ih+4}" stroke="var(--line)" stroke-width="1"/>
+     <text x="${X(i).toFixed(1)}" y="${H-8}" text-anchor="${k===0?'start':k===nLab-1?'end':'middle'}" font-size="9" fill="var(--muted)">${pts[i].d}</text>`
   ).join("");
 
   return `
@@ -807,6 +840,32 @@ function viewMacroStructure(d){
   </section>`;
 
   return banner + regimeChart(ms.regime_history) + volCurve(ms.volatility) + cards + table;
+}
+
+function miniLine(series, opts){
+  opts = opts || {};
+  const pts = (series || []).filter(p => p.v !== null && p.v !== undefined);
+  if(pts.length < 3) return "";
+  const W = opts.w || 760, H = opts.h || 150, PL = 38, PR = 10, PT = 12, PB = 22;
+  const iw = W-PL-PR, ih = H-PT-PB;
+  const vals = pts.map(p => p.v);
+  const lo = opts.min !== undefined ? opts.min : Math.min(...vals);
+  const hi = opts.max !== undefined ? opts.max : Math.max(...vals);
+  const pad = (hi-lo)*0.08 || 1;
+  const yl = (opts.min !== undefined ? lo : lo-pad), yh = (opts.max !== undefined ? hi : hi+pad);
+  const X = i => PL + (i/(pts.length-1))*iw;
+  const Y = v => PT + ih - ((v-yl)/(yh-yl))*ih;
+  const line = pts.map((p,i) => `${X(i).toFixed(1)},${Y(p.v).toFixed(1)}`).join(" ");
+  const ref = opts.ref !== undefined ? `<line x1="${PL}" y1="${Y(opts.ref).toFixed(1)}" x2="${W-PR}" y2="${Y(opts.ref).toFixed(1)}" stroke="var(--neg)" stroke-width="1" stroke-dasharray="3 3" opacity=".6"/>` : "";
+  const ticks = [yl, (yl+yh)/2, yh].map(v =>
+    `<text x="${PL-5}" y="${(Y(v)+3).toFixed(1)}" text-anchor="end" font-size="9" fill="var(--muted)">${v.toFixed(0)}</text>`).join("");
+  const nLab = Math.min(6, Math.max(2, Math.floor(pts.length/40)));
+  const idxs = Array.from({length:nLab}, (_,k)=>Math.round(k*(pts.length-1)/(nLab-1)));
+  const xl = idxs.map((i,k)=>`<text x="${X(i).toFixed(1)}" y="${H-6}" text-anchor="${k===0?'start':k===nLab-1?'end':'middle'}" font-size="9" fill="var(--muted)">${pts[i].d}</text>`).join("");
+  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block">
+    ${ref}${ticks}
+    <polyline points="${line}" fill="none" stroke="${opts.color||'var(--accent,#38bdf8)'}" stroke-width="1.6"/>
+    ${xl}</svg>`;
 }
 
 function emptyPanel(title, msg){

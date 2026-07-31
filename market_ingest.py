@@ -758,6 +758,33 @@ def build_macro_structure(conn, breadth_pct200, breadth_pct50=None, breadth_regi
     except Exception as e:
         print(f"[macro] regime_history unavailable: {e}")
 
+    # ---- historical series for charts elsewhere on the board ----
+    # Breadth is DERIVED from the price matrix (not stored), so it is available
+    # for the full 7y without any new storage. Theme scores come from the
+    # theme_scores table, which has been accumulating since the board went live.
+    breadth_history = []
+    try:
+        _names = [t for t in universe() if t not in NON_MEMBERS]
+        _pct = breadth_matrix(conn, _names)
+        if _pct is not None:
+            _pct = _pct.dropna()
+            if as_of is not None:
+                _pct = _pct[_pct.index <= pd.Timestamp(as_of)]
+            for d_, v in list(_pct.items())[-1600:]:
+                breadth_history.append({"d": d_.date().isoformat(), "pct200": round(float(v), 1)})
+    except Exception as e:
+        print(f"[hist] breadth series unavailable: {e}")
+
+    theme_history = {}
+    try:
+        trows = conn.execute(
+            "SELECT theme, d, score FROM theme_scores ORDER BY d").fetchall()
+        for th, d_, sc in trows:
+            theme_history.setdefault(th, []).append({"d": str(d_), "s": round(float(sc), 1)})
+        theme_history = {k: v[-260:] for k, v in theme_history.items()}
+    except Exception as e:
+        print(f"[hist] theme series unavailable: {e}")
+
     hist_rows = conn.execute("SELECT d, score FROM macro_scores ORDER BY d DESC LIMIT 60").fetchall()
     score_history = [{"d": d, "score": sc} for d, sc in reversed(hist_rows)]
     score_delta = round(float(total) - float(score_history[-2]["score"]), 2) if len(score_history) > 1 else 0
@@ -836,6 +863,8 @@ def build_macro_structure(conn, breadth_pct200, breadth_pct50=None, breadth_regi
                            "breadth_score": breadth_score},
         "score_history": score_history,
         "regime_history": regime_history,
+        "breadth_history": breadth_history,
+        "theme_history": theme_history,
         "intermarket_ratios": ratios,
         "volatility": {"vix9d": v9, "vix_close": vix_close, "vix3m_close": vix3_close,
                        "vix6m": v6m, "vvix": vvix_close, "vvix_10d_ago": vvix_10d,
@@ -883,7 +912,26 @@ def historical_breadth(conn, as_of, tickers, pct_series=None):
             above += 1
     return (100.0 * above / total) if total else None
 
-def replay(conn, start):
+def repair_history(conn):
+    """Backfill missing columns in macro_history.csv from the DB WITHOUT a full
+    recompute. Use when a change only adds a stored field (e.g. the spx column)
+    rather than altering the scoring itself -- seconds instead of minutes."""
+    merged = _load_hist_csv()
+    if not merged:
+        print("[repair] no history csv -- run --replay first"); return
+    spx_px = _close_series(conn, "SPY")
+    filled = 0
+    for d_, v in list(merged.items()):
+        px = v[3] if len(v) > 3 else None
+        if px is None and spx_px is not None:
+            ts = pd.Timestamp(d_)
+            if ts in spx_px.index:
+                merged[d_] = (v[0], v[1], v[2], float(spx_px.loc[ts]))
+                filled += 1
+    _save_hist_csv(merged)
+    print(f"[repair] filled {filled} missing prices across {len(merged)} rows -> {HIST_CSV}")
+
+def replay(conn, start, force=False):
     """Recompute the macro score for every trading day from `start` to the last
     stored close, writing results into macro_scores. Every input is truncated to
     each date -- no lookahead."""
@@ -894,6 +942,24 @@ def replay(conn, start):
     dates = [d for d in spy.index if d >= pd.Timestamp(start)]
     if not dates:
         print(f"[replay] no trading days on/after {start}"); return
+
+    # INCREMENTAL BY DEFAULT. Recomputing 1,650 days takes minutes and is only
+    # necessary when the SCORING changes. Routine catch-up needs just the missing
+    # dates. Use --force after any methodology change.
+    if not force:
+        try:
+            have = {r[0] for r in conn.execute("SELECT d FROM macro_hist").fetchall()}
+        except Exception:
+            have = set()
+        todo = [d for d in dates if d.date().isoformat() not in have]
+        if len(todo) < len(dates):
+            print(f"[replay] incremental: {len(todo)} of {len(dates)} days need computing "
+                  f"({len(dates)-len(todo)} already stored). Use --force to recompute all.")
+        dates = todo
+        if not dates:
+            print("[replay] nothing to compute -- history is current. "
+                  "Use --force if the scoring changed.")
+            return
     names = [t for t in universe() if t not in NON_MEMBERS]
     conn.execute("CREATE TABLE IF NOT EXISTS macro_smooth (d TEXT PRIMARY KEY, s REAL)")
     conn.execute("DELETE FROM macro_smooth WHERE d >= ?", (str(pd.Timestamp(start).date()),))
@@ -1598,7 +1664,11 @@ def main():
     ap.add_argument("--calibrate", action="store_true",
                     help="recommend regime bands from replayed score history")
     ap.add_argument("--replay", metavar="YYYY-MM-DD",
-                    help="recompute macro scores from this date forward (no lookahead)")
+                    help="compute macro scores from this date forward (incremental; no lookahead)")
+    ap.add_argument("--force", action="store_true",
+                    help="with --replay: recompute every date, not just missing ones")
+    ap.add_argument("--repair-history", action="store_true",
+                    help="backfill missing columns in macro_history.csv without recomputing")
     ap.add_argument("--add", metavar="TICKER", help="add a ticker (needs --theme)")
     ap.add_argument("--remove", metavar="TICKER", help="remove a ticker from all themes")
     ap.add_argument("--theme", metavar="NAME", help="theme name for --add")
@@ -1636,9 +1706,15 @@ def main():
         conn.close()
         return
 
+    if args.repair_history:
+        conn = sqlite3.connect(DB_PATH)
+        repair_history(conn)
+        conn.close()
+        return
+
     if args.replay:
         conn = sqlite3.connect(DB_PATH)
-        replay(conn, args.replay)
+        replay(conn, args.replay, force=args.force)
         conn.close()
         return
 
