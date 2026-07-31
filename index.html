@@ -621,6 +621,64 @@ function setChartRange(n){
   chartRange = n;
   const host = document.getElementById("regimeChartHost");
   if(host && DATA) host.innerHTML = regimeChartInner(DATA.macro_structure.regime_history);
+  if(DATA && activeTab === "Macro Structure") {
+    const main = document.getElementById("main");
+    const secs = main ? main.querySelectorAll("section.panel") : [];
+    // re-render the score panel in place (it is the one titled "Regime Score History")
+    secs.forEach(sec => {
+      const h = sec.querySelector(".phead");
+      if(h && h.textContent.indexOf("Regime Score History") === 0){
+        sec.outerHTML = scoreChart(DATA.macro_structure.regime_history, DATA.macro_structure.global_regime.bands);
+      }
+    });
+  }
+}
+
+function scoreChart(hist, bands){
+  if(!hist || hist.length < 10) return "";
+  let pts = hist.filter(h => h.score !== null && h.score !== undefined);
+  if(chartRange && pts.length > chartRange) pts = pts.slice(-chartRange);
+  if(pts.length < 10) return "";
+  const W = Math.max(900, Math.min(2400, pts.length * 3.4)), H = 210, PL = 40, PR = 12, PT = 12, PB = 24;
+  const iw = W-PL-PR, ih = H-PT-PB;
+  const lo = -11, hi = 10;                      // fixed scale = the score's own range
+  const X = i => PL + (i/(pts.length-1))*iw;
+  const Y = v => PT + ih - ((v-lo)/(hi-lo))*ih;
+  const B = bands || {full_on:5, moderate_on:3.5, full_off:-3};
+
+  // shaded band zones so the score's position is readable at a glance
+  const zones = `
+    <rect x="${PL}" y="${Y(hi).toFixed(1)}" width="${iw}" height="${(Y(B.full_on)-Y(hi)).toFixed(1)}" fill="var(--pos,#3ddc84)" opacity=".16"/>
+    <rect x="${PL}" y="${Y(B.full_on).toFixed(1)}" width="${iw}" height="${(Y(B.moderate_on)-Y(B.full_on)).toFixed(1)}" fill="var(--pos,#3ddc84)" opacity=".08"/>
+    <rect x="${PL}" y="${Y(B.full_off).toFixed(1)}" width="${iw}" height="${(Y(lo)-Y(B.full_off)).toFixed(1)}" fill="var(--neg,#ff5c57)" opacity=".14"/>`;
+  const gl = [B.full_on, B.moderate_on, 0, B.full_off].map(v =>
+    `<line x1="${PL}" y1="${Y(v).toFixed(1)}" x2="${W-PR}" y2="${Y(v).toFixed(1)}" stroke="var(--line)" stroke-width="1" ${v===0?'':'stroke-dasharray="4 3"'} opacity=".8"/>
+     <text x="${PL-5}" y="${(Y(v)+3).toFixed(1)}" text-anchor="end" font-size="9" fill="var(--muted)">${v>0?'+':''}${v}</text>`).join("");
+
+  const line = pts.map((p,i)=>`${X(i).toFixed(1)},${Y(Math.max(lo,Math.min(hi,p.score))).toFixed(1)}`).join(" ");
+  const nLab = Math.min(7, Math.max(3, Math.floor(pts.length/40)));
+  const idxs = Array.from({length:nLab},(_,k)=>Math.round(k*(pts.length-1)/(nLab-1)));
+  const xl = idxs.map((i,k)=>`<text x="${X(i).toFixed(1)}" y="${H-6}" text-anchor="${k===0?'start':k===nLab-1?'end':'middle'}" font-size="9" fill="var(--muted)">${pts[i].d}</text>`).join("");
+  const last = pts[pts.length-1];
+
+  return `
+  <section class="panel">
+    <div class="phead">Regime Score History
+      <span class="r">${pts.length} SESSIONS · SHADED = BAND ZONES</span></div>
+    <div class="pbody" style="overflow-x:auto">
+      <svg viewBox="0 0 ${W} ${H}" style="width:100%;min-width:${Math.min(1600,Math.max(560,pts.length*2.2)).toFixed(0)}px;height:auto;display:block">
+        ${zones}${gl}
+        <polyline points="${line}" fill="none" stroke="var(--ink,#e8eaed)" stroke-width="1.5"/>
+        <circle cx="${X(pts.length-1).toFixed(1)}" cy="${Y(Math.max(lo,Math.min(hi,last.score))).toFixed(1)}" r="3"
+                fill="${last.score>=B.moderate_on?'var(--pos,#3ddc84)':last.score<=B.full_off?'var(--neg,#ff5c57)':'var(--muted)'}"/>
+        ${xl}
+      </svg>
+      <div class="dim" style="color:var(--muted);font-size:11.5px;margin-top:6px">
+        Green zones = risk-on bands (+${B.moderate_on} / +${B.full_on}), red = risk-off (${B.full_off}).
+        Uses the same range buttons as the chart above. Note the label you see also
+        reflects smoothing, hysteresis and the dwell floor, so it can lag a band crossing here.</div>
+    </div>
+  </section>`;
 }
 
 function regimeChart(hist){
@@ -839,7 +897,7 @@ function viewMacroStructure(d){
     </div>
   </section>`;
 
-  return banner + regimeChart(ms.regime_history) + volCurve(ms.volatility) + cards + table;
+  return banner + regimeChart(ms.regime_history) + scoreChart(ms.regime_history, ms.global_regime.bands) + volCurve(ms.volatility) + cards + table;
 }
 
 function miniLine(series, opts){
