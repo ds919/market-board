@@ -448,6 +448,29 @@ def build_macro_structure(conn, breadth_pct200, breadth_pct50=None, breadth_regi
     vvix_10d = (round(float(vvix_s.iloc[-11]), 3)
                 if vvix_s is not None and len(vvix_s) > 11 else None)
 
+    # CURVE SPREAD, and critically its DIRECTION. The 7y replay showed the vol
+    # component pinned at -2 for entire recoveries: COVID stayed backwardated
+    # 2/24 through 4/23 while price rallied 28% off the 3/23 bottom. Realized vol
+    # stays elevated after a low, so the curve's LEVEL is a lagging indicator on
+    # the way out. Its CHANGE is not -- the spread starts normalizing right at
+    # the bottom, which is exactly when the level still says "stress".
+    spread_now = None
+    spread_5d = None
+    try:
+        _v9s = _close_series(conn, "^VIX9D", as_of)
+        _v3s = _close_series(conn, "^VIX3M", as_of)
+        if _v9s is not None and _v3s is not None:
+            _j = pd.concat([_v9s, _v3s], axis=1, join="inner").dropna()
+            if len(_j) > 6:
+                _sp = _j.iloc[:, 0] - _j.iloc[:, 1]      # 9D minus 3M; >0 = inverted
+                spread_now = round(float(_sp.iloc[-1]), 3)
+                spread_5d = round(float(_sp.iloc[-6]), 3)
+    except Exception:
+        pass
+    # improving = still inverted but the spread is narrowing meaningfully
+    curve_improving = (spread_now is not None and spread_5d is not None
+                       and spread_now > 0 and spread_now < spread_5d - 1.0)
+
     # each adjacent pair: True when in contango (healthy)
     segs = []
     for a, b, lbl in ((v9, vix_close, "9D<30D"), (vix_close, vix3_close, "30D<3M"),
@@ -476,24 +499,29 @@ def build_macro_structure(conn, breadth_pct200, breadth_pct50=None, breadth_regi
         elif curve in ("front-inverted", "flat"):
             vix_score = -1
         else:
-            # curve healthy -> fall back to the absolute level
+            # curve healthy -> fall back to the absolute level.
             # CALM VOL IS NOT SCORED BULLISH. The --vixtest hypothesis test came
             # back 4/4: forward SPX returns after STRESS readings beat those after
-            # CALM readings in every window, monotonically (stress > zero > calm),
-            # by +1.9pp at 21d and +5.2pp at 63d out-of-sample. Mechanism is the
-            # "volatility paradox" -- suppressed vol invites leverage, which
-            # precedes poor returns.
-            #
-            # Calm is therefore scored 0 rather than +1. NOT inverted to -1: full
-            # inversion is a larger claim than 4/4 on ~78 effective independent
-            # observations supports, and the engine is a CONCURRENT classifier --
-            # "vol is calm now" remains a true statement about present conditions.
+            # CALM readings in every window, monotonically, by +1.9pp at 21d and
+            # +5.2pp at 63d out-of-sample ("volatility paradox" -- suppressed vol
+            # invites leverage, which precedes poor returns). Calm scores 0, NOT
+            # -1: full inversion is a larger claim than 4/4 on ~78 effective
+            # observations supports, and this is a CONCURRENT classifier.
             vix_score = -1 if (vix_close is not None and vix_close > 20.0) else 0
-            # vol-of-vol falling no longer adds a positive; it only offsets an
-            # elevated-level penalty back toward neutral.
+            # vol-of-vol falling only offsets an elevated-level penalty; it never
+            # adds a positive.
             if (vix_score < 0 and vvix_close is not None and vvix_10d is not None
                     and vvix_close < vvix_10d):
                 vix_score = 0
+
+        # DECAY THE PENALTY WHEN THE CURVE IS REPAIRING. Applied AFTER the chain
+        # above so every branch has assigned vix_score first. Still inverted, but
+        # the 9D-3M spread has narrowed >1pt over 5 sessions -- stress receding.
+        # Halved rather than cleared: the curve is still inverted, so a full
+        # reprieve would overstate the improvement.
+        if vix_score < 0 and curve_improving:
+            vix_score = vix_score / 2.0
+
     total += vix_score
 
     # ---- ABSOLUTE components (the fix for rotation masquerading as risk appetite) ----
@@ -544,7 +572,15 @@ def build_macro_structure(conn, breadth_pct200, breadth_pct50=None, breadth_regi
     # Symmetric span=5 delayed the Feb-2025 risk-off warning by about a week;
     # span=3 on the way down recovers most of that, while span=8 on the way up
     # keeps the regime blocks readable and deliberately slows re-entry.
-    SPAN_DOWN, SPAN_UP = 3, 8
+    # SPAN_UP was 8. The 7y replay showed the failure is EXITS, not entries:
+    # COVID exited 4/27 after price had already rallied 28% off the 3/23 low;
+    # Spring 2025 exited 5/05 after +13%; Aug 2024 spent its entire risk-off
+    # window in a rally. Cause: components are structurally slow to RECOVER
+    # (backwardation persists after a bottom, breadth-above-200DMA cannot repair
+    # quickly), and span-8 up-smoothing plus a 10-session dwell floor put two
+    # brakes on the same wheel. Env-overridable so the effect can be measured.
+    SPAN_DOWN = int(os.environ.get("SPAN_DOWN", "3"))
+    SPAN_UP   = int(os.environ.get("SPAN_UP", "8"))
     SMOOTH_SPAN = SPAN_DOWN  # reported; the active span depends on direction
     raw_score = total
     try:
@@ -630,6 +666,70 @@ def build_macro_structure(conn, breadth_pct200, breadth_pct50=None, breadth_regi
     if str(prev_lab) == "Full Risk-Off" and raw_status != "Full Risk-Off" and prev_run < MIN_DWELL_OFF:
         status = "Full Risk-Off"
         dwell_held = True
+
+    # ---- PRICE RECOVERY OVERRIDE (LATCHED) ---------------------------------
+    # Exits from Risk-Off are structurally late: the composite stays deep-negative
+    # through recoveries because credit/breadth/vol repair AFTER price does. That
+    # is what a V-bottom is, so no reweighting of those inputs fixes it. This adds
+    # price -- a different information type that recovers first.
+    #
+    # LATCHED, and that matters. A stateless version oscillated 8 times in two
+    # weeks during COVID: it released to Neutral, then next bar prev_lab was no
+    # longer "Full Risk-Off" so the override stopped applying, the still-negative
+    # composite forced Risk-Off again, and the cycle repeated. The latch persists
+    # the release until price actually breaks back down.
+    #
+    # Releases a defensive stance only; it never initiates risk-on.
+    PRICE_RECOVERY_PCT = float(os.environ.get("PRICE_RECOVERY_PCT", "8.0"))
+    RECOVERY_LOOKBACK  = int(os.environ.get("RECOVERY_LOOKBACK", "20"))
+    price_override = False
+    recovery_pct = None
+    _ov = None
+    try:
+        conn.execute("CREATE TABLE IF NOT EXISTS macro_override (k TEXT PRIMARY KEY, v TEXT)")
+        _r = conn.execute("SELECT v FROM macro_override WHERE k='latch'").fetchone()
+        _ov = json.loads(_r[0]) if _r else None
+    except Exception:
+        pass
+
+    try:
+        _sp = _close_series(conn, "SPY", as_of)
+        if _sp is not None and len(_sp) > RECOVERY_LOOKBACK:
+            _win = _sp.iloc[-RECOVERY_LOOKBACK:]
+            _low = float(_win.min())
+            _now = float(_sp.iloc[-1])
+            _bars_since_low = len(_win) - 1 - int(_win.values.argmin())
+            if _low > 0:
+                recovery_pct = round((_now / _low - 1) * 100, 2)
+
+            # ---- latch already active: hold the release, or break it ----
+            if _ov and _ov.get("active"):
+                _trig_low = float(_ov.get("low", _low))
+                if _now < _trig_low:
+                    _ov = None                      # price undercut the low -> latch broken
+                elif raw_status == "Full Risk-Off":
+                    status = "Neutral / Choppy"     # keep holding the release
+                    price_override = True
+                    dwell_held = False
+                else:
+                    _ov = None                      # composite recovered on its own
+
+            # ---- not latched: can we release? ----
+            elif (str(prev_lab) == "Full Risk-Off" and status == "Full Risk-Off"
+                  and recovery_pct is not None and recovery_pct >= PRICE_RECOVERY_PCT
+                  and _bars_since_low >= 3 and vix_score > -2):
+                status = "Neutral / Choppy"
+                price_override = True
+                dwell_held = False
+                _ov = {"active": True, "low": _low}
+
+        conn.execute("DELETE FROM macro_override WHERE k='latch'")
+        if _ov and _ov.get("active"):
+            conn.execute("INSERT OR REPLACE INTO macro_override VALUES ('latch', ?)",
+                         (json.dumps(_ov),))
+        conn.commit()
+    except Exception:
+        pass
     prev_lab = ("Neutral / Choppy" if str(prev_lab).startswith("Neutral") else prev_lab)
     if (not dwell_held) and prev_lab and raw_status != prev_lab:
         h_on   = HYST["Full Risk-On"]
@@ -891,6 +991,7 @@ def build_macro_structure(conn, breadth_pct200, breadth_pct50=None, breadth_regi
                                          "trend": trend_score, "breadth": breadth_score},
                           "bands": {"full_on": B_FULL_ON, "moderate_on": B_MOD_ON, "full_off": B_FULL_OFF, "hysteresis": HYST},
                           "raw_status": raw_status, "dwell_held": dwell_held,
+                          "price_override": price_override, "recovery_pct": recovery_pct,
                           "slope_5d": slope, "neutral_dir": neutral_dir,
                           "min_dwell_off": MIN_DWELL_OFF, "prev_run_days": prev_run,
                           "agrees": _agreement(status, breadth_regime)},
@@ -906,6 +1007,8 @@ def build_macro_structure(conn, breadth_pct200, breadth_pct50=None, breadth_regi
         "volatility": {"vix9d": v9, "vix_close": vix_close, "vix3m_close": vix3_close,
                        "vix6m": v6m, "vvix": vvix_close, "vvix_10d_ago": vvix_10d,
                        "curve": curve, "segments": segs, "inverted_segments": inverted,
+                       "spread_9d_3m": spread_now, "spread_5d_ago": spread_5d,
+                       "curve_improving": bool(curve_improving),
                        "backwardated": bool(backwardated), "score": vix_score},
         "asset_engines": engines,
         "relative_valuation": relval,
@@ -1000,6 +1103,8 @@ def replay(conn, start, force=False):
     names = [t for t in universe() if t not in NON_MEMBERS]
     conn.execute("CREATE TABLE IF NOT EXISTS macro_smooth (d TEXT PRIMARY KEY, s REAL)")
     conn.execute("DELETE FROM macro_smooth WHERE d >= ?", (str(pd.Timestamp(start).date()),))
+    conn.execute("CREATE TABLE IF NOT EXISTS macro_override (k TEXT PRIMARY KEY, v TEXT)")
+    conn.execute("DELETE FROM macro_override")
     conn.commit()
     print("[replay] precomputing breadth matrix...")
     pct_series = breadth_matrix(conn, names)

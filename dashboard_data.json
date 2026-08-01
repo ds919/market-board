@@ -4808,7 +4808,7 @@
     }
   },
   "macro_structure": {
-    "updated_at": "2026-08-01T06:27:48Z",
+    "updated_at": "2026-08-01T15:45:23Z",
     "system_health": {
       "data_status": "ok",
       "last_close": "2026-07-31"
@@ -4821,7 +4821,7 @@
         "down": 3,
         "up": 8
       },
-      "delta_1d": 0.11,
+      "delta_1d": -0.52,
       "min": -11,
       "max": 10,
       "breadth_engine_regime": "NEUTRAL",
@@ -4844,6 +4844,8 @@
       },
       "raw_status": "Neutral / Choppy",
       "dwell_held": false,
+      "price_override": false,
+      "recovery_pct": 2.41,
       "slope_5d": -0.25,
       "neutral_dir": "flat",
       "min_dwell_off": 10,
@@ -5093,7 +5095,7 @@
       },
       {
         "d": "2026-07-30",
-        "score": 1.65
+        "score": 2.28
       },
       {
         "d": "2026-07-31",
@@ -5103,267 +5105,267 @@
     "regime_history": [
       {
         "d": "2020-03-19",
-        "score": -8.92,
-        "raw": -9.0,
+        "score": -8.64,
+        "raw": -8.0,
         "status": "Full Risk-Off",
         "spx": 219.23
       },
       {
         "d": "2020-03-20",
-        "score": -8.96,
-        "raw": -9.0,
+        "score": -8.5,
+        "raw": -8.0,
         "status": "Full Risk-Off",
         "spx": 209.78
       },
       {
         "d": "2020-03-23",
-        "score": -8.98,
-        "raw": -9.0,
+        "score": -8.39,
+        "raw": -8.0,
         "status": "Full Risk-Off",
         "spx": 204.42
       },
       {
         "d": "2020-03-24",
-        "score": -8.99,
-        "raw": -9.0,
+        "score": -8.3,
+        "raw": -8.0,
         "status": "Full Risk-Off",
         "spx": 222.94
       },
       {
         "d": "2020-03-25",
-        "score": -8.89,
+        "score": -8.42,
         "raw": -8.53,
         "status": "Full Risk-Off",
         "spx": 226.28
       },
       {
         "d": "2020-03-26",
-        "score": -8.63,
+        "score": -8.27,
         "raw": -7.75,
         "status": "Full Risk-Off",
         "spx": 239.49
       },
       {
         "d": "2020-03-27",
-        "score": -8.44,
-        "raw": -7.75,
-        "status": "Full Risk-Off",
-        "spx": 232.36
+        "score": -7.93,
+        "raw": -6.75,
+        "status": "Neutral / Choppy",
+        "spx": 232.36,
+        "unconfirmed_exit": true
       },
       {
         "d": "2020-03-30",
-        "score": -8.4,
-        "raw": -8.25,
-        "status": "Full Risk-Off",
+        "score": -7.78,
+        "raw": -7.25,
+        "status": "Neutral / Choppy",
         "spx": 239.9
       },
       {
         "d": "2020-03-31",
-        "score": -8.37,
-        "raw": -8.29,
-        "status": "Full Risk-Off",
+        "score": -7.67,
+        "raw": -7.29,
+        "status": "Neutral / Choppy",
         "spx": 236.33
       },
       {
         "d": "2020-04-01",
-        "score": -8.41,
-        "raw": -8.45,
-        "status": "Full Risk-Off",
+        "score": -7.62,
+        "raw": -7.45,
+        "status": "Neutral / Choppy",
         "spx": 225.69
       },
       {
         "d": "2020-04-02",
-        "score": -8.44,
-        "raw": -8.47,
-        "status": "Full Risk-Off",
+        "score": -7.59,
+        "raw": -7.47,
+        "status": "Neutral / Choppy",
         "spx": 230.9
       },
       {
         "d": "2020-04-03",
-        "score": -8.52,
-        "raw": -8.59,
-        "status": "Full Risk-Off",
+        "score": -7.59,
+        "raw": -7.59,
+        "status": "Neutral / Choppy",
         "spx": 227.56
       },
       {
         "d": "2020-04-06",
-        "score": -8.47,
-        "raw": -8.3,
-        "status": "Full Risk-Off",
+        "score": -7.52,
+        "raw": -7.3,
+        "status": "Neutral / Choppy",
         "spx": 242.84
       },
       {
         "d": "2020-04-07",
-        "score": -8.25,
-        "raw": -7.5,
-        "status": "Full Risk-Off",
+        "score": -7.3,
+        "raw": -6.5,
+        "status": "Neutral / Choppy",
         "spx": 243.09
       },
       {
         "d": "2020-04-08",
-        "score": -7.97,
-        "raw": -7.0,
-        "status": "Full Risk-Off",
+        "score": -7.01,
+        "raw": -6.0,
+        "status": "Neutral / Choppy",
         "spx": 251.25
       },
       {
         "d": "2020-04-09",
-        "score": -7.25,
+        "score": -6.5,
         "raw": -4.7,
-        "status": "Full Risk-Off",
+        "status": "Neutral / Choppy",
         "spx": 255.08
       },
       {
         "d": "2020-04-13",
-        "score": -6.5,
+        "score": -5.91,
         "raw": -3.87,
-        "status": "Full Risk-Off",
+        "status": "Neutral / Choppy",
         "spx": 252.75
       },
       {
         "d": "2020-04-14",
-        "score": -5.84,
-        "raw": -3.55,
-        "status": "Full Risk-Off",
+        "score": -5.17,
+        "raw": -2.55,
+        "status": "Neutral / Choppy",
         "spx": 260.2
       },
       {
         "d": "2020-04-15",
-        "score": -5.26,
-        "raw": -3.21,
-        "status": "Full Risk-Off",
+        "score": -4.51,
+        "raw": -2.21,
+        "status": "Neutral / Choppy",
         "spx": 254.67
       },
       {
         "d": "2020-04-16",
-        "score": -4.67,
+        "score": -4.09,
         "raw": -2.61,
-        "status": "Full Risk-Off",
+        "status": "Neutral / Choppy",
         "spx": 255.9
       },
       {
         "d": "2020-04-17",
-        "score": -4.05,
+        "score": -3.6,
         "raw": -1.88,
-        "status": "Full Risk-Off",
+        "status": "Neutral / Choppy",
         "spx": 262.81
       },
       {
         "d": "2020-04-20",
-        "score": -3.58,
+        "score": -3.22,
         "raw": -1.92,
-        "status": "Full Risk-Off",
+        "status": "Neutral / Choppy",
         "spx": 258.18
       },
       {
         "d": "2020-04-21",
-        "score": -3.24,
+        "score": -2.97,
         "raw": -2.07,
-        "status": "Full Risk-Off",
+        "status": "Neutral / Choppy",
         "spx": 250.34
       },
       {
         "d": "2020-04-22",
-        "score": -3.03,
+        "score": -2.82,
         "raw": -2.3,
-        "status": "Full Risk-Off",
+        "status": "Neutral / Choppy",
         "spx": 255.9
       },
       {
         "d": "2020-04-23",
-        "score": -2.92,
+        "score": -2.76,
         "raw": -2.54,
-        "status": "Full Risk-Off",
+        "status": "Neutral / Choppy",
         "spx": 255.88
       },
       {
         "d": "2020-04-24",
-        "score": -2.5,
+        "score": -2.37,
         "raw": -1.01,
         "status": "Neutral / Choppy",
-        "spx": 259.45,
-        "unconfirmed_exit": true
+        "spx": 259.45
       },
       {
         "d": "2020-04-27",
-        "score": -1.9,
+        "score": -1.8,
         "raw": 0.2,
         "status": "Neutral / Choppy",
         "spx": 263.19
       },
       {
         "d": "2020-04-28",
-        "score": -1.07,
+        "score": -1.0,
         "raw": 1.81,
         "status": "Neutral / Choppy",
         "spx": 261.98
       },
       {
         "d": "2020-04-29",
-        "score": -0.22,
+        "score": -0.16,
         "raw": 2.77,
         "status": "Neutral / Choppy",
         "spx": 268.84
       },
       {
         "d": "2020-04-30",
-        "score": 0.76,
+        "score": 0.81,
         "raw": 4.18,
         "status": "Neutral / Choppy",
         "spx": 266.34
       },
       {
         "d": "2020-05-01",
-        "score": 1.54,
+        "score": 1.58,
         "raw": 4.29,
         "status": "Neutral / Choppy",
         "spx": 259.28
       },
       {
         "d": "2020-05-04",
-        "score": 2.1,
+        "score": 2.13,
         "raw": 4.05,
         "status": "Neutral / Choppy",
         "spx": 260.0
       },
       {
         "d": "2020-05-05",
-        "score": 2.44,
+        "score": 2.47,
         "raw": 3.65,
         "status": "Neutral / Choppy",
         "spx": 262.4
       },
       {
         "d": "2020-05-06",
-        "score": 2.55,
+        "score": 2.56,
         "raw": 2.9,
         "status": "Neutral / Choppy",
         "spx": 260.62
       },
       {
         "d": "2020-05-07",
-        "score": 2.82,
+        "score": 2.83,
         "raw": 3.78,
         "status": "Neutral / Choppy",
         "spx": 263.77
       },
       {
         "d": "2020-05-08",
-        "score": 3.2,
+        "score": 3.21,
         "raw": 4.51,
         "status": "Neutral / Choppy",
         "spx": 268.13
       },
       {
         "d": "2020-05-11",
-        "score": 3.44,
+        "score": 3.45,
         "raw": 4.31,
         "status": "Neutral / Choppy",
         "spx": 268.19
       },
       {
         "d": "2020-05-12",
-        "score": 2.9,
+        "score": 2.91,
         "raw": 2.36,
         "status": "Neutral / Choppy",
         "spx": 262.84
@@ -6224,84 +6226,84 @@
       },
       {
         "d": "2020-11-04",
-        "score": 1.96,
-        "raw": 2.03,
+        "score": 2.18,
+        "raw": 3.03,
         "status": "Neutral / Choppy",
         "spx": 317.64
       },
       {
         "d": "2020-11-05",
-        "score": 2.38,
+        "score": 2.55,
         "raw": 3.86,
         "status": "Neutral / Choppy",
         "spx": 323.83
       },
       {
         "d": "2020-11-06",
-        "score": 2.82,
+        "score": 2.96,
         "raw": 4.37,
         "status": "Neutral / Choppy",
         "spx": 323.76
       },
       {
         "d": "2020-11-09",
-        "score": 3.29,
+        "score": 3.4,
         "raw": 4.95,
         "status": "Neutral / Choppy",
         "spx": 327.83
       },
       {
         "d": "2020-11-10",
-        "score": 4.11,
+        "score": 4.19,
         "raw": 6.95,
         "status": "Moderate Risk-On",
         "spx": 327.35
       },
       {
         "d": "2020-11-11",
-        "score": 4.75,
+        "score": 4.81,
         "raw": 6.99,
         "status": "Moderate Risk-On",
         "spx": 329.78
       },
       {
         "d": "2020-11-12",
-        "score": 5.25,
+        "score": 5.3,
         "raw": 7.0,
         "status": "Moderate Risk-On",
         "spx": 326.58
       },
       {
         "d": "2020-11-13",
-        "score": 5.67,
+        "score": 5.71,
         "raw": 7.16,
         "status": "Moderate Risk-On",
         "spx": 331.1
       },
       {
         "d": "2020-11-16",
-        "score": 6.04,
+        "score": 6.07,
         "raw": 7.33,
         "status": "Full Risk-On",
         "spx": 335.23
       },
       {
         "d": "2020-11-17",
-        "score": 6.33,
+        "score": 6.36,
         "raw": 7.35,
         "status": "Full Risk-On",
         "spx": 333.43
       },
       {
         "d": "2020-11-18",
-        "score": 6.57,
+        "score": 6.59,
         "raw": 7.41,
         "status": "Full Risk-On",
         "spx": 329.42
       },
       {
         "d": "2020-11-19",
-        "score": 6.77,
+        "score": 6.79,
         "raw": 7.47,
         "status": "Full Risk-On",
         "spx": 330.8
@@ -6315,14 +6317,14 @@
       },
       {
         "d": "2020-11-23",
-        "score": 6.77,
+        "score": 6.78,
         "raw": 7.67,
         "status": "Full Risk-On",
         "spx": 330.51
       },
       {
         "d": "2020-11-24",
-        "score": 7.0,
+        "score": 7.01,
         "raw": 7.82,
         "status": "Full Risk-On",
         "spx": 335.83
@@ -6385,7 +6387,7 @@
       },
       {
         "d": "2020-12-08",
-        "score": 7.91,
+        "score": 7.92,
         "raw": 7.86,
         "status": "Full Risk-On",
         "spx": 342.26
@@ -8605,77 +8607,77 @@
       },
       {
         "d": "2022-03-14",
-        "score": -5.85,
-        "raw": -5.89,
+        "score": -5.72,
+        "raw": -5.39,
         "status": "Full Risk-Off",
         "spx": 392.36
       },
       {
         "d": "2022-03-15",
-        "score": -5.94,
+        "score": -5.87,
         "raw": -6.02,
         "status": "Full Risk-Off",
         "spx": 400.99
       },
       {
         "d": "2022-03-16",
-        "score": -5.53,
+        "score": -5.48,
         "raw": -4.12,
         "status": "Full Risk-Off",
         "spx": 409.88
       },
       {
         "d": "2022-03-17",
-        "score": -4.69,
+        "score": -4.64,
         "raw": -1.72,
         "status": "Full Risk-Off",
         "spx": 415.01
       },
       {
         "d": "2022-03-18",
-        "score": -3.22,
+        "score": -3.19,
         "raw": 1.91,
         "status": "Full Risk-Off",
         "spx": 419.56
       },
       {
         "d": "2022-03-21",
-        "score": -2.1,
+        "score": -2.08,
         "raw": 1.82,
         "status": "Neutral / Choppy",
         "spx": 419.43
       },
       {
         "d": "2022-03-22",
-        "score": -1.13,
+        "score": -1.11,
         "raw": 2.25,
         "status": "Neutral / Choppy",
         "spx": 424.34
       },
       {
         "d": "2022-03-23",
-        "score": -0.23,
+        "score": -0.22,
         "raw": 2.92,
         "status": "Neutral / Choppy",
         "spx": 418.88
       },
       {
         "d": "2022-03-24",
-        "score": 0.46,
+        "score": 0.47,
         "raw": 2.89,
         "status": "Neutral / Choppy",
         "spx": 425.19
       },
       {
         "d": "2022-03-25",
-        "score": 0.92,
+        "score": 0.93,
         "raw": 2.52,
         "status": "Neutral / Choppy",
         "spx": 427.27
       },
       {
         "d": "2022-03-28",
-        "score": 1.33,
+        "score": 1.34,
         "raw": 2.79,
         "status": "Neutral / Choppy",
         "spx": 430.31
@@ -8850,42 +8852,42 @@
       },
       {
         "d": "2022-05-03",
-        "score": -6.99,
-        "raw": -6.72,
+        "score": -6.88,
+        "raw": -6.22,
         "status": "Full Risk-Off",
         "spx": 393.0
       },
       {
         "d": "2022-05-04",
-        "score": -6.84,
+        "score": -6.75,
         "raw": -6.33,
         "status": "Full Risk-Off",
         "spx": 404.96
       },
       {
         "d": "2022-05-05",
-        "score": -6.82,
+        "score": -6.75,
         "raw": -6.73,
         "status": "Full Risk-Off",
         "spx": 390.57
       },
       {
         "d": "2022-05-06",
-        "score": -6.67,
+        "score": -6.61,
         "raw": -6.14,
         "status": "Full Risk-Off",
         "spx": 388.24
       },
       {
         "d": "2022-05-09",
-        "score": -7.79,
+        "score": -7.76,
         "raw": -8.91,
         "status": "Full Risk-Off",
         "spx": 375.81
       },
       {
         "d": "2022-05-10",
-        "score": -8.56,
+        "score": -8.55,
         "raw": -9.33,
         "status": "Full Risk-Off",
         "spx": 376.68
@@ -8899,7 +8901,7 @@
       },
       {
         "d": "2022-05-12",
-        "score": -8.81,
+        "score": -8.8,
         "raw": -8.23,
         "status": "Full Risk-Off",
         "spx": 370.31
@@ -8927,7 +8929,7 @@
       },
       {
         "d": "2022-05-18",
-        "score": -7.92,
+        "score": -7.91,
         "raw": -6.98,
         "status": "Full Risk-Off",
         "spx": 369.85
@@ -9557,119 +9559,119 @@
       },
       {
         "d": "2022-09-27",
-        "score": -7.31,
-        "raw": -8.25,
+        "score": -6.81,
+        "raw": -7.25,
         "status": "Full Risk-Off",
         "spx": 345.87
       },
       {
         "d": "2022-09-28",
-        "score": -7.28,
-        "raw": -7.18,
+        "score": -6.78,
+        "raw": -6.68,
         "status": "Full Risk-Off",
         "spx": 352.68
       },
       {
         "d": "2022-09-29",
-        "score": -7.58,
+        "score": -7.33,
         "raw": -7.88,
         "status": "Full Risk-Off",
         "spx": 345.31
       },
       {
         "d": "2022-09-30",
-        "score": -7.33,
+        "score": -7.13,
         "raw": -6.44,
         "status": "Full Risk-Off",
         "spx": 339.97
       },
       {
         "d": "2022-10-03",
-        "score": -7.07,
+        "score": -6.92,
         "raw": -6.16,
         "status": "Full Risk-Off",
         "spx": 348.94
       },
       {
         "d": "2022-10-04",
-        "score": -6.59,
-        "raw": -4.92,
+        "score": -6.36,
+        "raw": -4.42,
         "status": "Full Risk-Off",
         "spx": 359.76
       },
       {
         "d": "2022-10-05",
-        "score": -5.99,
+        "score": -5.81,
         "raw": -3.87,
         "status": "Full Risk-Off",
         "spx": 358.92
       },
       {
         "d": "2022-10-06",
-        "score": -5.48,
+        "score": -5.35,
         "raw": -3.73,
         "status": "Full Risk-Off",
         "spx": 355.22
       },
       {
         "d": "2022-10-07",
-        "score": -5.14,
+        "score": -5.03,
         "raw": -3.94,
         "status": "Full Risk-Off",
         "spx": 345.31
       },
       {
         "d": "2022-10-10",
-        "score": -4.66,
+        "score": -4.58,
         "raw": -2.99,
         "status": "Full Risk-Off",
         "spx": 342.67
       },
       {
         "d": "2022-10-11",
-        "score": -4.75,
+        "score": -4.71,
         "raw": -4.84,
         "status": "Full Risk-Off",
         "spx": 340.5
       },
       {
         "d": "2022-10-12",
-        "score": -4.82,
+        "score": -4.8,
         "raw": -4.89,
         "status": "Full Risk-Off",
         "spx": 339.38
       },
       {
         "d": "2022-10-13",
-        "score": -4.55,
+        "score": -4.54,
         "raw": -3.61,
         "status": "Full Risk-Off",
         "spx": 348.34
       },
       {
         "d": "2022-10-14",
-        "score": -4.2,
+        "score": -4.19,
         "raw": -2.98,
         "status": "Full Risk-Off",
         "spx": 340.4
       },
       {
         "d": "2022-10-17",
-        "score": -3.8,
+        "score": -3.79,
         "raw": -2.37,
         "status": "Full Risk-Off",
         "spx": 349.14
       },
       {
         "d": "2022-10-18",
-        "score": -3.28,
+        "score": -3.27,
         "raw": -1.47,
         "status": "Full Risk-Off",
         "spx": 353.25
       },
       {
         "d": "2022-10-19",
-        "score": -3.0,
+        "score": -2.99,
         "raw": -2.02,
         "status": "Full Risk-Off",
         "spx": 350.74
@@ -9683,7 +9685,7 @@
       },
       {
         "d": "2022-10-21",
-        "score": -2.65,
+        "score": -2.64,
         "raw": -2.07,
         "status": "Neutral / Choppy",
         "spx": 356.25
@@ -9739,7 +9741,7 @@
       },
       {
         "d": "2022-11-02",
-        "score": -0.49,
+        "score": -0.48,
         "raw": 0.38,
         "status": "Neutral / Choppy",
         "spx": 356.81
@@ -9760,77 +9762,77 @@
       },
       {
         "d": "2022-11-07",
-        "score": -0.14,
-        "raw": 0.14,
+        "score": -0.03,
+        "raw": 0.64,
         "status": "Neutral / Choppy",
         "spx": 361.64
       },
       {
         "d": "2022-11-08",
-        "score": -0.4,
-        "raw": -0.66,
+        "score": -0.1,
+        "raw": -0.16,
         "status": "Neutral / Choppy",
         "spx": 363.59
       },
       {
         "d": "2022-11-09",
-        "score": -1.0,
-        "raw": -1.6,
+        "score": -0.6,
+        "raw": -1.1,
         "status": "Neutral / Choppy",
         "spx": 356.1
       },
       {
         "d": "2022-11-10",
-        "score": -1.15,
+        "score": -0.95,
         "raw": -1.3,
         "status": "Neutral / Choppy",
         "spx": 375.67
       },
       {
         "d": "2022-11-11",
-        "score": -1.11,
+        "score": -0.97,
         "raw": -0.99,
         "status": "Neutral / Choppy",
         "spx": 379.31
       },
       {
         "d": "2022-11-14",
-        "score": -1.09,
+        "score": -0.99,
         "raw": -1.02,
         "status": "Neutral / Choppy",
         "spx": 376.08
       },
       {
         "d": "2022-11-15",
-        "score": -1.02,
+        "score": -0.94,
         "raw": -0.77,
         "status": "Neutral / Choppy",
         "spx": 379.29
       },
       {
         "d": "2022-11-16",
-        "score": -1.39,
+        "score": -1.35,
         "raw": -1.75,
         "status": "Neutral / Choppy",
         "spx": 376.39
       },
       {
         "d": "2022-11-17",
-        "score": -1.97,
+        "score": -1.95,
         "raw": -2.55,
         "status": "Neutral / Choppy",
         "spx": 375.24
       },
       {
         "d": "2022-11-18",
-        "score": -2.08,
+        "score": -2.07,
         "raw": -2.19,
         "status": "Neutral / Choppy",
         "spx": 376.95
       },
       {
         "d": "2022-11-21",
-        "score": -2.28,
+        "score": -2.27,
         "raw": -2.48,
         "status": "Neutral / Choppy",
         "spx": 375.58
@@ -9874,63 +9876,64 @@
         "d": "2022-11-30",
         "score": -2.65,
         "raw": 1.6,
-        "status": "Full Risk-Off",
-        "spx": 388.04
+        "status": "Neutral / Choppy",
+        "spx": 388.04,
+        "unconfirmed_exit": true
       },
       {
         "d": "2022-12-01",
         "score": -1.68,
         "raw": 1.73,
-        "status": "Full Risk-Off",
+        "status": "Neutral / Choppy",
         "spx": 387.75
       },
       {
         "d": "2022-12-02",
         "score": -0.75,
         "raw": 2.49,
-        "status": "Full Risk-Off",
+        "status": "Neutral / Choppy",
         "spx": 387.3
       },
       {
         "d": "2022-12-05",
         "score": -1.78,
         "raw": -2.81,
-        "status": "Full Risk-Off",
+        "status": "Neutral / Choppy",
         "spx": 380.34
       },
       {
         "d": "2022-12-06",
         "score": -2.42,
         "raw": -3.06,
-        "status": "Full Risk-Off",
+        "status": "Neutral / Choppy",
         "spx": 374.85
       },
       {
         "d": "2022-12-07",
         "score": -3.05,
         "raw": -3.68,
-        "status": "Full Risk-Off",
+        "status": "Neutral / Choppy",
         "spx": 374.21
       },
       {
         "d": "2022-12-08",
         "score": -3.03,
         "raw": -2.97,
-        "status": "Full Risk-Off",
+        "status": "Neutral / Choppy",
         "spx": 377.15
       },
       {
         "d": "2022-12-09",
         "score": -3.16,
         "raw": -3.29,
-        "status": "Full Risk-Off",
+        "status": "Neutral / Choppy",
         "spx": 374.33
       },
       {
         "d": "2022-12-12",
         "score": -3.27,
         "raw": -3.37,
-        "status": "Full Risk-Off",
+        "status": "Neutral / Choppy",
         "spx": 379.73
       },
       {
@@ -9938,8 +9941,7 @@
         "score": -2.38,
         "raw": 0.7,
         "status": "Neutral / Choppy",
-        "spx": 382.6,
-        "unconfirmed_exit": true
+        "spx": 382.6
       },
       {
         "d": "2022-12-14",
@@ -10378,105 +10380,105 @@
       },
       {
         "d": "2023-03-16",
-        "score": -6.14,
-        "raw": -5.52,
+        "score": -6.03,
+        "raw": -5.02,
         "status": "Full Risk-Off",
         "spx": 378.75
       },
       {
         "d": "2023-03-17",
-        "score": -5.92,
+        "score": -5.83,
         "raw": -5.14,
         "status": "Full Risk-Off",
         "spx": 374.33
       },
       {
         "d": "2023-03-20",
-        "score": -5.21,
-        "raw": -2.73,
+        "score": -5.03,
+        "raw": -2.23,
         "status": "Full Risk-Off",
         "spx": 377.92
       },
       {
         "d": "2023-03-21",
-        "score": -4.5,
+        "score": -4.36,
         "raw": -2.0,
         "status": "Full Risk-Off",
         "spx": 382.89
       },
       {
         "d": "2023-03-22",
-        "score": -4.39,
+        "score": -4.28,
         "raw": -4.01,
         "status": "Full Risk-Off",
         "spx": 376.36
       },
       {
         "d": "2023-03-23",
-        "score": -4.3,
+        "score": -4.22,
         "raw": -4.01,
         "status": "Full Risk-Off",
         "spx": 377.38
       },
       {
         "d": "2023-03-24",
-        "score": -4.04,
+        "score": -3.97,
         "raw": -3.1,
         "status": "Full Risk-Off",
         "spx": 379.85
       },
       {
         "d": "2023-03-27",
-        "score": -3.4,
+        "score": -3.35,
         "raw": -1.17,
         "status": "Full Risk-Off",
         "spx": 380.56
       },
       {
         "d": "2023-03-28",
-        "score": -2.92,
+        "score": -2.88,
         "raw": -1.25,
         "status": "Full Risk-Off",
         "spx": 379.71
       },
       {
         "d": "2023-03-29",
-        "score": -2.4,
+        "score": -2.36,
         "raw": -0.55,
         "status": "Neutral / Choppy",
         "spx": 385.23
       },
       {
         "d": "2023-03-30",
-        "score": -1.84,
+        "score": -1.82,
         "raw": 0.09,
         "status": "Neutral / Choppy",
         "spx": 387.48
       },
       {
         "d": "2023-03-31",
-        "score": -1.24,
+        "score": -1.23,
         "raw": 0.85,
         "status": "Neutral / Choppy",
         "spx": 392.95
       },
       {
         "d": "2023-04-03",
-        "score": -0.69,
+        "score": -0.68,
         "raw": 1.24,
         "status": "Neutral / Choppy",
         "spx": 394.44
       },
       {
         "d": "2023-04-04",
-        "score": -0.36,
+        "score": -0.35,
         "raw": 0.8,
         "status": "Neutral / Choppy",
         "spx": 392.26
       },
       {
         "d": "2023-04-05",
-        "score": -0.35,
+        "score": -0.34,
         "raw": -0.32,
         "status": "Neutral / Choppy",
         "spx": 391.23
@@ -10504,14 +10506,14 @@
       },
       {
         "d": "2023-04-12",
-        "score": 0.02,
+        "score": 0.03,
         "raw": 0.49,
         "status": "Neutral / Choppy",
         "spx": 391.66
       },
       {
         "d": "2023-04-13",
-        "score": 0.18,
+        "score": 0.19,
         "raw": 0.74,
         "status": "Neutral / Choppy",
         "spx": 396.86
@@ -12849,105 +12851,105 @@
       },
       {
         "d": "2024-08-12",
-        "score": -3.96,
-        "raw": -3.95,
+        "score": -3.74,
+        "raw": -2.95,
         "status": "Full Risk-Off",
         "spx": 520.94
       },
       {
         "d": "2024-08-13",
-        "score": -3.81,
+        "score": -3.64,
         "raw": -3.27,
         "status": "Full Risk-Off",
         "spx": 529.5
       },
       {
         "d": "2024-08-14",
-        "score": -3.41,
+        "score": -3.28,
         "raw": -2.02,
         "status": "Full Risk-Off",
         "spx": 531.18
       },
       {
         "d": "2024-08-15",
-        "score": -3.12,
+        "score": -3.01,
         "raw": -2.09,
         "status": "Full Risk-Off",
         "spx": 540.28
       },
       {
         "d": "2024-08-16",
-        "score": -2.69,
+        "score": -2.61,
         "raw": -1.21,
         "status": "Full Risk-Off",
         "spx": 541.49
       },
       {
         "d": "2024-08-19",
-        "score": -2.17,
+        "score": -2.1,
         "raw": -0.32,
-        "status": "Full Risk-Off",
+        "status": "Neutral / Choppy",
         "spx": 546.67
       },
       {
         "d": "2024-08-20",
-        "score": -1.71,
+        "score": -1.66,
         "raw": -0.12,
-        "status": "Full Risk-Off",
+        "status": "Neutral / Choppy",
         "spx": 545.78
       },
       {
         "d": "2024-08-21",
-        "score": -1.21,
+        "score": -1.17,
         "raw": 0.54,
         "status": "Neutral / Choppy",
         "spx": 547.66
       },
       {
         "d": "2024-08-22",
-        "score": -0.69,
+        "score": -0.66,
         "raw": 1.14,
         "status": "Neutral / Choppy",
         "spx": 543.36
       },
       {
         "d": "2024-08-23",
-        "score": -0.05,
+        "score": -0.03,
         "raw": 2.18,
         "status": "Neutral / Choppy",
         "spx": 549.13
       },
       {
         "d": "2024-08-26",
-        "score": 0.7,
+        "score": 0.72,
         "raw": 3.33,
         "status": "Neutral / Choppy",
         "spx": 547.82
       },
       {
         "d": "2024-08-27",
-        "score": 1.27,
+        "score": 1.29,
         "raw": 3.27,
         "status": "Neutral / Choppy",
         "spx": 548.57
       },
       {
         "d": "2024-08-28",
-        "score": 1.64,
+        "score": 1.65,
         "raw": 2.92,
         "status": "Neutral / Choppy",
         "spx": 545.39
       },
       {
         "d": "2024-08-29",
-        "score": 1.92,
+        "score": 1.93,
         "raw": 2.91,
         "status": "Neutral / Choppy",
         "spx": 545.44
       },
       {
         "d": "2024-08-30",
-        "score": 2.23,
+        "score": 2.24,
         "raw": 3.32,
         "status": "Neutral / Choppy",
         "spx": 550.64
@@ -13871,98 +13873,98 @@
       },
       {
         "d": "2025-03-13",
-        "score": -6.73,
-        "raw": -6.71,
+        "score": -6.51,
+        "raw": -5.71,
         "status": "Full Risk-Off",
         "spx": 542.14
       },
       {
         "d": "2025-03-14",
-        "score": -6.51,
+        "score": -6.33,
         "raw": -5.73,
         "status": "Full Risk-Off",
         "spx": 553.34
       },
       {
         "d": "2025-03-17",
-        "score": -6.26,
+        "score": -6.12,
         "raw": -5.39,
         "status": "Full Risk-Off",
         "spx": 557.6
       },
       {
         "d": "2025-03-18",
-        "score": -6.02,
-        "raw": -5.18,
+        "score": -5.8,
+        "raw": -4.68,
         "status": "Full Risk-Off",
         "spx": 551.58
       },
       {
         "d": "2025-03-19",
-        "score": -5.53,
+        "score": -5.36,
         "raw": -3.82,
         "status": "Full Risk-Off",
         "spx": 557.58
       },
       {
         "d": "2025-03-20",
-        "score": -5.12,
+        "score": -4.99,
         "raw": -3.68,
         "status": "Full Risk-Off",
         "spx": 555.97
       },
       {
         "d": "2025-03-21",
-        "score": -4.85,
+        "score": -4.75,
         "raw": -3.91,
         "status": "Full Risk-Off",
         "spx": 556.16
       },
       {
         "d": "2025-03-24",
-        "score": -4.15,
+        "score": -4.07,
         "raw": -1.71,
         "status": "Full Risk-Off",
         "spx": 566.12
       },
       {
         "d": "2025-03-25",
-        "score": -3.53,
+        "score": -3.47,
         "raw": -1.37,
         "status": "Full Risk-Off",
         "spx": 567.48
       },
       {
         "d": "2025-03-26",
-        "score": -3.47,
+        "score": -3.42,
         "raw": -3.24,
         "status": "Full Risk-Off",
         "spx": 560.7
       },
       {
         "d": "2025-03-27",
-        "score": -3.44,
+        "score": -3.4,
         "raw": -3.34,
         "status": "Full Risk-Off",
         "spx": 559.21
       },
       {
         "d": "2025-03-28",
-        "score": -3.97,
+        "score": -3.95,
         "raw": -4.5,
         "status": "Full Risk-Off",
         "spx": 547.95
       },
       {
         "d": "2025-03-31",
-        "score": -5.38,
+        "score": -5.37,
         "raw": -6.79,
         "status": "Full Risk-Off",
         "spx": 551.63
       },
       {
         "d": "2025-04-01",
-        "score": -5.96,
+        "score": -5.95,
         "raw": -6.53,
         "status": "Full Risk-Off",
         "spx": 553.19
@@ -14018,175 +14020,175 @@
       },
       {
         "d": "2025-04-11",
-        "score": -10.1,
-        "raw": -10.36,
+        "score": -9.74,
+        "raw": -9.36,
         "status": "Full Risk-Off",
         "spx": 526.53
       },
       {
         "d": "2025-04-14",
-        "score": -10.01,
-        "raw": -9.69,
-        "status": "Full Risk-Off",
+        "score": -9.5,
+        "raw": -8.69,
+        "status": "Neutral / Choppy",
         "spx": 531.64
       },
       {
         "d": "2025-04-15",
-        "score": -9.93,
-        "raw": -9.66,
-        "status": "Full Risk-Off",
+        "score": -9.32,
+        "raw": -8.66,
+        "status": "Neutral / Choppy",
         "spx": 530.15
       },
       {
         "d": "2025-04-16",
-        "score": -9.82,
-        "raw": -9.41,
-        "status": "Full Risk-Off",
+        "score": -9.11,
+        "raw": -8.41,
+        "status": "Neutral / Choppy",
         "spx": 518.37
       },
       {
         "d": "2025-04-17",
-        "score": -9.52,
+        "score": -8.98,
         "raw": -8.49,
-        "status": "Full Risk-Off",
+        "status": "Neutral / Choppy",
         "spx": 519.11
       },
       {
         "d": "2025-04-21",
-        "score": -9.23,
-        "raw": -8.22,
-        "status": "Full Risk-Off",
+        "score": -8.59,
+        "raw": -7.22,
+        "status": "Neutral / Choppy",
         "spx": 506.75
       },
       {
         "d": "2025-04-22",
-        "score": -8.86,
+        "score": -8.36,
         "raw": -7.55,
-        "status": "Full Risk-Off",
+        "status": "Neutral / Choppy",
         "spx": 519.93
       },
       {
         "d": "2025-04-23",
-        "score": -8.19,
+        "score": -7.8,
         "raw": -5.86,
-        "status": "Full Risk-Off",
+        "status": "Neutral / Choppy",
         "spx": 527.99
       },
       {
         "d": "2025-04-24",
-        "score": -7.45,
+        "score": -7.15,
         "raw": -4.87,
-        "status": "Full Risk-Off",
+        "status": "Neutral / Choppy",
         "spx": 539.11
       },
       {
         "d": "2025-04-25",
-        "score": -6.35,
+        "score": -6.11,
         "raw": -2.47,
-        "status": "Full Risk-Off",
+        "status": "Neutral / Choppy",
         "spx": 543.0
       },
       {
         "d": "2025-04-28",
-        "score": -5.49,
-        "raw": -2.49,
-        "status": "Full Risk-Off",
+        "score": -5.19,
+        "raw": -1.99,
+        "status": "Neutral / Choppy",
         "spx": 543.21
       },
       {
         "d": "2025-04-29",
-        "score": -4.71,
+        "score": -4.48,
         "raw": -1.97,
-        "status": "Full Risk-Off",
+        "status": "Neutral / Choppy",
         "spx": 546.63
       },
       {
         "d": "2025-04-30",
-        "score": -4.21,
+        "score": -4.03,
         "raw": -2.45,
-        "status": "Full Risk-Off",
+        "status": "Neutral / Choppy",
         "spx": 546.85
       },
       {
         "d": "2025-05-01",
-        "score": -3.81,
+        "score": -3.67,
         "raw": -2.43,
-        "status": "Full Risk-Off",
+        "status": "Neutral / Choppy",
         "spx": 550.72
       },
       {
         "d": "2025-05-02",
-        "score": -3.12,
+        "score": -3.01,
         "raw": -0.7,
-        "status": "Full Risk-Off",
+        "status": "Neutral / Choppy",
         "spx": 558.9
       },
       {
         "d": "2025-05-05",
-        "score": -2.59,
+        "score": -2.5,
         "raw": -0.72,
         "status": "Neutral / Choppy",
         "spx": 555.69
       },
       {
         "d": "2025-05-06",
-        "score": -2.22,
+        "score": -2.16,
         "raw": -0.95,
         "status": "Neutral / Choppy",
         "spx": 551.05
       },
       {
         "d": "2025-05-07",
-        "score": -1.93,
+        "score": -1.88,
         "raw": -0.92,
         "status": "Neutral / Choppy",
         "spx": 553.36
       },
       {
         "d": "2025-05-08",
-        "score": -1.52,
+        "score": -1.48,
         "raw": -0.09,
         "status": "Neutral / Choppy",
         "spx": 557.22
       },
       {
         "d": "2025-05-09",
-        "score": -1.05,
+        "score": -1.01,
         "raw": 0.63,
         "status": "Neutral / Choppy",
         "spx": 556.51
       },
       {
         "d": "2025-05-12",
-        "score": 0.32,
+        "score": 0.34,
         "raw": 5.09,
         "status": "Neutral / Choppy",
         "spx": 574.9
       },
       {
         "d": "2025-05-13",
-        "score": 1.45,
+        "score": 1.46,
         "raw": 5.39,
         "status": "Neutral / Choppy",
         "spx": 578.7
       },
       {
         "d": "2025-05-14",
-        "score": 2.32,
+        "score": 2.33,
         "raw": 5.36,
         "status": "Neutral / Choppy",
         "spx": 579.44
       },
       {
         "d": "2025-05-15",
-        "score": 2.87,
+        "score": 2.88,
         "raw": 4.82,
         "status": "Neutral / Choppy",
         "spx": 582.27
       },
       {
         "d": "2025-05-16",
-        "score": 3.32,
+        "score": 3.33,
         "raw": 4.91,
         "status": "Neutral / Choppy",
         "spx": 585.96
@@ -14200,7 +14202,7 @@
       },
       {
         "d": "2025-05-20",
-        "score": 3.98,
+        "score": 3.99,
         "raw": 5.01,
         "status": "Moderate Risk-On",
         "spx": 584.62
@@ -15628,91 +15630,91 @@
       },
       {
         "d": "2026-03-13",
-        "score": -5.31,
-        "raw": -5.31,
+        "score": -5.19,
+        "raw": -4.81,
         "status": "Full Risk-Off",
         "spx": 658.79
       },
       {
         "d": "2026-03-16",
-        "score": -5.22,
+        "score": -5.14,
         "raw": -4.94,
         "status": "Full Risk-Off",
         "spx": 665.49
       },
       {
         "d": "2026-03-17",
-        "score": -4.84,
+        "score": -4.77,
         "raw": -3.48,
         "status": "Full Risk-Off",
         "spx": 667.24
       },
       {
         "d": "2026-03-18",
-        "score": -4.71,
+        "score": -4.66,
         "raw": -4.26,
         "status": "Full Risk-Off",
         "spx": 657.93
       },
       {
         "d": "2026-03-19",
-        "score": -4.3,
+        "score": -4.25,
         "raw": -2.85,
         "status": "Full Risk-Off",
         "spx": 656.31
       },
       {
         "d": "2026-03-20",
-        "score": -4.4,
+        "score": -4.38,
         "raw": -4.5,
         "status": "Full Risk-Off",
         "spx": 646.9
       },
       {
         "d": "2026-03-23",
-        "score": -4.37,
+        "score": -4.35,
         "raw": -4.27,
         "status": "Full Risk-Off",
         "spx": 653.7
       },
       {
         "d": "2026-03-24",
-        "score": -4.13,
+        "score": -4.12,
         "raw": -3.3,
         "status": "Full Risk-Off",
         "spx": 651.5
       },
       {
         "d": "2026-03-25",
-        "score": -3.24,
+        "score": -3.23,
         "raw": -0.13,
         "status": "Full Risk-Off",
         "spx": 655.13
       },
       {
         "d": "2026-03-26",
-        "score": -2.73,
+        "score": -2.72,
         "raw": -0.94,
         "status": "Full Risk-Off",
         "spx": 643.43
       },
       {
         "d": "2026-03-27",
-        "score": -2.55,
+        "score": -2.54,
         "raw": -1.92,
         "status": "Neutral / Choppy",
         "spx": 632.46
       },
       {
         "d": "2026-03-30",
-        "score": -2.41,
+        "score": -2.4,
         "raw": -1.91,
         "status": "Neutral / Choppy",
         "spx": 630.35
       },
       {
         "d": "2026-03-31",
-        "score": -2.4,
+        "score": -2.39,
         "raw": -2.36,
         "status": "Neutral / Choppy",
         "spx": 648.67
@@ -23119,9 +23121,9 @@
       },
       {
         "pair": "BTC-USD/GLD",
-        "value": 172.823,
-        "ema5": 172.471,
-        "ema21": 171.499,
+        "value": 169.063,
+        "ema5": 171.218,
+        "ema21": 171.157,
         "direction": "up",
         "score": 1,
         "age_days": 17,
@@ -23183,6 +23185,9 @@
         }
       ],
       "inverted_segments": 0,
+      "spread_9d_3m": -5.97,
+      "spread_5d_ago": -5.84,
+      "curve_improving": false,
       "backwardated": false,
       "score": 0
     },
@@ -23282,8 +23287,8 @@
       },
       {
         "ticker": "BTC-USD",
-        "spread_1m": -1.405,
-        "spread_3m": -18.778
+        "spread_1m": -1.449,
+        "spread_3m": -18.816
       }
     ]
   },
@@ -23546,41 +23551,6 @@
     ]
   },
   "earnings": [
-    {
-      "tk": "CCJ",
-      "theme": "Materials & Uranium",
-      "date": "2026-07-31"
-    },
-    {
-      "tk": "CL",
-      "theme": "Defensives",
-      "date": "2026-07-31"
-    },
-    {
-      "tk": "CVX",
-      "theme": "Energy",
-      "date": "2026-07-31"
-    },
-    {
-      "tk": "ETN",
-      "theme": "AI Power & Datacenter",
-      "date": "2026-07-31"
-    },
-    {
-      "tk": "LIN",
-      "theme": "Materials & Uranium",
-      "date": "2026-07-31"
-    },
-    {
-      "tk": "MRNA",
-      "theme": "Biotech",
-      "date": "2026-07-31"
-    },
-    {
-      "tk": "XOM",
-      "theme": "Energy",
-      "date": "2026-07-31"
-    },
     {
       "tk": "BWXT",
       "theme": "AI Power & Datacenter",
@@ -24739,6 +24709,26 @@
     {
       "tk": "BFLY",
       "theme": "Medical Devices",
+      "date": "2026-10-30"
+    },
+    {
+      "tk": "CCJ",
+      "theme": "Materials & Uranium",
+      "date": "2026-10-30"
+    },
+    {
+      "tk": "CVX",
+      "theme": "Energy",
+      "date": "2026-10-30"
+    },
+    {
+      "tk": "LIN",
+      "theme": "Materials & Uranium",
+      "date": "2026-10-30"
+    },
+    {
+      "tk": "XOM",
+      "theme": "Energy",
       "date": "2026-10-30"
     }
   ]
