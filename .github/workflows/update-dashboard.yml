@@ -10,7 +10,12 @@ on:
     #    An off-spike minute measurably reduces queue delay.
     #  - LATER HOUR: gives Yahoo more margin to finalize the daily bar than
     #    21:30 UTC did (only 90 min after the close).
-    - cron: "47 22 * * 1-5"
+    # 23:47 UTC weekdays = 4:47pm MST / 6:47pm ET (EDT), 3:47pm MST / 5:47pm ET (EST).
+    # The previous 22:47 UTC fired at 3:47pm MST -- BEFORE the 4:00pm ET close --
+    # so it could only ever pick up the prior session and the board read a day
+    # stale every morning. One hour later clears the close plus Yahoo's
+    # settlement lag. Odd minute keeps it off GitHub's :00/:30 scheduler spike.
+    - cron: "47 23 * * 1-5"
   workflow_dispatch:        # lets you run it manually from the Actions tab
 
 permissions:
