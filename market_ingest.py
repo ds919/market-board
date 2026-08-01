@@ -337,11 +337,25 @@ def _close_series(conn, ticker, as_of=None):
     c = df["close"]
     return c if as_of is None else c[c.index <= pd.Timestamp(as_of)]
 
+def _basket_series(conn, tickers, as_of=None):
+    """Equal-weight, base-100 normalised composite of several tickers. Used for
+    basket-vs-basket ratios where no single ETF represents the concept."""
+    cols = []
+    for t in tickers:
+        c = _close_series(conn, t, as_of)
+        if c is not None and len(c) > 5:
+            cols.append(c / c.iloc[0] * 100.0)
+    if not cols:
+        return None
+    df = pd.concat(cols, axis=1, join="inner").dropna()
+    return None if df.empty else df.mean(axis=1)
+
 def _ratio_signal(conn, num, den, inverted=False, as_of=None):
     """5/21 EMA crossover on a date-aligned price ratio. Returns dict or None.
     Date alignment matters: BTC-USD trades 7d/wk vs 5 for equities, so we inner-
     join on common dates before computing the ratio and its EMAs."""
-    a, b = _close_series(conn, num, as_of), _close_series(conn, den, as_of)
+    a = _basket_series(conn, num, as_of) if isinstance(num, (list, tuple)) else _close_series(conn, num, as_of)
+    b = _basket_series(conn, den, as_of) if isinstance(den, (list, tuple)) else _close_series(conn, den, as_of)
     if a is None or b is None:
         return None
     j = pd.concat([a, b], axis=1, join="inner").dropna()
@@ -366,7 +380,9 @@ def _ratio_signal(conn, num, den, inverted=False, as_of=None):
     mag_w = min(1.0, sep_now / sep_ref) if sep_ref and sep_ref > 0 else 0.5
     age_w = min(1.0, (age + 1) / 5.0)          # full weight once the cross is 4+ days old
     weight = max(0.25, round(mag_w * age_w, 3))
-    return {"pair": f"{num}/{den}", "value": round(float(r.iloc[-1]), 3),
+    _nm = "+".join(num) if isinstance(num, (list, tuple)) else num
+    _dn = "+".join(den) if isinstance(den, (list, tuple)) else den
+    return {"pair": f"{_nm}/{_dn}", "value": round(float(r.iloc[-1]), 3),
             "ema5": round(float(e5.iloc[-1]), 3), "ema21": round(float(e21.iloc[-1]), 3),
             "direction": "up" if up else "down", "score": score, "age_days": age,
             "weight": weight, "weighted_score": round(score * weight, 2)}
@@ -422,6 +438,16 @@ def build_macro_structure(conn, breadth_pct200, breadth_pct50=None, breadth_regi
               ("BTC-USD", "GLD", False, "Digital Risk vs Safety"),
               ("CPER", "GLD", False, "Industrial Demand"),
               ("UUP", "SPY", True,  "US Dollar vs Equities")]
+    # TESTED AND REMOVED: a cyclical-vs-defensive basket ratio
+    #   (["XLK","XLY","XLI","XLF"] / ["XLP","XLU","XLV"])
+    # Rationale was sound -- rotation into defensives as regime confirmation --
+    # and it DID improve entries (Aug 2024 8/07->8/06, Nov 2025 11/20->11/18,
+    # deeper scores at turns). But it crowds: it reads the same "are cyclicals
+    # leading" dimension as XLY/XLP and RSP/SPY, so it amplified rather than
+    # added. Regime changes 84->95, Full Risk-On days 95->179, the 2020 and late
+    # 2022 recoveries fragmented, and Spring 2025 LOST its April re-entry -- the
+    # April bottom would have been scored Neutral instead of Risk-Off. Not worth
+    # two days of earlier warning. _basket_series() is retained for future use.
     ratios = []
     total = 0
     for num, den, inv, label in RATIOS:
