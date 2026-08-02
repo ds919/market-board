@@ -638,7 +638,7 @@ function scoreChart(hist, bands){
   if(!hist || hist.length < 10) return "";
   let pts = hist.filter(h => h.score !== null && h.score !== undefined);
   if(chartRange && pts.length > chartRange) pts = pts.slice(-chartRange);
-  if(pts.length < 10) return "";
+  if(pts.length < 3) return "";
   const W = Math.max(900, Math.min(2400, pts.length * 3.4)), H = 210, PL = 40, PR = 12, PT = 12, PB = 24;
   const iw = W-PL-PR, ih = H-PT-PB;
   const lo = -11, hi = 10;                      // fixed scale = the score's own range
@@ -659,7 +659,7 @@ function scoreChart(hist, bands){
   const unconfS = pts.map((p,i) => p.unconfirmed_exit
     ? `<line x1="${X(i).toFixed(1)}" y1="${PT}" x2="${X(i).toFixed(1)}" y2="${PT+ih}"
              stroke="#f5c451" stroke-width="1.1" stroke-dasharray="3 3" opacity=".85"/>` : "").join("");
-  const nLab = Math.min(7, Math.max(3, Math.floor(pts.length/40)));
+  const nLab = pts.length <= 25 ? Math.min(6, pts.length) : Math.min(7, Math.max(3, Math.floor(pts.length/40)));
   const idxs = Array.from({length:nLab},(_,k)=>Math.round(k*(pts.length-1)/(nLab-1)));
   const xl = idxs.map((i,k)=>`<text x="${X(i).toFixed(1)}" y="${H-6}" text-anchor="${k===0?'start':k===nLab-1?'end':'middle'}" font-size="9" fill="var(--muted)">${pts[i].d}</text>`).join("");
   const last = pts[pts.length-1];
@@ -694,8 +694,11 @@ function regimeChart(hist){
     const lastY = new Date(hist[hist.length-1].d).getUTCFullYear();
     ytdN = hist.filter(h => new Date(h.d).getUTCFullYear() === lastY).length;
   } catch(e){}
-  const opts = [[130,"6M"], [ytdN && ytdN > 5 ? ytdN : null, "YTD"], [260,"1Y"], [520,"2Y"], [null,"All"]]
-    .filter(o => o[1] === "YTD" ? (ytdN && ytdN > 5) : (o[0] === null || o[0] <= Math.max(hist.length, 130)));
+  // 14 and 30 are CALENDAR days; the series is trading days, so convert at ~0.7.
+  // 14d -> ~10 sessions, 30d -> ~21 sessions.
+  const opts = [[10,"14D"], [21,"30D"], [65,"3M"], [130,"6M"],
+                [ytdN && ytdN > 5 ? ytdN : null, "YTD"], [260,"1Y"], [520,"2Y"], [null,"All"]]
+    .filter(o => o[1] === "YTD" ? (ytdN && ytdN > 5) : (o[0] === null || o[0] <= Math.max(hist.length, 10)));
   return `
   <section class="panel">
     <div class="phead">SPX vs Regime
@@ -713,7 +716,7 @@ function regimeChartInner(hist){
   if(!hist || hist.length < 5) return "";
   let pts = hist.filter(h => h.spx !== null && h.spx !== undefined);
   if(chartRange && pts.length > chartRange) pts = pts.slice(-chartRange);
-  if(pts.length < 5) return "";
+  if(pts.length < 3) return "";
   const W = Math.max(900, Math.min(2400, pts.length * 3.4)), H = 260, PL = 46, PR = 12, PT = 14, PB = 26;
   const iw = W - PL - PR, ih = H - PT - PB;
   const px = pts.map(p => p.spx);
@@ -746,7 +749,7 @@ function regimeChartInner(hist){
   }).join("");
   // x labels: first, middle, last
   // denser date axis: ~7 evenly spaced labels, plus tick marks
-  const nLab = Math.min(7, Math.max(3, Math.floor(pts.length / 40)));
+  const nLab = pts.length <= 25 ? Math.min(6, pts.length) : Math.min(7, Math.max(3, Math.floor(pts.length / 40)));
   const idxs = Array.from({length: nLab}, (_, k) => Math.round(k * (pts.length - 1) / (nLab - 1)));
   const xl = idxs.map((i, k) =>
     `<line x1="${X(i).toFixed(1)}" y1="${PT+ih}" x2="${X(i).toFixed(1)}" y2="${PT+ih+4}" stroke="var(--line)" stroke-width="1"/>
