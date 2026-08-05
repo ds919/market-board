@@ -4719,7 +4719,7 @@
     }
   },
   "macro_structure": {
-    "updated_at": "2026-08-05T04:18:00Z",
+    "updated_at": "2026-08-05T09:47:41Z",
     "system_health": {
       "data_status": "ok",
       "last_close": "2026-08-04"
@@ -17872,7 +17872,7 @@
     ],
     "volatility": {
       "vix9d": 15.04,
-      "vix_close": 16.5,
+      "vix_close": 16.21,
       "vix3m_close": 19.34,
       "vix6m": 21.35,
       "vvix": 92.57,
