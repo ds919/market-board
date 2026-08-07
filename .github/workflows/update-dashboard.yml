@@ -3,19 +3,20 @@ name: Update market dashboard
 
 on:
   schedule:
-    # 22:47 UTC weekdays = 6:47pm ET (EDT) / 5:47pm ET (EST).
-    # Two deliberate choices:
-    #  - ODD MINUTE: GitHub's scheduler queues everything fired at :00/:30, so
-    #    those slots get delayed the most (we saw a Friday run land Sunday).
-    #    An off-spike minute measurably reduces queue delay.
-    #  - LATER HOUR: gives Yahoo more margin to finalize the daily bar than
-    #    21:30 UTC did (only 90 min after the close).
-    # 23:47 UTC weekdays = 4:47pm MST / 6:47pm ET (EDT), 3:47pm MST / 5:47pm ET (EST).
-    # The previous 22:47 UTC fired at 3:47pm MST -- BEFORE the 4:00pm ET close --
-    # so it could only ever pick up the prior session and the board read a day
-    # stale every morning. One hour later clears the close plus Yahoo's
-    # settlement lag. Odd minute keeps it off GitHub's :00/:30 scheduler spike.
-    - cron: "47 23 * * 1-5"
+    # GitHub's scheduled-event queue on this repo has run CONSISTENTLY 8-10 hours
+    # late: observed landings at 07:44, 08:10 and 08:23 UTC against crons set for
+    # 21:30-23:47 UTC. Fighting the delay did not work (three schedule changes,
+    # same lateness), so these times COMPENSATE for it rather than assume
+    # punctuality.
+    #
+    # 13:30 UTC + ~8-10h  ->  lands ~21:30-23:30 UTC = 15:30-17:30 MST, i.e. at
+    # or just after the 16:00 ET close. If GitHub ever runs it ON TIME, 13:30 UTC
+    # is 07:30 MST and it simply picks up the PRIOR session -- stale by hours, not
+    # wrong, and the second run below corrects it the same day.
+    - cron: "31 13 * * 1-5"
+    # Safety net ~5h later; catches the case where the first run fired early and
+    # only had the prior close. Exits without committing when nothing changed.
+    - cron: "37 18 * * 1-5"
   workflow_dispatch:        # lets you run it manually from the Actions tab
 
 permissions:
