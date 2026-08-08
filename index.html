@@ -326,7 +326,11 @@ function viewDailyBoard(d){
   </div>`;
 }
 
-let quadTrailMode = "top";   // off | top | all
+let quadTrailMode = "off";   // off | top | all
+// Default OFF deliberately. With only a handful of stored sessions the momentum
+// measure is still jumpy, so trails drew confident-looking lines across the whole
+// panel that were mostly noise. The positional snapshot is the part that is
+// informative today; turn trails on once theme_scores has accumulated a month.
 function setQuadTrails(m){ quadTrailMode = m; render(); }
 
 function themeQuadrant(d){
@@ -417,14 +421,20 @@ function themeQuadrant(d){
     const col = now.x >= 0 ? (now.y >= 0 ? "var(--pos,#3ddc84)" : "#f5c451")
                            : (now.y >= 0 ? "var(--accent,#38bdf8)" : "var(--neg,#ff5c57)");
     const px = X(now.x), py = Y(now.y);
-    let ly = py + 3.5;
-    let guard = 0;
-    while(placed.some(q => Math.abs(q.y - ly) < 11 && Math.abs(q.x - px) < 120) && guard++ < 14) ly += 11;
+    // Nudge at most twice. The previous version allowed 14 steps, which pushed
+    // labels ~150px from their dot -- worse than an overlap, because the name no
+    // longer identifies anything. If it still collides, drop the label: the dot
+    // stays and the hover-free chart is honest about being crowded there.
+    let ly = py + 3.5, guard = 0;
+    while(placed.some(q => Math.abs(q.y - ly) < 11 && Math.abs(q.x - px) < 120) && guard < 2){ ly += 11; guard++; }
+    const collides = placed.some(q => Math.abs(q.y - ly) < 11 && Math.abs(q.x - px) < 120);
+    const dot = `<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="3.6" fill="${col}"/>`;
+    if(collides) return dot;
     placed.push({x: px, y: ly});
     const anchor = px > W * 0.72 ? "end" : "start";
     const lx = anchor === "end" ? px - 7 : px + 7;
-    return `<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="3.6" fill="${col}"/>`
-      + (ly !== py + 3.5 ? `<line x1="${px.toFixed(1)}" y1="${py.toFixed(1)}" x2="${lx.toFixed(1)}" y2="${(ly-3).toFixed(1)}" stroke="${col}" stroke-width=".6" opacity=".35"/>` : "")
+    return dot
+      + (guard > 0 ? `<line x1="${px.toFixed(1)}" y1="${py.toFixed(1)}" x2="${lx.toFixed(1)}" y2="${(ly-3).toFixed(1)}" stroke="${col}" stroke-width=".7" opacity=".5"/>` : "")
       + `<text x="${lx.toFixed(1)}" y="${ly.toFixed(1)}" text-anchor="${anchor}" font-size="9.5" fill="var(--ink,#e8eaed)">${p.name}</text>`;
   }).join("");
 
@@ -448,6 +458,7 @@ function themeQuadrant(d){
         enough to fling a theme across the chart on noise. Solid dot is today;
         the faded trail is where it was${offs.length>1 ? " (" + offs.slice(1).map(o=>o+"d").join(", ") + " ago)" : ""}.
         Orderly rotation runs clockwise: Improving → Leading → Weakening → Lagging.
+        Trails default to off until more sessions accumulate — turn them on above.
       </div>
     </div>
   </section>`;
