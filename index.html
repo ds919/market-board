@@ -211,7 +211,6 @@
     </nav>
     <div class="ctrls">
       <button id="themeBtn">LIGHT</button>
-      <span class="date mono" id="dateline">—</span>
     </div>
   </div>
 </header>
@@ -360,9 +359,18 @@ function themeQuadrant(d){
     return (a === null || b === null) ? null : a - b;
   };
 
-  const SPAN = Math.min(5, Math.max(2, N - 1));      // momentum lookback
-  const trailOffsets = [0, 7, 30].filter(o => o + SPAN < N);   // now, 7d, 30d
-  if(!trailOffsets.length) return emptyPanel("Theme Rotation", "not enough history yet");
+  // Momentum lookback shrinks with available history so a short series still
+  // produces a usable chart instead of a bare scatter.
+  const SPAN = Math.max(1, Math.min(5, Math.floor((N - 1) / 3)));
+  const maxBack = N - 1 - SPAN;                     // deepest offset we can measure
+
+  // Prefer 7d and 30d. If history is too short for those, fall back to evenly
+  // spaced points inside what IS available -- a 4-session trail beats no trail.
+  let trailOffsets = [0, 7, 30].filter(o => o <= maxBack);
+  if(trailOffsets.length < 2 && maxBack >= 2){
+    trailOffsets = [0, Math.floor(maxBack / 2), maxBack].filter((o, i, a) => a.indexOf(o) === i);
+  }
+  if(!trailOffsets.length) trailOffsets = [0];
 
   // build points
   const pts = [];
@@ -413,8 +421,8 @@ function themeQuadrant(d){
   }).join("");
 
   const trailNote = trailOffsets.length > 1
-    ? `trails to ${trailOffsets.slice(1).map(o => o + "d").join(" and ")} ago`
-    : "no trail yet — needs 7+ sessions of history";
+    ? `${N} sessions stored · trails to ${trailOffsets.slice(1).map(o => o + "d").join(" and ")} ago`
+    : `${N} sessions stored · no trail yet (needs ${SPAN + 2}+)`;
 
   return `
   <section class="panel">
@@ -1065,7 +1073,6 @@ function render(){
   const el = document.getElementById("metaline");
   el.style.color = "";
   el.textContent = `${d.date} · ${d.tickers} TICKERS · ${d.universe}`;
-  document.getElementById("dateline").textContent = d.date;
 
   document.querySelectorAll("nav a").forEach(a=>{
     a.classList.toggle("active", a.dataset.tab === activeTab);
