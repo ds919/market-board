@@ -899,12 +899,36 @@ def build_macro_structure(conn, breadth_pct200, breadth_pct50=None, breadth_regi
 
         hrows = [(d, v[0], v[1], v[2], (v[3] if len(v) > 3 else None))
                  for d, v in sorted(merged.items())][-1600:]
-        for d_, rw, sm, st, px in hrows:
+
+        # ---- PRICE / SCORE DIVERGENCE (descriptive flag, NOT a signal) --------
+        # --divtest over 2020-2026: price DOWN >=2% over 10 sessions while the
+        # score held flat or rose beat the base-rate forward return at every
+        # horizon in both windows (21d: 3.61 vs 1.10 IS, 5.36 vs 1.67 OOS). The
+        # mirror case -- price up, score unconfirmed -- showed essentially
+        # nothing.
+        #
+        # THE SAMPLE IS FAR TOO SMALL TO TRADE: n=55 in-sample, n=20 out, and at
+        # a 21-day horizon the effective independent count out-of-sample is about
+        # ONE. This is emitted so observations ACCUMULATE going forward instead of
+        # a conclusion being drawn from twenty. Treat it as descriptive, like the
+        # unconfirmed-exit marker.
+        DIV_WIN, DIV_PX, DIV_SC = 10, 2.0, 0.0
+        for i, (d_, rw, sm, st, px) in enumerate(hrows):
             row = {"d": d_, "score": round(float(sm), 2),
                    "raw": round(float(rw), 2), "status": st,
                    "spx": round(float(px), 2) if px is not None else None}
             if d_ in unconf:
                 row["unconfirmed_exit"] = True
+            if i >= DIV_WIN:
+                p0 = hrows[i - DIV_WIN][4]
+                s0 = hrows[i - DIV_WIN][2]
+                if p0 and px:
+                    px_chg = (float(px) / float(p0) - 1) * 100.0
+                    sc_chg = float(sm) - float(s0)
+                    if px_chg <= -DIV_PX and sc_chg >= DIV_SC:
+                        row["div_bull"] = True      # price fell, conditions did not
+                    elif px_chg >= DIV_PX and sc_chg <= -DIV_SC:
+                        row["div_bear"] = True      # price rose, conditions did not
             regime_history.append(row)
     except Exception as e:
         print(f"[macro] regime_history unavailable: {e}")

@@ -878,6 +878,15 @@ function regimeChartInner(hist){
   const line = pts.map((p,i) => `${X(i).toFixed(1)},${Y(p.spx).toFixed(1)}`).join(" ");
   // dates where the engine left Full Risk-Off while cross-asset signals were
   // still deteriorating -- previously visible only as a same-day banner
+  // divergence markers: small triangles under/over the price line. Descriptive
+  // only -- the sample behind them is far too small to trade (see engine notes).
+  const divs = pts.map((p,i) => {
+    if(!p.div_bull && !p.div_bear) return "";
+    const x = X(i), y = Y(p.spx);
+    return p.div_bull
+      ? `<polygon points="${x.toFixed(1)},${(y+7).toFixed(1)} ${(x-3.4).toFixed(1)},${(y+13).toFixed(1)} ${(x+3.4).toFixed(1)},${(y+13).toFixed(1)}" fill="var(--pos,#3ddc84)" opacity=".75"/>`
+      : `<polygon points="${x.toFixed(1)},${(y-7).toFixed(1)} ${(x-3.4).toFixed(1)},${(y-13).toFixed(1)} ${(x+3.4).toFixed(1)},${(y-13).toFixed(1)}" fill="var(--neg,#ff5c57)" opacity=".7"/>`;
+  }).join("");
   const unconf = pts.map((p,i) => p.unconfirmed_exit
     ? `<line x1="${X(i).toFixed(1)}" y1="${PT}" x2="${X(i).toFixed(1)}" y2="${PT+ih}"
              stroke="#f5c451" stroke-width="1.2" stroke-dasharray="3 3" opacity=".9"/>
@@ -902,7 +911,7 @@ function regimeChartInner(hist){
       <svg viewBox="0 0 ${W} ${H}" style="width:100%;min-width:${Math.min(1600, Math.max(560, pts.length*2.2)).toFixed(0)}px;height:auto;display:block">
         ${bands}${ticks}
         <polyline points="${line}" fill="none" stroke="var(--fg,#e6edf3)" stroke-width="1.6"/>
-        ${unconf}
+        ${unconf}${divs}
         ${xl}
       </svg>
       <div style="display:flex;gap:16px;font-size:11.5px;margin-top:8px;flex-wrap:wrap">
@@ -910,6 +919,8 @@ function regimeChartInner(hist){
         <span><span style="display:inline-block;width:10px;height:10px;background:var(--muted,#3a4a5e);opacity:.16;margin-right:5px"></span>Neutral</span>
         <span><span style="display:inline-block;width:10px;height:10px;background:var(--neg,#8c3630);opacity:.34;margin-right:5px"></span>Risk-Off</span>
         <span><span style="display:inline-block;width:10px;height:10px;border-left:2px dashed #f5c451;margin-right:5px"></span>Unconfirmed exit</span>
+        <span><span class="pos">▲</span> price fell, score held</span>
+        <span><span class="neg">▼</span> price rose, score didn't</span>
         <span class="dim" style="color:var(--muted)">line = SPY close</span>
       </div>`;
 }
