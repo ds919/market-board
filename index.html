@@ -770,7 +770,13 @@ function setChartRange(n){
 
 function scoreChart(hist, bands){
   if(!hist || hist.length < 10) return "";
-  let pts = hist.filter(h => h.score !== null && h.score !== undefined);
+  // Both charts MUST filter identically. Previously the score chart kept rows
+  // with a score and the SPX chart kept rows with a price; whenever those counts
+  // differed the two panels stretched over the same pixel width with different
+  // point counts, so the same date sat at different x positions and the regime
+  // bands appeared offset from the score.
+  let pts = hist.filter(h => h.score !== null && h.score !== undefined
+                          && h.spx   !== null && h.spx   !== undefined);
   if(chartRange && pts.length > chartRange) pts = pts.slice(-chartRange);
   if(pts.length < 3) return "";
   const W = Math.max(900, Math.min(2400, pts.length * 3.4)), H = 210, PL = 40, PR = 12, PT = 12, PB = 24;
@@ -848,7 +854,8 @@ function regimeChart(hist){
 
 function regimeChartInner(hist){
   if(!hist || hist.length < 5) return "";
-  let pts = hist.filter(h => h.spx !== null && h.spx !== undefined);
+  let pts = hist.filter(h => h.spx !== null && h.spx !== undefined
+                          && h.score !== null && h.score !== undefined);
   if(chartRange && pts.length > chartRange) pts = pts.slice(-chartRange);
   if(pts.length < 3) return "";
   const W = Math.max(900, Math.min(2400, pts.length * 3.4)), H = 260, PL = 46, PR = 12, PT = 14, PB = 26;

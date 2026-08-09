@@ -1488,6 +1488,185 @@ def vix_sign_test(conn, split="2024-01-01"):
     print("          NOTE: forward-return differences of <1-2% over 21d are inside")
     print("          the noise band given ~78 effective independent observations.")
 
+
+def divergence_test(conn, split="2024-01-01", lookback=10):
+    """Does SPX moving WITHOUT the regime score confirming carry information?
+
+    Premise: when price rallies hard but the composite stays flat or falls, the
+    move is unconfirmed by underlying conditions and may be likelier to fail.
+    Mirror case: price falls while the score improves may mark washouts.
+
+    Method: over a rolling `lookback` window, measure SPX % change and score
+    change, classify into four quadrants, measure FORWARD SPX returns from each.
+    In-sample / out-of-sample split -- a pattern in only one window is noise.
+
+    LIMITS (printed with the output):
+      - Overlapping windows: effective independent n is ~days/horizon.
+      - 4 quadrants x 3 horizons x 2 windows = 24 cells; some will look good by
+        chance alone.
+      - Compare against the BASE RATE, not zero. SPX rose through most of the
+        sample, so "price rose afterward" is the default outcome.
+    """
+    try:
+        rows = conn.execute("SELECT d, j FROM macro_detail ORDER BY d").fetchall()
+    except Exception:
+        print("[div] no detail -- run --replay first"); return
+    recs = {}
+    for d_, j in rows:
+        try:
+            o = json.loads(j)
+        except Exception:
+            continue
+        recs[pd.Timestamp(d_)] = {"score": o.get("score"), "spx": o.get("spx")}
+    df = pd.DataFrame.from_dict(recs, orient="index").sort_index().dropna()
+    if len(df) < 300:
+        print(f"[div] only {len(df)} usable days -- run --replay 2020-01-01 --force"); return
+
+    df["spx_chg"]   = (df["spx"] / df["spx"].shift(lookback) - 1) * 100
+    df["score_chg"] = df["score"] - df["score"].shift(lookback)
+    for h in (5, 21, 63):
+        df[f"fwd{h}"] = (df["spx"].shift(-h) / df["spx"] - 1) * 100
+    df = df.dropna(subset=["spx_chg", "score_chg"])
+
+    px_up = df["spx_chg"] >= 2.0
+    px_dn = df["spx_chg"] <= -2.0
+    sc_up = df["score_chg"] >= 1.0
+    sc_dn = df["score_chg"] <= -1.0
+
+    quads = {
+        "price UP + score UP (confirmed)":      px_up & sc_up,
+        "price UP + score flat/dn (UNCONF)":    px_up & ~sc_up,
+        "price DN + score DN (confirmed)":      px_dn & sc_dn,
+        "price DN + score flat/up (washout?)":  px_dn & ~sc_dn,
+    }
+
+    cut = pd.Timestamp(split)
+    print(f"\n[div] price vs score divergence, {lookback}-session windows")
+    print(f"      thresholds: |SPX| >= 2.0%, |score change| >= 1.0")
+    print(f"      IS: {df.index.min().date()} -> {(cut - pd.Timedelta(days=1)).date()}"
+          f"   OOS: {cut.date()} -> {df.index.max().date()}\n")
+
+    ins_all, oos_all = df[df.index < cut], df[df.index >= cut]
+    print(f"      {'BASE RATE (all days)':<38}{len(ins_all):>7}{len(oos_all):>8}", end="")
+    for h in (5, 21, 63):
+        print(f"{ins_all[f'fwd{h}'].mean():>9.2f}{oos_all[f'fwd{h}'].mean():>10.2f}", end="")
+    print()
+    hdr = (f"      {'quadrant':<38}{'n(IS)':>7}{'n(OOS)':>8}"
+           + "".join(f"{('IS'+str(h)):>9}{('OOS'+str(h)):>10}" for h in (5, 21, 63)))
+    print("      " + "-" * (len(hdr) - 6))
+    print(hdr)
+    for name, mask in quads.items():
+        ins, oos = df[mask & (df.index < cut)], df[mask & (df.index >= cut)]
+        line = f"      {name:<38}{len(ins):>7}{len(oos):>8}"
+        for h in (5, 21, 63):
+            a = ins[f"fwd{h}"].mean() if len(ins) > 10 else None
+            b = oos[f"fwd{h}"].mean() if len(oos) > 10 else None
+            line += (f"{a:>9.2f}{b:>10.2f}" if a is not None and b is not None
+                     else f"{'-':>9}{'-':>10}")
+        print(line)
+    print("\n      Read against the BASE RATE row, not zero. A quadrant means something")
+    print("      only if it differs from base AND the sign holds in BOTH windows.")
+    print("      Effective independent observations at 21d is roughly n/21.")
+
+
+def band_forward_test(conn, split="2024-01-01"):
+    """Do LOW scores actually precede BETTER forward returns?
+
+    Motivated by an eyeball observation that the score dipping into the risk-off
+    band tends to be followed by SPX rising. If true at scale it would mean the
+    chart's colour semantics (red = bad) are misleading as a forward read, even
+    though they are correct as a description of CURRENT conditions.
+
+    Reports mean forward SPX return by score band, in-sample and out-of-sample,
+    against the all-days base rate.
+
+    WATCH THE CONFOUND: SPX rose over most of this sample, and low scores cluster
+    inside drawdowns. "Buy when the score is low" is therefore close to "buy the
+    dip in a rising market" -- which works until it doesn't. A positive result
+    here is NOT evidence the colours should flip; it is evidence that drawdowns
+    in this sample resolved upward.
+    """
+    try:
+        rows = conn.execute("SELECT d, j FROM macro_detail ORDER BY d").fetchall()
+    except Exception:
+        print("[band] no detail -- run --replay first"); return
+    recs = {}
+    for d_, j in rows:
+        try:
+            o = json.loads(j)
+        except Exception:
+            continue
+        if o.get("score") is not None and o.get("spx") is not None:
+            recs[pd.Timestamp(d_)] = {"score": o["score"], "spx": o["spx"]}
+    df = pd.DataFrame.from_dict(recs, orient="index").sort_index()
+    if len(df) < 300:
+        print(f"[band] only {len(df)} usable days"); return
+    for h in (5, 21, 63):
+        df[f"fwd{h}"] = (df["spx"].shift(-h) / df["spx"] - 1) * 100
+
+    bands = [("risk-off      (<= -3)",      df["score"] <= -3),
+             ("weak          (-3 to 0)",    (df["score"] > -3) & (df["score"] <= 0)),
+             ("mild          (0 to 3.5)",   (df["score"] > 0) & (df["score"] < 3.5)),
+             ("risk-on       (3.5 to 5)",   (df["score"] >= 3.5) & (df["score"] < 5)),
+             ("full risk-on  (>= 5)",       df["score"] >= 5)]
+
+    cut = pd.Timestamp(split)
+    ins, oos = df[df.index < cut], df[df.index >= cut]
+    print(f"\n[band] mean forward SPX return (%) by score band")
+    print(f"       IS {df.index.min().date()} -> {(cut-pd.Timedelta(days=1)).date()}"
+          f" | OOS {cut.date()} -> {df.index.max().date()}\n")
+    hdr = (f"       {'band':<26}{'n(IS)':>7}{'n(OOS)':>8}"
+           + "".join(f"{('IS'+str(h)):>9}{('OOS'+str(h)):>10}" for h in (5,21,63)))
+    print(f"       {'BASE RATE (all days)':<26}{len(ins):>7}{len(oos):>8}"
+          + "".join(f"{ins[f'fwd{h}'].mean():>9.2f}{oos[f'fwd{h}'].mean():>10.2f}" for h in (5,21,63)))
+    print("       " + "-"*(len(hdr)-7)); print(hdr)
+    for name, mask in bands:
+        a, b = df[mask & (df.index < cut)], df[mask & (df.index >= cut)]
+        line = f"       {name:<26}{len(a):>7}{len(b):>8}"
+        for h in (5,21,63):
+            x = a[f"fwd{h}"].mean() if len(a) > 10 else None
+            y = b[f"fwd{h}"].mean() if len(b) > 10 else None
+            line += (f"{x:>9.2f}{y:>10.2f}") if x is not None and y is not None else f"{'-':>9}{'-':>10}"
+        print(line)
+    print("\n       Compare each row to BASE RATE, not zero, and require the sign to")
+    print("       hold in BOTH windows. Effective independent obs at 21d is ~n/21.")
+
+    # ---- SECOND TABLE: by CHANGE in the score, not its level -----------------
+    # The engine currently labels off the LEVEL. The level is structurally slow to
+    # recover (credit/breadth/vol repair after price does), which is why exits ran
+    # late. The CHANGE may carry the information earlier. This measures whether it
+    # actually does, before any trigger is rebuilt around it.
+    for win in (5, 10, 21):
+        df[f"chg{win}"] = df["score"] - df["score"].shift(win)
+    print()
+    for win in (10,):
+        c = f"chg{win}"
+        cbands = [(f"falling hard  (<= -3)",  df[c] <= -3),
+                  (f"falling       (-3 to -1)", (df[c] > -3) & (df[c] <= -1)),
+                  (f"flat          (-1 to 1)",  (df[c] > -1) & (df[c] < 1)),
+                  (f"rising        (1 to 3)",   (df[c] >= 1) & (df[c] < 3)),
+                  (f"rising hard   (>= 3)",     df[c] >= 3)]
+        print(f"[band] mean forward SPX return (%) by {win}-SESSION CHANGE in score\n")
+        hdr2 = (f"       {'change band':<26}{'n(IS)':>7}{'n(OOS)':>8}"
+                + "".join(f"{('IS'+str(h)):>9}{('OOS'+str(h)):>10}" for h in (5,21,63)))
+        print(f"       {'BASE RATE (all days)':<26}{len(ins):>7}{len(oos):>8}"
+              + "".join(f"{ins[f'fwd{h}'].mean():>9.2f}{oos[f'fwd{h}'].mean():>10.2f}" for h in (5,21,63)))
+        print("       " + "-"*(len(hdr2)-7)); print(hdr2)
+        for name, mask in cbands:
+            a, b = df[mask & (df.index < cut)], df[mask & (df.index >= cut)]
+            line = f"       {name:<26}{len(a):>7}{len(b):>8}"
+            for h in (5,21,63):
+                x = a[f"fwd{h}"].mean() if len(a) > 10 else None
+                y = b[f"fwd{h}"].mean() if len(b) > 10 else None
+                line += (f"{x:>9.2f}{y:>10.2f}") if x is not None and y is not None else f"{'-':>9}{'-':>10}"
+            print(line)
+    print("\n       READ THE TWO TABLES TOGETHER. If the CHANGE bands separate forward")
+    print("       returns more cleanly than the LEVEL bands -- bigger spread, signs")
+    print("       holding in both windows -- then triggering on rate-of-change is")
+    print("       better supported than triggering on level. If they look similar,")
+    print("       the level is not the problem and switching would add complexity")
+    print("       for nothing.")
+
 def dispatch_webhook(prev_status, new_status, payload):
     """POST a regime-shift alert to WEBHOOK_URL if set. Never crashes the run."""
     url = os.environ.get("WEBHOOK_URL", "").strip()
@@ -1821,6 +2000,12 @@ def main():
     ap.add_argument("--selftest", action="store_true", help="synthetic data, no network")
     ap.add_argument("--verify", nargs="+", metavar="TICKER",
                     help="audit calc chain for given tickers vs the DB (read-only)")
+    ap.add_argument("--bandtest", action="store_true",
+                    help="mean forward SPX return by score band")
+    ap.add_argument("--divtest", action="store_true",
+                    help="test whether price/score divergence predicts forward SPX")
+    ap.add_argument("--div-lookback", type=int, default=10, metavar="N",
+                    help="window for --divtest (default 10 sessions)")
     ap.add_argument("--vixtest", action="store_true",
                     help="test whether the vol component's sign should be inverted")
     ap.add_argument("--ic", action="store_true",
@@ -1848,6 +2033,18 @@ def main():
 
     if args.verify:
         verify(args.verify)
+        return
+
+    if args.bandtest:
+        conn = sqlite3.connect(DB_PATH)
+        band_forward_test(conn, args.ic_split)
+        conn.close()
+        return
+
+    if args.divtest:
+        conn = sqlite3.connect(DB_PATH)
+        divergence_test(conn, args.ic_split, args.div_lookback)
+        conn.close()
         return
 
     if args.vixtest:
