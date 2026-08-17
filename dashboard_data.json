@@ -87,6 +87,26 @@
       "255"
     ],
     [
+      "Advancers / Decliners",
+      "117 / 136"
+    ],
+    [
+      "A/D net",
+      "-19"
+    ],
+    [
+      "% advancing",
+      "46.2%"
+    ],
+    [
+      "4%+ up / down",
+      "12 / 17"
+    ],
+    [
+      "New highs \u2212 lows (20d)",
+      "+31"
+    ],
+    [
       "New 20D highs",
       "37"
     ],
@@ -6095,20 +6115,20 @@
     }
   },
   "macro_structure": {
-    "updated_at": "2026-08-17T05:11:16Z",
+    "updated_at": "2026-08-17T05:31:02Z",
     "system_health": {
       "data_status": "ok",
       "last_close": "2026-08-14"
     },
     "global_regime": {
       "status": "Neutral / Choppy",
-      "score": 2.31,
+      "score": 2.28,
       "raw_score": 2.11,
       "smooth_span": {
         "down": 3,
         "up": 8
       },
-      "delta_1d": -0.68,
+      "delta_1d": -0.02,
       "min": -11,
       "max": 10,
       "breadth_engine_regime": "RISK-ON",
@@ -6116,7 +6136,7 @@
       "deploy_pct": 50.0,
       "deploy_notes": [],
       "components": {
-        "intermarket": 0.31,
+        "intermarket": 0.28,
         "vix": 0,
         "trend": 1,
         "breadth": 1
@@ -6137,10 +6157,10 @@
       "lead_min": 40.0,
       "price_override": false,
       "recovery_pct": 6.43,
-      "slope_5d": 0.47,
-      "neutral_dir": "improving",
+      "slope_5d": -0.23,
+      "neutral_dir": "flat",
       "min_dwell_off": 10,
-      "prev_run_days": 44,
+      "prev_run_days": 48,
       "agrees": false,
       "confirmed_status": "Neutral / Choppy"
     },
@@ -6152,22 +6172,6 @@
       "breadth_score": 1
     },
     "score_history": [
-      {
-        "d": "2026-05-14",
-        "score": 3.58
-      },
-      {
-        "d": "2026-05-15",
-        "score": 3.14
-      },
-      {
-        "d": "2026-05-18",
-        "score": 2.56
-      },
-      {
-        "d": "2026-05-19",
-        "score": 1.91
-      },
       {
         "d": "2026-05-20",
         "score": 1.98
@@ -6389,40 +6393,27 @@
         "score": 2.99
       },
       {
+        "d": "2026-08-10",
+        "score": 2.67
+      },
+      {
+        "d": "2026-08-11",
+        "score": 2.78
+      },
+      {
+        "d": "2026-08-12",
+        "score": 2.64
+      },
+      {
+        "d": "2026-08-13",
+        "score": 2.3
+      },
+      {
         "d": "2026-08-14",
-        "score": 2.31
+        "score": 2.28
       }
     ],
     "regime_history": [
-      {
-        "d": "2020-03-27",
-        "score": -7.93,
-        "raw": -6.75,
-        "status": "Neutral / Choppy",
-        "spx": 232.36,
-        "unconfirmed_exit": true
-      },
-      {
-        "d": "2020-03-30",
-        "score": -7.78,
-        "raw": -7.25,
-        "status": "Neutral / Choppy",
-        "spx": 239.9
-      },
-      {
-        "d": "2020-03-31",
-        "score": -7.67,
-        "raw": -7.29,
-        "status": "Neutral / Choppy",
-        "spx": 236.33
-      },
-      {
-        "d": "2020-04-01",
-        "score": -7.62,
-        "raw": -7.45,
-        "status": "Neutral / Choppy",
-        "spx": 225.69
-      },
       {
         "d": "2020-04-02",
         "score": -7.59,
@@ -17749,8 +17740,36 @@
         "spx": 773.26
       },
       {
+        "d": "2026-08-10",
+        "score": 2.55,
+        "raw": 2.67,
+        "status": "Neutral / Choppy",
+        "spx": 773.03
+      },
+      {
+        "d": "2026-08-11",
+        "score": 2.6,
+        "raw": 2.78,
+        "status": "Neutral / Choppy",
+        "spx": 770.56
+      },
+      {
+        "d": "2026-08-12",
+        "score": 2.61,
+        "raw": 2.64,
+        "status": "Neutral / Choppy",
+        "spx": 772.49
+      },
+      {
+        "d": "2026-08-13",
+        "score": 2.45,
+        "raw": 2.3,
+        "status": "Neutral / Choppy",
+        "spx": 777.88
+      },
+      {
         "d": "2026-08-14",
-        "score": 2.31,
+        "score": 2.28,
         "raw": 2.11,
         "status": "Neutral / Choppy",
         "spx": 776.34
@@ -24959,8 +24978,8 @@
       },
       {
         "ticker": "BTC-USD",
-        "spread_1m": -6.359,
-        "spread_3m": -7.525
+        "spread_1m": -6.337,
+        "spread_3m": -7.504
       }
     ]
   },
@@ -25234,13 +25253,43 @@
       "date": "2026-08-18"
     },
     {
+      "tk": "HD",
+      "theme": "\u2014",
+      "date": "2026-08-18"
+    },
+    {
+      "tk": "TOL",
+      "theme": "\u2014",
+      "date": "2026-08-18"
+    },
+    {
       "tk": "ADI",
       "theme": "Semiconductors",
       "date": "2026-08-19"
     },
     {
+      "tk": "EL",
+      "theme": "\u2014",
+      "date": "2026-08-19"
+    },
+    {
+      "tk": "LOW",
+      "theme": "\u2014",
+      "date": "2026-08-19"
+    },
+    {
       "tk": "NDSN",
       "theme": "Robotics & Automation",
+      "date": "2026-08-19"
+    },
+    {
+      "tk": "TGT",
+      "theme": "\u2014",
+      "date": "2026-08-19"
+    },
+    {
+      "tk": "TJX",
+      "theme": "\u2014",
       "date": "2026-08-19"
     },
     {
@@ -25256,6 +25305,11 @@
     {
       "tk": "NTES",
       "theme": "China Tech",
+      "date": "2026-08-20"
+    },
+    {
+      "tk": "ROST",
+      "theme": "\u2014",
       "date": "2026-08-20"
     },
     {
@@ -25282,6 +25336,11 @@
       "tk": "PDD",
       "theme": "China Tech",
       "date": "2026-08-25"
+    },
+    {
+      "tk": "A",
+      "theme": "\u2014",
+      "date": "2026-08-26"
     },
     {
       "tk": "CRM",
@@ -25324,8 +25383,33 @@
       "date": "2026-08-27"
     },
     {
+      "tk": "BBY",
+      "theme": "\u2014",
+      "date": "2026-08-27"
+    },
+    {
+      "tk": "BURL",
+      "theme": "\u2014",
+      "date": "2026-08-27"
+    },
+    {
+      "tk": "DG",
+      "theme": "\u2014",
+      "date": "2026-08-27"
+    },
+    {
+      "tk": "DLTR",
+      "theme": "\u2014",
+      "date": "2026-08-27"
+    },
+    {
       "tk": "ESTC",
       "theme": "Software Infrastructure",
+      "date": "2026-08-27"
+    },
+    {
+      "tk": "HRL",
+      "theme": "\u2014",
       "date": "2026-08-27"
     },
     {
@@ -25389,6 +25473,11 @@
       "date": "2026-09-03"
     },
     {
+      "tk": "CPB",
+      "theme": "\u2014",
+      "date": "2026-09-03"
+    },
+    {
       "tk": "LULU",
       "theme": "Consumer Momentum",
       "date": "2026-09-03"
@@ -25429,6 +25518,21 @@
       "date": "2026-09-10"
     },
     {
+      "tk": "KR",
+      "theme": "\u2014",
+      "date": "2026-09-11"
+    },
+    {
+      "tk": "LEN",
+      "theme": "\u2014",
+      "date": "2026-09-17"
+    },
+    {
+      "tk": "AZO",
+      "theme": "\u2014",
+      "date": "2026-09-22"
+    },
+    {
       "tk": "GIS",
       "theme": "Defensives",
       "date": "2026-09-23"
@@ -25444,14 +25548,44 @@
       "date": "2026-09-24"
     },
     {
+      "tk": "DRI",
+      "theme": "\u2014",
+      "date": "2026-09-24"
+    },
+    {
       "tk": "UEC",
       "theme": "Materials & Uranium",
       "date": "2026-09-24"
     },
     {
+      "tk": "CCL",
+      "theme": "\u2014",
+      "date": "2026-09-28"
+    },
+    {
       "tk": "NKE",
       "theme": "Consumer Momentum",
       "date": "2026-09-29"
+    },
+    {
+      "tk": "CAG",
+      "theme": "\u2014",
+      "date": "2026-09-30"
+    },
+    {
+      "tk": "STZ",
+      "theme": "\u2014",
+      "date": "2026-10-05"
+    },
+    {
+      "tk": "MKC",
+      "theme": "\u2014",
+      "date": "2026-10-06"
+    },
+    {
+      "tk": "DAL",
+      "theme": "\u2014",
+      "date": "2026-10-08"
     },
     {
       "tk": "PEP",
@@ -25461,6 +25595,11 @@
     {
       "tk": "C",
       "theme": "Financials",
+      "date": "2026-10-13"
+    },
+    {
+      "tk": "DPZ",
+      "theme": "\u2014",
       "date": "2026-10-13"
     },
     {
@@ -25504,13 +25643,48 @@
       "date": "2026-10-14"
     },
     {
+      "tk": "FAST",
+      "theme": "\u2014",
+      "date": "2026-10-14"
+    },
+    {
+      "tk": "JBHT",
+      "theme": "\u2014",
+      "date": "2026-10-14"
+    },
+    {
       "tk": "MS",
       "theme": "Financials",
       "date": "2026-10-14"
     },
     {
+      "tk": "PGR",
+      "theme": "\u2014",
+      "date": "2026-10-14"
+    },
+    {
+      "tk": "PLD",
+      "theme": "\u2014",
+      "date": "2026-10-14"
+    },
+    {
+      "tk": "STT",
+      "theme": "\u2014",
+      "date": "2026-10-14"
+    },
+    {
+      "tk": "AA",
+      "theme": "\u2014",
+      "date": "2026-10-15"
+    },
+    {
       "tk": "SCHW",
       "theme": "Financials",
+      "date": "2026-10-15"
+    },
+    {
+      "tk": "TRV",
+      "theme": "\u2014",
       "date": "2026-10-15"
     },
     {
@@ -25524,8 +25698,53 @@
       "date": "2026-10-15"
     },
     {
+      "tk": "CFG",
+      "theme": "\u2014",
+      "date": "2026-10-16"
+    },
+    {
+      "tk": "MTB",
+      "theme": "\u2014",
+      "date": "2026-10-16"
+    },
+    {
+      "tk": "RF",
+      "theme": "\u2014",
+      "date": "2026-10-16"
+    },
+    {
+      "tk": "CLF",
+      "theme": "\u2014",
+      "date": "2026-10-19"
+    },
+    {
+      "tk": "FITB",
+      "theme": "\u2014",
+      "date": "2026-10-19"
+    },
+    {
+      "tk": "STLD",
+      "theme": "\u2014",
+      "date": "2026-10-19"
+    },
+    {
+      "tk": "ZION",
+      "theme": "\u2014",
+      "date": "2026-10-19"
+    },
+    {
       "tk": "COF",
       "theme": "Financials",
+      "date": "2026-10-20"
+    },
+    {
+      "tk": "DGX",
+      "theme": "\u2014",
+      "date": "2026-10-20"
+    },
+    {
+      "tk": "EQT",
+      "theme": "\u2014",
       "date": "2026-10-20"
     },
     {
@@ -25539,6 +25758,11 @@
       "date": "2026-10-20"
     },
     {
+      "tk": "GPC",
+      "theme": "\u2014",
+      "date": "2026-10-20"
+    },
+    {
       "tk": "HAL",
       "theme": "Energy",
       "date": "2026-10-20"
@@ -25546,6 +25770,11 @@
     {
       "tk": "ISRG",
       "theme": "Robotics & Automation",
+      "date": "2026-10-20"
+    },
+    {
+      "tk": "KEY",
+      "theme": "\u2014",
       "date": "2026-10-20"
     },
     {
@@ -25564,6 +25793,11 @@
       "date": "2026-10-20"
     },
     {
+      "tk": "MSCI",
+      "theme": "\u2014",
+      "date": "2026-10-20"
+    },
+    {
       "tk": "NFLX",
       "theme": "Consumer Momentum",
       "date": "2026-10-20"
@@ -25574,9 +25808,34 @@
       "date": "2026-10-20"
     },
     {
+      "tk": "OMC",
+      "theme": "\u2014",
+      "date": "2026-10-20"
+    },
+    {
+      "tk": "PHM",
+      "theme": "\u2014",
+      "date": "2026-10-20"
+    },
+    {
+      "tk": "PNR",
+      "theme": "\u2014",
+      "date": "2026-10-20"
+    },
+    {
       "tk": "RTX",
       "theme": "Space & Defense Tech",
       "date": "2026-10-20"
+    },
+    {
+      "tk": "VZ",
+      "theme": "\u2014",
+      "date": "2026-10-20"
+    },
+    {
+      "tk": "AVY",
+      "theme": "\u2014",
+      "date": "2026-10-21"
     },
     {
       "tk": "CCI",
@@ -25584,8 +25843,68 @@
       "date": "2026-10-21"
     },
     {
+      "tk": "CME",
+      "theme": "\u2014",
+      "date": "2026-10-21"
+    },
+    {
+      "tk": "ELV",
+      "theme": "\u2014",
+      "date": "2026-10-21"
+    },
+    {
+      "tk": "EQR",
+      "theme": "\u2014",
+      "date": "2026-10-21"
+    },
+    {
+      "tk": "FE",
+      "theme": "\u2014",
+      "date": "2026-10-21"
+    },
+    {
       "tk": "LRCX",
       "theme": "Semiconductors",
+      "date": "2026-10-21"
+    },
+    {
+      "tk": "LUV",
+      "theme": "\u2014",
+      "date": "2026-10-21"
+    },
+    {
+      "tk": "LVS",
+      "theme": "\u2014",
+      "date": "2026-10-21"
+    },
+    {
+      "tk": "MCO",
+      "theme": "\u2014",
+      "date": "2026-10-21"
+    },
+    {
+      "tk": "NTRS",
+      "theme": "\u2014",
+      "date": "2026-10-21"
+    },
+    {
+      "tk": "NVR",
+      "theme": "\u2014",
+      "date": "2026-10-21"
+    },
+    {
+      "tk": "PKG",
+      "theme": "\u2014",
+      "date": "2026-10-21"
+    },
+    {
+      "tk": "PM",
+      "theme": "\u2014",
+      "date": "2026-10-21"
+    },
+    {
+      "tk": "T",
+      "theme": "\u2014",
       "date": "2026-10-21"
     },
     {
@@ -25599,13 +25918,43 @@
       "date": "2026-10-21"
     },
     {
+      "tk": "UAL",
+      "theme": "\u2014",
+      "date": "2026-10-21"
+    },
+    {
+      "tk": "URI",
+      "theme": "\u2014",
+      "date": "2026-10-21"
+    },
+    {
       "tk": "VRT",
       "theme": "AI Power & Datacenter",
       "date": "2026-10-21"
     },
     {
+      "tk": "ALLE",
+      "theme": "\u2014",
+      "date": "2026-10-22"
+    },
+    {
+      "tk": "BKR",
+      "theme": "\u2014",
+      "date": "2026-10-22"
+    },
+    {
       "tk": "BX",
       "theme": "Financials",
+      "date": "2026-10-22"
+    },
+    {
+      "tk": "CNP",
+      "theme": "\u2014",
+      "date": "2026-10-22"
+    },
+    {
+      "tk": "CSX",
+      "theme": "\u2014",
       "date": "2026-10-22"
     },
     {
@@ -25619,6 +25968,16 @@
       "date": "2026-10-22"
     },
     {
+      "tk": "DOV",
+      "theme": "\u2014",
+      "date": "2026-10-22"
+    },
+    {
+      "tk": "DOW",
+      "theme": "\u2014",
+      "date": "2026-10-22"
+    },
+    {
       "tk": "F",
       "theme": "EV & Autonomy",
       "date": "2026-10-22"
@@ -25626,6 +25985,16 @@
     {
       "tk": "FCX",
       "theme": "Materials & Uranium",
+      "date": "2026-10-22"
+    },
+    {
+      "tk": "FTI",
+      "theme": "\u2014",
+      "date": "2026-10-22"
+    },
+    {
+      "tk": "HBAN",
+      "theme": "\u2014",
       "date": "2026-10-22"
     },
     {
@@ -25639,13 +26008,43 @@
       "date": "2026-10-22"
     },
     {
+      "tk": "LEA",
+      "theme": "\u2014",
+      "date": "2026-10-22"
+    },
+    {
+      "tk": "NDAQ",
+      "theme": "\u2014",
+      "date": "2026-10-22"
+    },
+    {
       "tk": "NEM",
       "theme": "Materials & Uranium",
       "date": "2026-10-22"
     },
     {
+      "tk": "NSC",
+      "theme": "\u2014",
+      "date": "2026-10-22"
+    },
+    {
+      "tk": "PCG",
+      "theme": "\u2014",
+      "date": "2026-10-22"
+    },
+    {
       "tk": "PG",
       "theme": "Defensives",
+      "date": "2026-10-22"
+    },
+    {
+      "tk": "ROP",
+      "theme": "\u2014",
+      "date": "2026-10-22"
+    },
+    {
+      "tk": "TMUS",
+      "theme": "\u2014",
       "date": "2026-10-22"
     },
     {
@@ -25656,6 +26055,11 @@
     {
       "tk": "VLO",
       "theme": "Energy",
+      "date": "2026-10-22"
+    },
+    {
+      "tk": "WST",
+      "theme": "\u2014",
       "date": "2026-10-22"
     },
     {
@@ -25679,8 +26083,18 @@
       "date": "2026-10-23"
     },
     {
+      "tk": "ARE",
+      "theme": "\u2014",
+      "date": "2026-10-26"
+    },
+    {
       "tk": "BMRN",
       "theme": "Biotech",
+      "date": "2026-10-26"
+    },
+    {
+      "tk": "BRO",
+      "theme": "\u2014",
       "date": "2026-10-26"
     },
     {
@@ -25689,8 +26103,23 @@
       "date": "2026-10-26"
     },
     {
+      "tk": "NOV",
+      "theme": "\u2014",
+      "date": "2026-10-26"
+    },
+    {
+      "tk": "NUE",
+      "theme": "\u2014",
+      "date": "2026-10-26"
+    },
+    {
       "tk": "NXPI",
       "theme": "Semiconductors",
+      "date": "2026-10-26"
+    },
+    {
+      "tk": "WELL",
+      "theme": "\u2014",
       "date": "2026-10-26"
     },
     {
@@ -25704,6 +26133,41 @@
       "date": "2026-10-27"
     },
     {
+      "tk": "BXP",
+      "theme": "\u2014",
+      "date": "2026-10-27"
+    },
+    {
+      "tk": "CARR",
+      "theme": "\u2014",
+      "date": "2026-10-27"
+    },
+    {
+      "tk": "CB",
+      "theme": "\u2014",
+      "date": "2026-10-27"
+    },
+    {
+      "tk": "CNC",
+      "theme": "\u2014",
+      "date": "2026-10-27"
+    },
+    {
+      "tk": "ECL",
+      "theme": "\u2014",
+      "date": "2026-10-27"
+    },
+    {
+      "tk": "EIX",
+      "theme": "\u2014",
+      "date": "2026-10-27"
+    },
+    {
+      "tk": "ESS",
+      "theme": "\u2014",
+      "date": "2026-10-27"
+    },
+    {
       "tk": "EXEL",
       "theme": "Biotech",
       "date": "2026-10-27"
@@ -25714,8 +26178,18 @@
       "date": "2026-10-27"
     },
     {
+      "tk": "IVZ",
+      "theme": "\u2014",
+      "date": "2026-10-27"
+    },
+    {
       "tk": "MDLZ",
       "theme": "Defensives",
+      "date": "2026-10-27"
+    },
+    {
+      "tk": "NEE",
+      "theme": "\u2014",
       "date": "2026-10-27"
     },
     {
@@ -25724,8 +26198,38 @@
       "date": "2026-10-27"
     },
     {
+      "tk": "OKE",
+      "theme": "\u2014",
+      "date": "2026-10-27"
+    },
+    {
+      "tk": "PCAR",
+      "theme": "\u2014",
+      "date": "2026-10-27"
+    },
+    {
+      "tk": "PPG",
+      "theme": "\u2014",
+      "date": "2026-10-27"
+    },
+    {
       "tk": "PYPL",
       "theme": "Fintech & Payments",
+      "date": "2026-10-27"
+    },
+    {
+      "tk": "RCL",
+      "theme": "\u2014",
+      "date": "2026-10-27"
+    },
+    {
+      "tk": "RRC",
+      "theme": "\u2014",
+      "date": "2026-10-27"
+    },
+    {
+      "tk": "SHW",
+      "theme": "\u2014",
       "date": "2026-10-27"
     },
     {
@@ -25736,6 +26240,11 @@
     {
       "tk": "TXN",
       "theme": "Semiconductors",
+      "date": "2026-10-27"
+    },
+    {
+      "tk": "UNH",
+      "theme": "\u2014",
       "date": "2026-10-27"
     },
     {
@@ -25759,6 +26268,21 @@
       "date": "2026-10-27"
     },
     {
+      "tk": "AR",
+      "theme": "\u2014",
+      "date": "2026-10-28"
+    },
+    {
+      "tk": "AVB",
+      "theme": "\u2014",
+      "date": "2026-10-28"
+    },
+    {
+      "tk": "AWK",
+      "theme": "\u2014",
+      "date": "2026-10-28"
+    },
+    {
       "tk": "BSX",
       "theme": "Medical Devices",
       "date": "2026-10-28"
@@ -25769,8 +26293,28 @@
       "date": "2026-10-28"
     },
     {
+      "tk": "CHRW",
+      "theme": "\u2014",
+      "date": "2026-10-28"
+    },
+    {
       "tk": "EQIX",
       "theme": "Datacenter REITs",
+      "date": "2026-10-28"
+    },
+    {
+      "tk": "EXR",
+      "theme": "\u2014",
+      "date": "2026-10-28"
+    },
+    {
+      "tk": "FDX",
+      "theme": "\u2014",
+      "date": "2026-10-28"
+    },
+    {
+      "tk": "FTV",
+      "theme": "\u2014",
       "date": "2026-10-28"
     },
     {
@@ -25794,6 +26338,16 @@
       "date": "2026-10-28"
     },
     {
+      "tk": "HLT",
+      "theme": "\u2014",
+      "date": "2026-10-28"
+    },
+    {
+      "tk": "IP",
+      "theme": "\u2014",
+      "date": "2026-10-28"
+    },
+    {
       "tk": "KLAC",
       "theme": "Semiconductors",
       "date": "2026-10-28"
@@ -25804,8 +26358,23 @@
       "date": "2026-10-28"
     },
     {
+      "tk": "LII",
+      "theme": "\u2014",
+      "date": "2026-10-28"
+    },
+    {
+      "tk": "MAA",
+      "theme": "\u2014",
+      "date": "2026-10-28"
+    },
+    {
       "tk": "META",
       "theme": "Mega-cap Platforms",
+      "date": "2026-10-28"
+    },
+    {
+      "tk": "MGM",
+      "theme": "\u2014",
       "date": "2026-10-28"
     },
     {
@@ -25819,13 +26388,53 @@
       "date": "2026-10-28"
     },
     {
+      "tk": "NI",
+      "theme": "\u2014",
+      "date": "2026-10-28"
+    },
+    {
       "tk": "NOW",
       "theme": "Software Infrastructure",
       "date": "2026-10-28"
     },
     {
+      "tk": "ODFL",
+      "theme": "\u2014",
+      "date": "2026-10-28"
+    },
+    {
+      "tk": "ORLY",
+      "theme": "\u2014",
+      "date": "2026-10-28"
+    },
+    {
+      "tk": "OTIS",
+      "theme": "\u2014",
+      "date": "2026-10-28"
+    },
+    {
+      "tk": "PRU",
+      "theme": "\u2014",
+      "date": "2026-10-28"
+    },
+    {
+      "tk": "PSA",
+      "theme": "\u2014",
+      "date": "2026-10-28"
+    },
+    {
+      "tk": "REG",
+      "theme": "\u2014",
+      "date": "2026-10-28"
+    },
+    {
       "tk": "REGN",
       "theme": "Biotech",
+      "date": "2026-10-28"
+    },
+    {
+      "tk": "RIG",
+      "theme": "\u2014",
       "date": "2026-10-28"
     },
     {
@@ -25839,8 +26448,23 @@
       "date": "2026-10-28"
     },
     {
+      "tk": "UDR",
+      "theme": "\u2014",
+      "date": "2026-10-28"
+    },
+    {
       "tk": "UTHR",
       "theme": "Biotech",
+      "date": "2026-10-28"
+    },
+    {
+      "tk": "VAL",
+      "theme": "\u2014",
+      "date": "2026-10-28"
+    },
+    {
+      "tk": "VTR",
+      "theme": "\u2014",
       "date": "2026-10-28"
     },
     {
@@ -25849,8 +26473,23 @@
       "date": "2026-10-29"
     },
     {
+      "tk": "AEP",
+      "theme": "\u2014",
+      "date": "2026-10-29"
+    },
+    {
+      "tk": "AJG",
+      "theme": "\u2014",
+      "date": "2026-10-29"
+    },
+    {
       "tk": "ALNY",
       "theme": "Biotech",
+      "date": "2026-10-29"
+    },
+    {
+      "tk": "AME",
+      "theme": "\u2014",
       "date": "2026-10-29"
     },
     {
@@ -25859,8 +26498,23 @@
       "date": "2026-10-29"
     },
     {
+      "tk": "APTV",
+      "theme": "\u2014",
+      "date": "2026-10-29"
+    },
+    {
+      "tk": "BAX",
+      "theme": "\u2014",
+      "date": "2026-10-29"
+    },
+    {
       "tk": "BIIB",
       "theme": "Biotech",
+      "date": "2026-10-29"
+    },
+    {
+      "tk": "BWA",
+      "theme": "\u2014",
       "date": "2026-10-29"
     },
     {
@@ -25869,8 +26523,28 @@
       "date": "2026-10-29"
     },
     {
+      "tk": "CMCSA",
+      "theme": "\u2014",
+      "date": "2026-10-29"
+    },
+    {
+      "tk": "CMS",
+      "theme": "\u2014",
+      "date": "2026-10-29"
+    },
+    {
       "tk": "COIN",
       "theme": "Crypto-linked",
+      "date": "2026-10-29"
+    },
+    {
+      "tk": "DHI",
+      "theme": "\u2014",
+      "date": "2026-10-29"
+    },
+    {
+      "tk": "DTE",
+      "theme": "\u2014",
       "date": "2026-10-29"
     },
     {
@@ -25884,8 +26558,33 @@
       "date": "2026-10-29"
     },
     {
+      "tk": "FOXA",
+      "theme": "\u2014",
+      "date": "2026-10-29"
+    },
+    {
       "tk": "GILD",
       "theme": "Biotech",
+      "date": "2026-10-29"
+    },
+    {
+      "tk": "HIG",
+      "theme": "\u2014",
+      "date": "2026-10-29"
+    },
+    {
+      "tk": "ICE",
+      "theme": "\u2014",
+      "date": "2026-10-29"
+    },
+    {
+      "tk": "IR",
+      "theme": "\u2014",
+      "date": "2026-10-29"
+    },
+    {
+      "tk": "KIM",
+      "theme": "\u2014",
       "date": "2026-10-29"
     },
     {
@@ -25894,8 +26593,23 @@
       "date": "2026-10-29"
     },
     {
+      "tk": "LNG",
+      "theme": "\u2014",
+      "date": "2026-10-29"
+    },
+    {
+      "tk": "LUMN",
+      "theme": "\u2014",
+      "date": "2026-10-29"
+    },
+    {
       "tk": "MA",
       "theme": "Fintech & Payments",
+      "date": "2026-10-29"
+    },
+    {
+      "tk": "MAS",
+      "theme": "\u2014",
       "date": "2026-10-29"
     },
     {
@@ -25934,8 +26648,33 @@
       "date": "2026-10-29"
     },
     {
+      "tk": "QSR",
+      "theme": "\u2014",
+      "date": "2026-10-29"
+    },
+    {
+      "tk": "RBLX",
+      "theme": "\u2014",
+      "date": "2026-10-29"
+    },
+    {
       "tk": "RIOT",
       "theme": "Crypto-linked",
+      "date": "2026-10-29"
+    },
+    {
+      "tk": "RMD",
+      "theme": "\u2014",
+      "date": "2026-10-29"
+    },
+    {
+      "tk": "SO",
+      "theme": "\u2014",
+      "date": "2026-10-29"
+    },
+    {
+      "tk": "SPGI",
+      "theme": "\u2014",
       "date": "2026-10-29"
     },
     {
@@ -25949,9 +26688,39 @@
       "date": "2026-10-29"
     },
     {
+      "tk": "TT",
+      "theme": "\u2014",
+      "date": "2026-10-29"
+    },
+    {
       "tk": "TWLO",
       "theme": "Software Infrastructure",
       "date": "2026-10-29"
+    },
+    {
+      "tk": "VMC",
+      "theme": "\u2014",
+      "date": "2026-10-29"
+    },
+    {
+      "tk": "WEC",
+      "theme": "\u2014",
+      "date": "2026-10-29"
+    },
+    {
+      "tk": "WTW",
+      "theme": "\u2014",
+      "date": "2026-10-29"
+    },
+    {
+      "tk": "XEL",
+      "theme": "\u2014",
+      "date": "2026-10-29"
+    },
+    {
+      "tk": "AON",
+      "theme": "\u2014",
+      "date": "2026-10-30"
     },
     {
       "tk": "BFLY",
@@ -25959,8 +26728,23 @@
       "date": "2026-10-30"
     },
     {
+      "tk": "CBOE",
+      "theme": "\u2014",
+      "date": "2026-10-30"
+    },
+    {
       "tk": "CCJ",
       "theme": "Materials & Uranium",
+      "date": "2026-10-30"
+    },
+    {
+      "tk": "CHD",
+      "theme": "\u2014",
+      "date": "2026-10-30"
+    },
+    {
+      "tk": "CHTR",
+      "theme": "\u2014",
       "date": "2026-10-30"
     },
     {
@@ -25974,8 +26758,33 @@
       "date": "2026-10-30"
     },
     {
+      "tk": "D",
+      "theme": "\u2014",
+      "date": "2026-10-30"
+    },
+    {
+      "tk": "FRT",
+      "theme": "\u2014",
+      "date": "2026-10-30"
+    },
+    {
       "tk": "LIN",
       "theme": "Materials & Uranium",
+      "date": "2026-10-30"
+    },
+    {
+      "tk": "LYB",
+      "theme": "\u2014",
+      "date": "2026-10-30"
+    },
+    {
+      "tk": "TROW",
+      "theme": "\u2014",
+      "date": "2026-10-30"
+    },
+    {
+      "tk": "WAT",
+      "theme": "\u2014",
       "date": "2026-10-30"
     },
     {
@@ -25994,13 +26803,28 @@
       "date": "2026-11-02"
     },
     {
+      "tk": "O",
+      "theme": "\u2014",
+      "date": "2026-11-02"
+    },
+    {
       "tk": "ON",
       "theme": "Semiconductors",
       "date": "2026-11-02"
     },
     {
+      "tk": "PEG",
+      "theme": "\u2014",
+      "date": "2026-11-02"
+    },
+    {
       "tk": "PLTR",
       "theme": "Software Infrastructure",
+      "date": "2026-11-02"
+    },
+    {
+      "tk": "SPG",
+      "theme": "\u2014",
       "date": "2026-11-02"
     },
     {
@@ -26012,6 +26836,11 @@
       "tk": "WMB",
       "theme": "Energy",
       "date": "2026-11-02"
+    },
+    {
+      "tk": "ADM",
+      "theme": "\u2014",
+      "date": "2026-11-03"
     },
     {
       "tk": "ALAB",
@@ -26034,8 +26863,18 @@
       "date": "2026-11-03"
     },
     {
+      "tk": "BALL",
+      "theme": "\u2014",
+      "date": "2026-11-03"
+    },
+    {
       "tk": "DNN",
       "theme": "Materials & Uranium",
+      "date": "2026-11-03"
+    },
+    {
+      "tk": "EA",
+      "theme": "\u2014",
       "date": "2026-11-03"
     },
     {
@@ -26044,8 +26883,18 @@
       "date": "2026-11-03"
     },
     {
+      "tk": "EXPD",
+      "theme": "\u2014",
+      "date": "2026-11-03"
+    },
+    {
       "tk": "GPN",
       "theme": "Fintech & Payments",
+      "date": "2026-11-03"
+    },
+    {
+      "tk": "IFF",
+      "theme": "\u2014",
       "date": "2026-11-03"
     },
     {
@@ -26066,6 +26915,21 @@
     {
       "tk": "LDOS",
       "theme": "Space & Defense Tech",
+      "date": "2026-11-03"
+    },
+    {
+      "tk": "LH",
+      "theme": "\u2014",
+      "date": "2026-11-03"
+    },
+    {
+      "tk": "MAR",
+      "theme": "\u2014",
+      "date": "2026-11-03"
+    },
+    {
+      "tk": "MOS",
+      "theme": "\u2014",
       "date": "2026-11-03"
     },
     {
@@ -26099,6 +26963,16 @@
       "date": "2026-11-03"
     },
     {
+      "tk": "SYY",
+      "theme": "\u2014",
+      "date": "2026-11-03"
+    },
+    {
+      "tk": "TAP",
+      "theme": "\u2014",
+      "date": "2026-11-03"
+    },
+    {
       "tk": "TEM",
       "theme": "AI Healthcare & Diagnostics",
       "date": "2026-11-03"
@@ -26114,13 +26988,48 @@
       "date": "2026-11-03"
     },
     {
+      "tk": "AFL",
+      "theme": "\u2014",
+      "date": "2026-11-04"
+    },
+    {
+      "tk": "AIG",
+      "theme": "\u2014",
+      "date": "2026-11-04"
+    },
+    {
+      "tk": "ALB",
+      "theme": "\u2014",
+      "date": "2026-11-04"
+    },
+    {
+      "tk": "ALL",
+      "theme": "\u2014",
+      "date": "2026-11-04"
+    },
+    {
+      "tk": "APA",
+      "theme": "\u2014",
+      "date": "2026-11-04"
+    },
+    {
       "tk": "ARM",
       "theme": "Semiconductors",
       "date": "2026-11-04"
     },
     {
+      "tk": "ATO",
+      "theme": "\u2014",
+      "date": "2026-11-04"
+    },
+    {
       "tk": "CAI",
       "theme": "AI Healthcare & Diagnostics",
+      "date": "2026-11-04"
+    },
+    {
+      "tk": "CF",
+      "theme": "\u2014",
       "date": "2026-11-04"
     },
     {
@@ -26131,6 +27040,11 @@
     {
       "tk": "COHR",
       "theme": "Optics & Photonics",
+      "date": "2026-11-04"
+    },
+    {
+      "tk": "COR",
+      "theme": "\u2014",
       "date": "2026-11-04"
     },
     {
@@ -26154,6 +27068,11 @@
       "date": "2026-11-04"
     },
     {
+      "tk": "ES",
+      "theme": "\u2014",
+      "date": "2026-11-04"
+    },
+    {
       "tk": "FIS",
       "theme": "Fintech & Payments",
       "date": "2026-11-04"
@@ -26164,8 +27083,18 @@
       "date": "2026-11-04"
     },
     {
+      "tk": "GWW",
+      "theme": "\u2014",
+      "date": "2026-11-04"
+    },
+    {
       "tk": "HOOD",
       "theme": "Fintech & Payments",
+      "date": "2026-11-04"
+    },
+    {
+      "tk": "HST",
+      "theme": "\u2014",
       "date": "2026-11-04"
     },
     {
@@ -26204,6 +27133,16 @@
       "date": "2026-11-04"
     },
     {
+      "tk": "MCK",
+      "theme": "\u2014",
+      "date": "2026-11-04"
+    },
+    {
+      "tk": "PPL",
+      "theme": "\u2014",
+      "date": "2026-11-04"
+    },
+    {
       "tk": "RDW",
       "theme": "Space & Defense Tech",
       "date": "2026-11-04"
@@ -26219,8 +27158,18 @@
       "date": "2026-11-04"
     },
     {
+      "tk": "SRE",
+      "theme": "\u2014",
+      "date": "2026-11-04"
+    },
+    {
       "tk": "SRPT",
       "theme": "Biotech",
+      "date": "2026-11-04"
+    },
+    {
+      "tk": "STE",
+      "theme": "\u2014",
       "date": "2026-11-04"
     },
     {
@@ -26239,6 +27188,16 @@
       "date": "2026-11-05"
     },
     {
+      "tk": "BDX",
+      "theme": "\u2014",
+      "date": "2026-11-05"
+    },
+    {
+      "tk": "CAH",
+      "theme": "\u2014",
+      "date": "2026-11-05"
+    },
+    {
       "tk": "CERT",
       "theme": "AI Healthcare & Diagnostics",
       "date": "2026-11-05"
@@ -26254,6 +27213,11 @@
       "date": "2026-11-05"
     },
     {
+      "tk": "DD",
+      "theme": "\u2014",
+      "date": "2026-11-05"
+    },
+    {
       "tk": "DDOG",
       "theme": "Software Infrastructure",
       "date": "2026-11-05"
@@ -26264,8 +27228,28 @@
       "date": "2026-11-05"
     },
     {
+      "tk": "DUK",
+      "theme": "\u2014",
+      "date": "2026-11-05"
+    },
+    {
+      "tk": "ED",
+      "theme": "\u2014",
+      "date": "2026-11-05"
+    },
+    {
+      "tk": "EVRG",
+      "theme": "\u2014",
+      "date": "2026-11-05"
+    },
+    {
       "tk": "FROG",
       "theme": "Software Infrastructure",
+      "date": "2026-11-05"
+    },
+    {
+      "tk": "HSY",
+      "theme": "\u2014",
       "date": "2026-11-05"
     },
     {
@@ -26286,6 +27270,11 @@
     {
       "tk": "MCHP",
       "theme": "Semiconductors",
+      "date": "2026-11-05"
+    },
+    {
+      "tk": "MNST",
+      "theme": "\u2014",
       "date": "2026-11-05"
     },
     {
@@ -26334,9 +27323,34 @@
       "date": "2026-11-05"
     },
     {
+      "tk": "TRGP",
+      "theme": "\u2014",
+      "date": "2026-11-05"
+    },
+    {
       "tk": "VST",
       "theme": "AI Power & Datacenter",
       "date": "2026-11-05"
+    },
+    {
+      "tk": "WBD",
+      "theme": "\u2014",
+      "date": "2026-11-05"
+    },
+    {
+      "tk": "WYNN",
+      "theme": "\u2014",
+      "date": "2026-11-05"
+    },
+    {
+      "tk": "ZBH",
+      "theme": "\u2014",
+      "date": "2026-11-05"
+    },
+    {
+      "tk": "BRK-B",
+      "theme": "\u2014",
+      "date": "2026-11-07"
     },
     {
       "tk": "ASTS",
@@ -26381,6 +27395,11 @@
     {
       "tk": "AMAT",
       "theme": "Semiconductors",
+      "date": "2026-11-12"
+    },
+    {
+      "tk": "DIS",
+      "theme": "\u2014",
       "date": "2026-11-12"
     },
     {

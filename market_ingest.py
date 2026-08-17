@@ -58,6 +58,56 @@ MACRO_STRUCT_EXTRA = [("BTC-USD", "Bitcoin"), ("IEI", "3-7Y Treasuries"),
                       ("^VIX3M", "VIX 3-Month"), ("^VIX6M", "VIX 6-Month"),
                       ("^VVIX", "Vol of VIX")]
 MACRO_STRUCT_SYMS = [s for s, _ in MACRO_STRUCT_EXTRA]
+
+# ---- BREADTH UNIVERSE EXTENSION -------------------------------------------
+# Breadth was computed on the 255 THEME names, which are deliberately skewed
+# toward quantum, space, AI and other high-beta corners. That is right for theme
+# scoring and WRONG for breadth: "% above the 200-DMA" across a thematic list is
+# a different statistic from market breadth, and breadth is 2 of the 10 score
+# points.
+#
+# These names are added for BREADTH ONLY -- large/mid caps spread across sectors
+# that are not already in THEMES. They do not get theme scores and are excluded
+# from the Screen (which requires a theme). Roughly doubles the breadth sample
+# and, more importantly, makes it representative rather than thematic.
+#
+# Still not true market breadth: comparable tools run thousands of names, which
+# needs a paid feed. This narrows the gap at zero cost.
+BREADTH_EXTRA = [
+    # staples / household
+    "KO","PEP","PG","CL","KMB","GIS","K","HSY","SYY","KR","STZ","MNST","CHD","MKC",
+    "CAG","CPB","HRL","TAP","EL","TSN","ADM","MDLZ","PM","MO",
+    # healthcare beyond the theme lists
+    "UNH","ELV","CI","HUM","CNC","MCK","COR","CAH","ZBH","BAX","BDX","STE","RMD",
+    "WST","HOLX","DGX","LH","IQV","A","MTD","WAT","PKI",
+    # financials / insurance
+    "BRK-B","PGR","TRV","ALL","MET","PRU","AFL","AIG","HIG","CB","MMC","AON","AJG",
+    "BRO","WTW","SPGI","MCO","MSCI","ICE","CME","NDAQ","CBOE","TROW","BEN","IVZ",
+    "STT","NTRS","BK","RF","KEY","CFG","HBAN","FITB","MTB","ZION","CMA",
+    # industrials / transport
+    "HON","LMT","GD","NOC","EMR","ROK","DOV","IR","XYL","AME","ROP","FTV","PNR",
+    "SWK","MAS","ALLE","JCI","CARR","OTIS","TT","LII","GWW","FAST","URI","PCAR",
+    "CSX","NSC","ODFL","JBHT","CHRW","EXPD","LUV","DAL","UAL","FDX",
+    # consumer discretionary / retail
+    "HD","LOW","TJX","ROST","BURL","DG","DLTR","TGT","BBY","ORLY","AZO","GPC",
+    "YUM","QSR","DRI","DPZ","MAR","HLT","LVS","WYNN","MGM","RCL","CCL","NCLH",
+    "GM","F","APTV","BWA","LEA","PHM","DHI","LEN","NVR","TOL",
+    # utilities / real estate
+    "NEE","DUK","SO","D","AEP","EXC","XEL","ED","WEC","ES","PEG","SRE","PCG","EIX",
+    "AWK","ATO","CMS","DTE","FE","PPL","AEE","CNP","NI","LNT","EVRG",
+    "PLD","SPG","O","PSA","EXR","AVB","EQR","MAA","UDR","ESS","VTR","WELL","ARE",
+    "BXP","KIM","REG","FRT","HST",
+    # materials / energy beyond the theme lists
+    "SHW","ECL","PPG","DD","DOW","LYB","IFF","ALB","MLM","VMC","NUE","STLD","CLF",
+    "X","AA","MOS","CF","IP","PKG","WRK","AVY","SEE","BALL",
+    "PXD","HES","APA","MRO","CTRA","EQT","AR","RRC","SWN","OKE","TRGP","LNG",
+    "BKR","NOV","FTI","RIG","VAL",
+    # communication / media
+    "DIS","CMCSA","CHTR","WBD","PARA","FOXA","OMC","IPG","EA","TTWO","RBLX","LYV",
+    "T","VZ","TMUS","LUMN",
+]
+BREADTH_EXTRA = sorted(set(BREADTH_EXTRA))
+
 NON_MEMBERS = set(INDEX_SYMS) | set(SECTOR_SYMS) | set(MACRO_SYMS) | set(MACRO_STRUCT_SYMS)
 
 # ---- Theme map: ~250-name universe. Edit freely -- a ticker may appear in more
@@ -147,7 +197,7 @@ def active_themes():
 
 
 def universe():
-    return sorted(set([s for m in active_themes().values() for s in m] + INDEX_SYMS + SECTOR_SYMS + MACRO_SYMS + MACRO_STRUCT_SYMS))
+    return sorted(set([s for m in active_themes().values() for s in m] + INDEX_SYMS + SECTOR_SYMS + MACRO_SYMS + MACRO_STRUCT_SYMS + BREADTH_EXTRA))
 
 # ------------------------------------------------------------------ storage
 def init_db(conn):
@@ -295,11 +345,30 @@ def breadth(metrics):
     def pct(k):
         vals = [m[k] for m in mem if m[k] is not None]
         return 100 * sum(vals) / len(vals) if vals else 0.0
+    # ---- measures beyond "% above a moving average" -------------------------
+    # % above an MA is a POSITION measure: it says where names sit, and it repairs
+    # slowly after a decline because a stock has to climb all the way back above
+    # its average. The measures below are PARTICIPATION measures -- they describe
+    # what happened today and turn far faster, which is the gap that made the
+    # regime engine's exits structurally late.
+    adv = sum(1 for m in mem if m.get("ret1") is not None and m["ret1"] > 0)
+    dec = sum(1 for m in mem if m.get("ret1") is not None and m["ret1"] < 0)
+    ad_net = adv - dec
+    ad_ratio = round(adv / dec, 2) if dec else None
+    # Stockbee-style thrust counts: how many names made a large one-day move.
+    # 4% is the conventional threshold; it catches genuine impulse rather than drift.
+    up4 = sum(1 for m in mem if m.get("ret1") is not None and m["ret1"] >= 4.0)
+    dn4 = sum(1 for m in mem if m.get("ret1") is not None and m["ret1"] <= -4.0)
+    nh, nl = sum(m["new20high"] for m in mem), sum(m["new20low"] for m in mem)
     return {
         "n": n, "pct20": pct("above20"), "pct50": pct("above50"), "pct200": pct("above200"),
-        "nh20": sum(m["new20high"] for m in mem), "nl20": sum(m["new20low"] for m in mem),
+        "nh20": nh, "nl20": nl,
         "nh52": sum(m["new52high"] for m in mem),
         "up3": sum(m["up3"] for m in mem), "down3": sum(m["down3"] for m in mem),
+        "adv": adv, "dec": dec, "ad_net": ad_net, "ad_ratio": ad_ratio,
+        "up4": up4, "dn4": dn4,
+        "hl_net": nh - nl,
+        "pct_adv": round(100.0 * adv / (adv + dec), 1) if (adv + dec) else None,
     }
 
 def regime_label(b):
@@ -1961,6 +2030,9 @@ def compute_and_emit(conn):
         return round(float(x), n) if _v(x) else None
 
     names = [(t, m) for t, m in metrics.items() if m and t not in NON_MEMBERS]
+    # screen/momentum/rvol operate on THEMED names only; the breadth-extension
+    # tickers have no theme and would show "—" in every row
+    themed = [(t, m) for t, m in names if t in t2theme]
 
     macro = []
     for sym, desc in MACRO_ETFS:
@@ -1981,15 +2053,15 @@ def compute_and_emit(conn):
         base.update(extra)
         return base
 
-    rv = sorted([x for x in names if _v(x[1]["rvol"])], key=lambda x: -x[1]["rvol"])[:18]
+    rv = sorted([x for x in themed if _v(x[1]["rvol"])], key=lambda x: -x[1]["rvol"])[:18]
     rvol_rows = [row(t, m, {"rvol": rnd(m["rvol"]), "d5": rnd(m["ret5"])}) for t, m in rv]
 
-    mo = sorted([x for x in names if _v(x[1]["ret21"])], key=lambda x: -x[1]["ret21"])
+    mo = sorted([x for x in themed if _v(x[1]["ret21"])], key=lambda x: -x[1]["ret21"])
     mrow = lambda t, m: row(t, m, {"r21": rnd(m["ret21"], 1), "r63": rnd(m["ret63"], 1)})
     momentum = {"leaders":  [mrow(t, m) for t, m in mo[:18]],
                 "laggards": [mrow(t, m) for t, m in mo[-18:][::-1]]}
 
-    ex = sorted([x for x in names if _v(x[1]["atr_ext"])], key=lambda x: -x[1]["atr_ext"])
+    ex = sorted([x for x in themed if _v(x[1]["atr_ext"])], key=lambda x: -x[1]["atr_ext"])
     erow = lambda t, m: row(t, m, {"atr": rnd(m["atr_ext"], 1), "d50": rnd(m["dist50"], 1)})
     extension = {"high": [erow(t, m) for t, m in ex[:18]],
                  "low":  [erow(t, m) for t, m in ex[-18:][::-1]]}
@@ -2034,7 +2106,7 @@ def compute_and_emit(conn):
 
     screen_long, screen_avoid = [], []
     screen_bull_ext, screen_bear_ext = [], []
-    for t, m in names:
+    for t, m in themed:
         if not _v(m.get("ret21")) or not _v(m.get("atr_ext")):
             continue
         th = t2theme.get(t, "—")
@@ -2155,6 +2227,11 @@ def compute_and_emit(conn):
         "breadth": [
             ["% > 20DMA", f"{b['pct20']:.1f}%"], ["% > 50DMA", f"{b['pct50']:.1f}%"],
             ["% > 200DMA", f"{b['pct200']:.1f}%"], ["Total names", str(b["n"])],
+            ["Advancers / Decliners", f"{b['adv']} / {b['dec']}"],
+            ["A/D net", f"{b['ad_net']:+d}"],
+            ["% advancing", f"{b['pct_adv']}%" if b.get("pct_adv") is not None else "—"],
+            ["4%+ up / down", f"{b['up4']} / {b['dn4']}"],
+            ["New highs − lows (20d)", f"{b['hl_net']:+d}"],
             ["New 20D highs", str(b["nh20"])], ["New 52W highs", str(b["nh52"])],
             ["Up 3%+", str(b["up3"])], ["Down 3%+", str(b["down3"])],
         ],
