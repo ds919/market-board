@@ -528,8 +528,19 @@ def _combo_signals(conn, tickers, as_of=None):
         buy_pos  = basis_atr is not None and basis_atr <= BUY_POS_ATR
         sell_pos = basis_atr is not None and basis_atr >= SELL_POS_ATR
 
-        buy_score  = int(buy_regime) + int(cross_mag) + int(buy_pos)
-        sell_score = int(sell_regime) + int(cross_mag) + int(sell_pos)
+        # MODULE B: volume climax. The Pine indicator has this enabled, making its
+        # conviction 0-4 rather than 0-3. Omitting it here caused a live mismatch
+        # (AAOI read 1/3 on the chart, 2/3 on the screen, on a 15.5% day at 1.55x
+        # volume). Volume is the only non-price factor in the score, so dropping it
+        # is not a rounding difference -- it changes the ranking.
+        CLIMAX_MULT = float(os.environ.get("CLIMAX_MULT", "2.0"))
+        v = df["volume"]
+        v20 = v.rolling(20).mean().iloc[-1]
+        vol_ratio = (float(v.iloc[-1]) / float(v20)) if (_v(v20) and float(v20) > 0) else 1.0
+        vol_climax = vol_ratio >= CLIMAX_MULT
+
+        buy_score  = int(buy_regime) + int(cross_mag) + int(buy_pos) + int(vol_climax)
+        sell_score = int(sell_regime) + int(cross_mag) + int(sell_pos) + int(vol_climax)
 
         # bars since the most recent cross, so a stale signal is visible as stale
         sign = (fm > fs)
@@ -541,6 +552,8 @@ def _combo_signals(conn, tickers, as_of=None):
                 age = len(idx) - 1 - i
                 break
         out[t] = {"basis_atr": round(basis_atr, 2) if basis_atr is not None else None,
+                  "vol_ratio": round(vol_ratio, 2), "vol_climax": bool(vol_climax),
+                  "conv_max": 4,
                   "state": "up" if up_now else "down",
                   "fresh_buy":  bool(up_now and not up_prev),
                   "fresh_sell": bool((not up_now) and up_prev),

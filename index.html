@@ -1125,7 +1125,7 @@ function viewScreen(d){
       <td class="num mono">${r.rvol===null||r.rvol===undefined?'—':r.rvol+'×'}</td>
       <td class="num mono" title="distance from the 20-EMA basis in ATR — the dot's entry-quality check wants <=0.5">${r.basis_atr===null||r.basis_atr===undefined?'—':(r.basis_atr>0?'+':'')+r.basis_atr}</td>
       <td class="num">${r.above200?'<span class="pos">✓</span>':'<span class="neg">✗</span>'}</td>
-      <td class="num">${r.sig_state ? `<span class="${r.sig_state==='up'?'pos':'neg'}">${r.sig_state==='up'?'▲':'▼'}${r.sig_buy_conv!==undefined?(r.sig_state==='up'?r.sig_buy_conv:r.sig_sell_conv):''}/3</span>${r.sig_age!==undefined?`<span class="dim" style="color:var(--muted);font-size:9.5px"> ${r.sig_age}d</span>`:""}` : '<span class="flat">—</span>'}</td>
+      <td class="num">${r.sig_state ? `<span class="${r.sig_state==='up'?'pos':'neg'}">${r.sig_state==='up'?'▲':'▼'}${r.sig_buy_conv!==undefined?(r.sig_state==='up'?r.sig_buy_conv:r.sig_sell_conv):''}/4</span>${r.sig_age!==undefined?`<span class="dim" style="color:var(--muted);font-size:9.5px"> ${r.sig_age}d</span>`:""}` : '<span class="flat">—</span>'}</td>
       <td class="num">${r.confluence ? '<span class="pos" style="font-weight:700">✓</span>' : '<span class="flat">·</span>'}</td>
     </tr>`).join("");
   const head = `<tr><th class="l">#</th><th class="l">Ticker</th><th class="l">Theme</th>
@@ -1154,7 +1154,7 @@ function viewScreen(d){
         <b>Basis</b> = distance from the 20-EMA in ATR; the chart dot's third conviction
         point wants ≤0.5, which is why outperformers cluster at 2/3 — the screen and the
         dot ask different questions (what is strong vs where is a good entry).
-        <b>Chart</b> reproduces the TradingView combo (Fast MACD 7/16/6). <b>Conf</b> =
+        <b>Chart</b> reproduces the TradingView combo (Fast MACD 7/16/6, incl. the volume-climax factor, so conviction is out of 4). <b>Conf</b> =
         both agree. Those dots backtested at PF 1.26 / return-per-drawdown 0.62 vs
         buy-and-hold, so agreement means your tools concur, not that edges align.
       </div>
