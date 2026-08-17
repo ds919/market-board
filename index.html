@@ -1123,12 +1123,19 @@ function viewScreen(d){
       <td class="num mono">${r.atr_ext}</td>
       <td class="num ${cls(r.dist50)}">${r.dist50>0?'+':''}${r.dist50}%</td>
       <td class="num mono">${r.rvol===null||r.rvol===undefined?'—':r.rvol+'×'}</td>
+      <td class="num mono" title="distance from the 20-EMA basis in ATR — the dot's entry-quality check wants <=0.5">${r.basis_atr===null||r.basis_atr===undefined?'—':(r.basis_atr>0?'+':'')+r.basis_atr}</td>
       <td class="num">${r.above200?'<span class="pos">✓</span>':'<span class="neg">✗</span>'}</td>
       <td class="num">${r.sig_state ? `<span class="${r.sig_state==='up'?'pos':'neg'}">${r.sig_state==='up'?'▲':'▼'}${r.sig_buy_conv!==undefined?(r.sig_state==='up'?r.sig_buy_conv:r.sig_sell_conv):''}/3</span>${r.sig_age!==undefined?`<span class="dim" style="color:var(--muted);font-size:9.5px"> ${r.sig_age}d</span>`:""}` : '<span class="flat">—</span>'}</td>
       <td class="num">${r.confluence ? '<span class="pos" style="font-weight:700">✓</span>' : '<span class="flat">·</span>'}</td>
     </tr>`).join("");
   const head = `<tr><th class="l">#</th><th class="l">Ticker</th><th class="l">Theme</th>
-    <th>RS 21d</th><th>1D</th><th>ATR ext</th><th>&gt;50DMA</th><th>RVOL</th><th>&gt;200</th><th>Chart</th><th>Conf</th></tr>`;
+    <th>RS 21d</th><th>1D</th><th>ATR ext</th><th>&gt;50DMA</th><th>RVOL</th><th>Basis</th><th>&gt;200</th><th>Chart</th><th>Conf</th></tr>`;
+
+  const panel = (title, sub, arr) => !arr || !arr.length ? "" : `
+    <section class="panel">
+      <div class="phead">${title} <span class="r">${sub}</span></div>
+      <div class="pbody" style="overflow-x:auto"><table style="min-width:820px">${head}${rows(arr)}</table></div>
+    </section>`;
 
   return `
   <section class="panel">
@@ -1141,31 +1148,26 @@ function viewScreen(d){
         ${g.deploy_pct!==null&&g.deploy_pct!==undefined?`<div><span class="dim" style="color:var(--muted)">Suggested exposure</span> <span class="mono ${g.deploy_pct>=75?'pos':g.deploy_pct<=25?'neg':''}" style="font-weight:700">${g.deploy_pct}%</span></div>`:""}
       </div>
       <div class="dim" style="color:var(--muted);font-size:11.5px">
-        These lists rank what is <b>currently</b> strong or weak — relative strength vs SPY,
-        trend, extension and participation joined into one view. Testing found <b>no
-        forward-predictive power</b> in these components (see docs), so treat this as a
-        starting point for work, not a recommendation. Read it against the regime above:
-        the strongest names in a Risk-Off tape are still swimming upstream.
-        <b>ER</b> = reports within 7 days.
-        <b>Chart</b> reproduces the TradingView combo's graded dot (Fast MACD 7/16/6,
-        same 0-3 conviction) so you can see where the screen and the indicator agree —
-        ▲/▼ with conviction and days since the cross. <b>Conf</b> = both point the same
-        way; those sort to the top. Note the dots backtested at PF 1.26 and
-        return-per-drawdown 0.62 vs buy-and-hold, so agreement means your two tools
-        concur, not that two proven edges align.
+        Four buckets, because "strong but extended" and "broken" are different problems.
+        Testing found <b>no forward-predictive power</b> in these components — this is a
+        starting point for work, not a recommendation. <b>ER</b> = reports within 7 days.
+        <b>Basis</b> = distance from the 20-EMA in ATR; the chart dot's third conviction
+        point wants ≤0.5, which is why outperformers cluster at 2/3 — the screen and the
+        dot ask different questions (what is strong vs where is a good entry).
+        <b>Chart</b> reproduces the TradingView combo (Fast MACD 7/16/6). <b>Conf</b> =
+        both agree. Those dots backtested at PF 1.26 / return-per-drawdown 0.62 vs
+        buy-and-hold, so agreement means your tools concur, not that edges align.
       </div>
     </div>
   </section>
 
   <div class="row two-5050">
-    <section class="panel">
-      <div class="phead">Candidates <span class="r">OUTPERFORMING · ABOVE 200DMA · NOT STRETCHED</span></div>
-      <div class="pbody" style="overflow-x:auto"><table style="min-width:760px">${head}${rows(sc.long)}</table></div>
-    </section>
-    <section class="panel">
-      <div class="phead">Avoid / Trim <span class="r">LAGGING &amp; BELOW 200DMA, OR OVER-EXTENDED</span></div>
-      <div class="pbody" style="overflow-x:auto"><table style="min-width:760px">${head}${rows(sc.avoid)}</table></div>
-    </section>
+    ${panel("Bullish", "OUTPERFORMING · ABOVE 200DMA · ENTRY STILL REASONABLE", sc.long)}
+    ${panel("Bullish — Extended", "STRONG BUT ≥3 ATR STRETCHED · POOR ENTRY, NOT A SHORT", sc.bull_ext)}
+  </div>
+  <div class="row two-5050">
+    ${panel("Bearish", "LAGGING · BELOW 200DMA", sc.avoid)}
+    ${panel("Bearish — Extended", "WASHED OUT ≥3 ATR BELOW · MEAN-REVERSION CANDIDATES", sc.bear_ext)}
   </div>`;
 }
 

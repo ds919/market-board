@@ -515,8 +515,18 @@ def _combo_signals(conn, tickers, as_of=None):
         buy_regime = px > e200.iloc[-1] and e200.iloc[-1] >= e200.iloc[-11]
         sell_regime = px < ema21 or e200.iloc[-1] < e200.iloc[-11]
         cross_mag = abs(float(fm.iloc[-1])) >= 0.60 * float(atr) if _v(atr) else False
-        buy_pos  = px <= ema20 + 0.5 * float(atr) if _v(atr) else False
-        sell_pos = px >= ema20 + 1.5 * float(atr) if _v(atr) else False
+        # Distance from the 20-EMA basis, in ATR. The dot's third conviction point
+        # asks "is this a good ENTRY" (near the basis, not chasing), while the
+        # screen pre-filters for OUTPERFORMERS -- which are by construction above
+        # it. That tension is why screen candidates cluster at 2/3: the two tools
+        # are asking different questions, not disagreeing.
+        # Thresholds are env-tunable, but the defaults MATCH THE LIVE INDICATOR.
+        # Changing them here without changing the Pine makes the two drift.
+        basis_atr = (px - ema20) / float(atr) if _v(atr) and float(atr) else None
+        BUY_POS_ATR  = float(os.environ.get("BUY_POS_ATR",  "0.5"))
+        SELL_POS_ATR = float(os.environ.get("SELL_POS_ATR", "1.5"))
+        buy_pos  = basis_atr is not None and basis_atr <= BUY_POS_ATR
+        sell_pos = basis_atr is not None and basis_atr >= SELL_POS_ATR
 
         buy_score  = int(buy_regime) + int(cross_mag) + int(buy_pos)
         sell_score = int(sell_regime) + int(cross_mag) + int(sell_pos)
@@ -530,7 +540,8 @@ def _combo_signals(conn, tickers, as_of=None):
             if bool(flips.iloc[i]):
                 age = len(idx) - 1 - i
                 break
-        out[t] = {"state": "up" if up_now else "down",
+        out[t] = {"basis_atr": round(basis_atr, 2) if basis_atr is not None else None,
+                  "state": "up" if up_now else "down",
                   "fresh_buy":  bool(up_now and not up_prev),
                   "fresh_sell": bool((not up_now) and up_prev),
                   "buy_conv": buy_score, "sell_conv": sell_score,
@@ -2009,6 +2020,7 @@ def compute_and_emit(conn):
         _sig = {}
 
     screen_long, screen_avoid = [], []
+    screen_bull_ext, screen_bear_ext = [], []
     for t, m in names:
         if not _v(m.get("ret21")) or not _v(m.get("atr_ext")):
             continue
@@ -2025,28 +2037,52 @@ def compute_and_emit(conn):
                "earnings_7d": t in _earn_soon}
         _sg = _sig.get(t)
         if _sg:
-            rec.update({"sig_state": _sg["state"], "sig_buy_conv": _sg["buy_conv"],
+            rec.update({"basis_atr": _sg.get("basis_atr"),
+                        "sig_state": _sg["state"], "sig_buy_conv": _sg["buy_conv"],
                         "sig_sell_conv": _sg["sell_conv"], "sig_age": _sg["cross_age"],
                         "sig_fresh_buy": _sg["fresh_buy"], "sig_fresh_sell": _sg["fresh_sell"]})
         # LONG shortlist: outperforming, in an uptrend, and NOT already stretched
         # (extension is a caution, not a virtue -- +4 ATR is a bad entry even on
         # a strong name).
-        if rs > 0 and m["above200"] and ext < 3.0:
-            rec["rank"] = round(rs - max(0.0, ext - 1.0) * 2.0
-                                + (th_score - 50) / 10.0 if th_score is not None else rs, 2)
-            screen_long.append(rec)
-        # AVOID/TRIM: lagging and below the 200-DMA, or very stretched
-        elif (rs < 0 and not m["above200"]) or ext > 4.0:
-            rec["rank"] = round(rs - max(0.0, ext - 1.0) * 2.0, 2)
-            screen_avoid.append(rec)
+        # FOUR CATEGORIES. The old two-list split lumped genuinely different
+        # situations together: RTX/REGN/LMT/MSFT/ZBRA were all OUTPERFORMING and
+        # above their 200-DMA, flagged only because they were 4.5-5.8 ATR
+        # extended. Calling that "avoid" alongside names down 30% obscured the
+        # distinction -- one is a bad ENTRY on a good trend, the other is a
+        # broken chart.
+        EXT_HOT = 3.0
+        base_rank = rs + ((th_score - 50) / 10.0 if th_score is not None else 0.0)
+        if rs > 0 and m["above200"]:
+            if ext < EXT_HOT:
+                rec["bucket"] = "bullish"
+                rec["rank"] = round(base_rank - max(0.0, ext - 1.0) * 2.0, 2)
+                screen_long.append(rec)
+            else:
+                rec["bucket"] = "bullish_ext"        # strong, but a poor entry here
+                rec["rank"] = round(ext, 2)
+                screen_bull_ext.append(rec)
+        elif rs < 0 and not m["above200"]:
+            if ext > -EXT_HOT:
+                rec["bucket"] = "bearish"
+                rec["rank"] = round(base_rank, 2)
+                screen_avoid.append(rec)
+            else:
+                rec["bucket"] = "bearish_ext"        # washed out, possible bounce
+                rec["rank"] = round(ext, 2)
+                screen_bear_ext.append(rec)
     for r in screen_long:
         r["confluence"] = bool(r.get("sig_state") == "up" and (r.get("sig_buy_conv", 0) >= 2))
-    for r in screen_avoid:
+    for r in screen_avoid + screen_bear_ext:
         r["confluence"] = bool(r.get("sig_state") == "down" and (r.get("sig_sell_conv", 0) >= 2))
+    for r in screen_bull_ext:
+        r["confluence"] = bool(r.get("sig_state") == "up" and (r.get("sig_buy_conv", 0) >= 2))
     # confluent names first, then by rank
     screen_long.sort(key=lambda r: (-int(r.get("confluence", False)), -r["rank"]))
     screen_avoid.sort(key=lambda r: (-int(r.get("confluence", False)), r["rank"]))
+    screen_bull_ext.sort(key=lambda r: -r["rank"])      # most extended first
+    screen_bear_ext.sort(key=lambda r: r["rank"])        # most washed out first
     screen = {"long": screen_long[:20], "avoid": screen_avoid[:20],
+              "bull_ext": screen_bull_ext[:12], "bear_ext": screen_bear_ext[:12],
               "regime": None}     # filled after the macro block below
 
     earn_map = globals().get("_EARNINGS", {})
