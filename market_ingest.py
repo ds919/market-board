@@ -470,6 +470,75 @@ def _theme_leadership(conn, as_of=None):
             beat += 1
     return round(100.0 * beat / tot, 1) if tot else None
 
+
+_SIG_CACHE = {"v": None}
+
+def _combo_signals(conn, tickers, as_of=None):
+    """Reproduce homily_combo.pine's graded dot logic in Python so the Screen tab
+    can show where the DASHBOARD and the CHART agree.
+
+    Mirrors the live indicator settings: Fast MACD 7/16/6 on the chart timeframe
+    (the config that replaced the lower-TF intrabar approach), with the same 0-3
+    conviction score -- regime, cross magnitude vs ATR, position vs the 20-EMA
+    basis.
+
+    HONEST CONTEXT: these dots backtested at PF 1.26 and return-per-drawdown 0.62
+    versus buy-and-hold's 28. Agreement between this and the screen means two of
+    your tools point the same way; it does not mean two validated edges align.
+
+    KNOWN COST: the logic now exists in two places (Pine and here) and can drift.
+    If the indicator's lengths change, change them here too.
+    """
+    if _SIG_CACHE["v"] is not None and as_of is None:
+        return _SIG_CACHE["v"]
+    out = {}
+    for t in tickers:
+        df = load_prices(conn, t)
+        if df is None or len(df) < 220:
+            continue
+        if as_of is not None:
+            df = df[df.index <= pd.Timestamp(as_of)]
+            if len(df) < 220:
+                continue
+        c = df["close"]
+        fm = c.ewm(span=7, adjust=False).mean() - c.ewm(span=16, adjust=False).mean()
+        fs = fm.rolling(6).mean()
+        if len(fm) < 3 or pd.isna(fs.iloc[-1]) or pd.isna(fs.iloc[-2]):
+            continue
+        up_now, up_prev = fm.iloc[-1] > fs.iloc[-1], fm.iloc[-2] > fs.iloc[-2]
+        atr = _atr14(df).iloc[-1]
+        ema20 = c.ewm(span=20, adjust=False).mean().iloc[-1]
+        ema21 = c.ewm(span=21, adjust=False).mean().iloc[-1]
+        e200 = c.ewm(span=200, adjust=False).mean()
+        px = float(c.iloc[-1])
+
+        buy_regime = px > e200.iloc[-1] and e200.iloc[-1] >= e200.iloc[-11]
+        sell_regime = px < ema21 or e200.iloc[-1] < e200.iloc[-11]
+        cross_mag = abs(float(fm.iloc[-1])) >= 0.60 * float(atr) if _v(atr) else False
+        buy_pos  = px <= ema20 + 0.5 * float(atr) if _v(atr) else False
+        sell_pos = px >= ema20 + 1.5 * float(atr) if _v(atr) else False
+
+        buy_score  = int(buy_regime) + int(cross_mag) + int(buy_pos)
+        sell_score = int(sell_regime) + int(cross_mag) + int(sell_pos)
+
+        # bars since the most recent cross, so a stale signal is visible as stale
+        sign = (fm > fs)
+        flips = sign != sign.shift()
+        age = 0
+        idx = list(sign.index)
+        for i in range(len(idx) - 1, 0, -1):
+            if bool(flips.iloc[i]):
+                age = len(idx) - 1 - i
+                break
+        out[t] = {"state": "up" if up_now else "down",
+                  "fresh_buy":  bool(up_now and not up_prev),
+                  "fresh_sell": bool((not up_now) and up_prev),
+                  "buy_conv": buy_score, "sell_conv": sell_score,
+                  "cross_age": age}
+    if as_of is None:
+        _SIG_CACHE["v"] = out
+    return out
+
 def build_macro_structure(conn, breadth_pct200, breadth_pct50=None, breadth_regime=None, as_of=None):
     import datetime as _dt
     RATIOS = [("RSP", "SPY", False, "Market Breadth"),
@@ -1933,6 +2002,12 @@ def compute_and_emit(conn):
     for r in emerging:
         _theme_rank.setdefault(r["name"], r["score"])
 
+    try:
+        _sig = _combo_signals(conn, [t for t, _ in names])
+    except Exception as e:
+        print(f"[screen] combo signals unavailable: {e}")
+        _sig = {}
+
     screen_long, screen_avoid = [], []
     for t, m in names:
         if not _v(m.get("ret21")) or not _v(m.get("atr_ext")):
@@ -1948,6 +2023,11 @@ def compute_and_emit(conn):
                "rvol": rnd(m["rvol"]),
                "above200": bool(m["above200"]),
                "earnings_7d": t in _earn_soon}
+        _sg = _sig.get(t)
+        if _sg:
+            rec.update({"sig_state": _sg["state"], "sig_buy_conv": _sg["buy_conv"],
+                        "sig_sell_conv": _sg["sell_conv"], "sig_age": _sg["cross_age"],
+                        "sig_fresh_buy": _sg["fresh_buy"], "sig_fresh_sell": _sg["fresh_sell"]})
         # LONG shortlist: outperforming, in an uptrend, and NOT already stretched
         # (extension is a caution, not a virtue -- +4 ATR is a bad entry even on
         # a strong name).
@@ -1959,8 +2039,13 @@ def compute_and_emit(conn):
         elif (rs < 0 and not m["above200"]) or ext > 4.0:
             rec["rank"] = round(rs - max(0.0, ext - 1.0) * 2.0, 2)
             screen_avoid.append(rec)
-    screen_long.sort(key=lambda r: -r["rank"])
-    screen_avoid.sort(key=lambda r: r["rank"])
+    for r in screen_long:
+        r["confluence"] = bool(r.get("sig_state") == "up" and (r.get("sig_buy_conv", 0) >= 2))
+    for r in screen_avoid:
+        r["confluence"] = bool(r.get("sig_state") == "down" and (r.get("sig_sell_conv", 0) >= 2))
+    # confluent names first, then by rank
+    screen_long.sort(key=lambda r: (-int(r.get("confluence", False)), -r["rank"]))
+    screen_avoid.sort(key=lambda r: (-int(r.get("confluence", False)), r["rank"]))
     screen = {"long": screen_long[:20], "avoid": screen_avoid[:20],
               "regime": None}     # filled after the macro block below
 
