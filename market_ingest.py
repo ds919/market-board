@@ -429,6 +429,47 @@ def _save_hist_csv(rows):
     except Exception as e:
         print(f"[hist] could not write {HIST_CSV}: {e}")
 
+
+_LEAD_CACHE = {"v": None}
+
+def _theme_leadership(conn, as_of=None):
+    """Share of themes whose equal-weight basket is BEATING SPY over 21 sessions.
+
+    Rationale (from a practitioner framing): a regime engine can say conditions
+    improved while the assets you would actually buy have not moved. Requiring the
+    leadership to confirm before allowing the top band is a different question
+    from 'is the composite high' -- it asks whether anything is actually working.
+
+    Cached per process: the basket series are built once from the full price
+    history and then sliced by date, so a 1,650-day replay does not rebuild 23
+    baskets per day (the same mistake that made breadth history unusably slow).
+    """
+    if _LEAD_CACHE["v"] is None:
+        series = {}
+        for th, syms in active_themes().items():
+            b = _basket_series(conn, syms)          # full history, no as_of
+            if b is not None and len(b) > 30:
+                series[th] = b
+        spy = _close_series(conn, "SPY")
+        _LEAD_CACHE["v"] = (series, spy)
+    series, spy = _LEAD_CACHE["v"]
+    if not series or spy is None:
+        return None
+    cut = pd.Timestamp(as_of) if as_of is not None else None
+    sp = spy if cut is None else spy[spy.index <= cut]
+    if len(sp) < 22:
+        return None
+    spy_ret = float(sp.iloc[-1] / sp.iloc[-22] - 1)
+    beat = tot = 0
+    for th, b in series.items():
+        bb = b if cut is None else b[b.index <= cut]
+        if len(bb) < 22:
+            continue
+        tot += 1
+        if float(bb.iloc[-1] / bb.iloc[-22] - 1) > spy_ret:
+            beat += 1
+    return round(100.0 * beat / tot, 1) if tot else None
+
 def build_macro_structure(conn, breadth_pct200, breadth_pct50=None, breadth_regime=None, as_of=None):
     import datetime as _dt
     RATIOS = [("RSP", "SPY", False, "Market Breadth"),
@@ -686,7 +727,24 @@ def build_macro_structure(conn, breadth_pct200, breadth_pct50=None, breadth_regi
         pass
 
     MIN_DWELL_OFF = 10
+    # ---- LEADERSHIP GATE ----------------------------------------------------
+    # Full Risk-On additionally requires that a real share of themes are actually
+    # OUTPERFORMING SPY. Without this the top band can fire off the composite
+    # alone while nothing is leading -- "the score says go but the assets you
+    # would buy have not moved". Gate applies ONLY to the top band; Moderate and
+    # Risk-Off are untouched, so this cannot make the engine slower to defend.
+    LEAD_MIN = float(os.environ.get("LEAD_MIN", "40"))
+    useLeadGate = os.environ.get("LEAD_GATE", "1") != "0"
+    leadership = None
+    try:
+        leadership = _theme_leadership(conn, as_of)
+    except Exception:
+        pass
+
     raw_status = _band(total)
+    if (useLeadGate and raw_status == "Full Risk-On"
+            and leadership is not None and leadership < LEAD_MIN):
+        raw_status = "Moderate Risk-On"
     status = raw_status
     dwell_held = False
     if str(prev_lab) == "Full Risk-Off" and raw_status != "Full Risk-Off" and prev_run < MIN_DWELL_OFF:
@@ -1041,6 +1099,7 @@ def build_macro_structure(conn, breadth_pct200, breadth_pct50=None, breadth_regi
                                          "trend": trend_score, "breadth": breadth_score},
                           "bands": {"full_on": B_FULL_ON, "moderate_on": B_MOD_ON, "full_off": B_FULL_OFF, "hysteresis": HYST},
                           "raw_status": raw_status, "dwell_held": dwell_held,
+                          "leadership_pct": leadership, "lead_min": LEAD_MIN,
                           "price_override": price_override, "recovery_pct": recovery_pct,
                           "slope_5d": slope, "neutral_dir": neutral_dir,
                           "min_dwell_off": MIN_DWELL_OFF, "prev_run_days": prev_run,

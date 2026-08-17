@@ -1017,6 +1017,10 @@ function viewMacroStructure(d){
       ${g.exit_unconfirmed ? `
         <div><span class="neg" style="font-weight:700">⚠ EXIT UNCONFIRMED</span>
           <span class="dim" style="color:var(--muted);font-size:11.5px"> — left risk-off while cross-asset signals kept falling</span></div>` : ""}
+      ${g.leadership_pct !== null && g.leadership_pct !== undefined ? `
+        <div><span class="dim" style="color:var(--muted)">Leadership</span>
+          <span class="mono ${g.leadership_pct >= (g.lead_min||40) ? 'pos' : 'neg'}"> ${g.leadership_pct}%</span>
+          <span class="dim" style="color:var(--muted);font-size:11px"> of themes beating SPY (21d; full risk-on needs ≥${g.lead_min||40}%)</span></div>` : ""}
       ${g.breadth_engine_regime ? `
         <div><span class="dim" style="color:var(--muted)">Breadth engine</span>
           <span class="mono"> ${g.breadth_engine_regime}</span>
