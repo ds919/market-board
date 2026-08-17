@@ -206,6 +206,7 @@
       <a href="#" data-tab="Events">Events</a>
       <a href="#" data-tab="Momentum">Momentum</a>
       <a href="#" data-tab="Extension">Extension</a>
+      <a href="#" data-tab="Screen">Screen</a>
       <a href="#" data-tab="Universe">Universe</a>
       <a href="#" data-tab="Verify">Verify</a>
     </nav>
@@ -224,7 +225,7 @@
    REFRESH re-fetches. LIVE polls every 60s. Tabs switch views.
    ===================================================================== */
 let DATA = null;
-const WORKING_TABS = ["Macro Structure", "Daily Board", "Themes", "Breadth", "ETF Grid", "RVOL", "Momentum", "Extension", "Events", "Universe", "Verify"];
+const WORKING_TABS = ["Macro Structure", "Daily Board", "Themes", "Breadth", "ETF Grid", "RVOL", "Momentum", "Extension", "Events", "Screen", "Universe", "Verify"];
 let activeTab = "Macro Structure";
 
 async function load(){
@@ -1098,6 +1099,61 @@ function miniLine(series, opts){
     ${xl}</svg>`;
 }
 
+function viewScreen(d){
+  const sc = d.screen;
+  if(!sc || (!sc.long || !sc.long.length)) return emptyPanel("Screen",
+    "no screen data — re-run market_ingest.py");
+  const g = (d.macro_structure && d.macro_structure.global_regime) || {};
+  const regCls = (g.status||"").includes("Risk-On") ? "pos"
+               : (g.status||"").includes("Risk-Off") ? "neg" : "flat";
+
+  const rows = arr => arr.map((r,i)=>`
+    <tr>
+      <td class="rank">${i+1}</td>
+      <td class="name mono">${r.tk}${r.earnings_7d ? ' <span class="warn" style="color:var(--pill-warn-ink,#f5c451);font-size:9px">ER</span>' : ""}</td>
+      <td class="name" style="font-weight:400;color:var(--muted);font-size:11.5px">${r.theme}</td>
+      <td class="num ${cls(r.rs21)}">${r.rs21>0?'+':''}${r.rs21}%</td>
+      <td class="num ${cls(r.d1)}">${r.d1>0?'+':''}${r.d1}%</td>
+      <td class="num mono">${r.atr_ext}</td>
+      <td class="num ${cls(r.dist50)}">${r.dist50>0?'+':''}${r.dist50}%</td>
+      <td class="num mono">${r.rvol===null||r.rvol===undefined?'—':r.rvol+'×'}</td>
+      <td class="num">${r.above200?'<span class="pos">✓</span>':'<span class="neg">✗</span>'}</td>
+    </tr>`).join("");
+  const head = `<tr><th class="l">#</th><th class="l">Ticker</th><th class="l">Theme</th>
+    <th>RS 21d</th><th>1D</th><th>ATR ext</th><th>&gt;50DMA</th><th>RVOL</th><th>&gt;200</th></tr>`;
+
+  return `
+  <section class="panel">
+    <div class="phead">Screen <span class="r">SHORTLIST TO RESEARCH — NOT SIGNALS</span></div>
+    <div class="pbody">
+      <div style="display:flex;gap:20px;flex-wrap:wrap;align-items:baseline;margin-bottom:8px">
+        <div>Regime <span class="${regCls}" style="font-weight:700">${g.status||"—"}</span>
+          <span class="dim mono" style="color:var(--muted);font-size:11.5px"> score ${g.score ?? "—"}</span></div>
+        ${g.leadership_pct!==null&&g.leadership_pct!==undefined?`<div><span class="dim" style="color:var(--muted)">Leadership</span> <span class="mono">${g.leadership_pct}%</span></div>`:""}
+      </div>
+      <div class="dim" style="color:var(--muted);font-size:11.5px">
+        These lists rank what is <b>currently</b> strong or weak — relative strength vs SPY,
+        trend, extension and participation joined into one view. Testing found <b>no
+        forward-predictive power</b> in these components (see docs), so treat this as a
+        starting point for work, not a recommendation. Read it against the regime above:
+        the strongest names in a Risk-Off tape are still swimming upstream.
+        <b>ER</b> = reports within 7 days.
+      </div>
+    </div>
+  </section>
+
+  <div class="row two-5050">
+    <section class="panel">
+      <div class="phead">Candidates <span class="r">OUTPERFORMING · ABOVE 200DMA · NOT STRETCHED</span></div>
+      <div class="pbody" style="overflow-x:auto"><table style="min-width:640px">${head}${rows(sc.long)}</table></div>
+    </section>
+    <section class="panel">
+      <div class="phead">Avoid / Trim <span class="r">LAGGING &amp; BELOW 200DMA, OR OVER-EXTENDED</span></div>
+      <div class="pbody" style="overflow-x:auto"><table style="min-width:640px">${head}${rows(sc.avoid)}</table></div>
+    </section>
+  </div>`;
+}
+
 function emptyPanel(title, msg){
   return `<section class="panel"><div class="phead">${title}</div>
     <div class="pbody"><span class="dim" style="color:var(--muted)">${msg}</span></div></section>`;
@@ -1125,6 +1181,7 @@ function render(){
   else if(activeTab === "Momentum")  main.innerHTML = viewMomentum(d);
   else if(activeTab === "Extension") main.innerHTML = viewExtension(d);
   else if(activeTab === "Events")    main.innerHTML = viewEvents(d);
+  else if(activeTab === "Screen")    main.innerHTML = viewScreen(d);
   else if(activeTab === "Universe")  { main.innerHTML = viewUniverse(d); attachUniFilter(); }
   else if(activeTab === "Verify")    { main.innerHTML = viewVerify(d); attachVerify(); }
   else                               main.innerHTML = viewDailyBoard(d);

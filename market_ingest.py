@@ -1884,6 +1884,55 @@ def compute_and_emit(conn):
             "nh20": m["new20high"], "nl20": m["new20low"],
         }
 
+    # ---- SCREEN: a JOIN across metrics already computed, not new signal -------
+    # The IC analysis found no forward-predictive power in these components, so
+    # this is explicitly a SHORTLIST TO RESEARCH, not a buy list. Its value is
+    # saving the cross-referencing you would otherwise do by hand across the
+    # Momentum / Extension / RVOL / Themes / Events tabs.
+    _earn_soon = set()
+    try:
+        _today = pd.Timestamp(today)
+        for _t, _d in globals().get("_EARNINGS", {}).items():
+            if 0 <= (pd.Timestamp(_d) - _today).days <= 7:
+                _earn_soon.add(_t)
+    except Exception:
+        pass
+
+    _theme_rank = {r["name"]: r["score"] for r in dominant}
+    for r in emerging:
+        _theme_rank.setdefault(r["name"], r["score"])
+
+    screen_long, screen_avoid = [], []
+    for t, m in names:
+        if not _v(m.get("ret21")) or not _v(m.get("atr_ext")):
+            continue
+        th = t2theme.get(t, "—")
+        th_score = _theme_rank.get(th)
+        rs = m["ret21"] - (spy_ret21 or 0.0)          # relative strength vs SPY
+        ext = m["atr_ext"]
+        rec = {"tk": t, "theme": th,
+               "theme_score": th_score,
+               "rs21": rnd(rs, 1), "d1": rnd(m["ret1"]),
+               "atr_ext": rnd(ext, 1), "dist50": rnd(m["dist50"], 1),
+               "rvol": rnd(m["rvol"]),
+               "above200": bool(m["above200"]),
+               "earnings_7d": t in _earn_soon}
+        # LONG shortlist: outperforming, in an uptrend, and NOT already stretched
+        # (extension is a caution, not a virtue -- +4 ATR is a bad entry even on
+        # a strong name).
+        if rs > 0 and m["above200"] and ext < 3.0:
+            rec["rank"] = round(rs - max(0.0, ext - 1.0) * 2.0
+                                + (th_score - 50) / 10.0 if th_score is not None else rs, 2)
+            screen_long.append(rec)
+        # AVOID/TRIM: lagging and below the 200-DMA, or very stretched
+        elif (rs < 0 and not m["above200"]) or ext > 4.0:
+            rec["rank"] = round(rs - max(0.0, ext - 1.0) * 2.0, 2)
+            screen_avoid.append(rec)
+    screen_long.sort(key=lambda r: -r["rank"])
+    screen_avoid.sort(key=lambda r: r["rank"])
+    screen = {"long": screen_long[:20], "avoid": screen_avoid[:20],
+              "regime": None}     # filled after the macro block below
+
     earn_map = globals().get("_EARNINGS", {})
     t2th = t2theme
     earnings = []
@@ -1946,6 +1995,7 @@ def compute_and_emit(conn):
         ],
         "dominant": dominant, "emerging": emerging,
         "etfs": etfs, "macro": macro, "rvol": rvol_rows, "momentum": momentum,
+        "screen": screen,
         "universe_map": universe_map, "verify_map": verify_map,
         "macro_structure": macro_structure,
         "extension": extension, "earnings": earnings,
