@@ -1018,6 +1018,12 @@ function viewMacroStructure(d){
       ${g.exit_unconfirmed ? `
         <div><span class="neg" style="font-weight:700">⚠ EXIT UNCONFIRMED</span>
           <span class="dim" style="color:var(--muted);font-size:11.5px"> — left risk-off while cross-asset signals kept falling</span></div>` : ""}
+      ${g.deploy_pct !== null && g.deploy_pct !== undefined ? `
+        <div title="A policy mapping you set, not a model output — nothing in testing supports a specific number. Override via env vars.">
+          <span class="dim" style="color:var(--muted)">Suggested exposure</span>
+          <span class="mono ${g.deploy_pct>=75?'pos':g.deploy_pct<=25?'neg':''}" style="font-weight:700"> ${g.deploy_pct}%</span>
+          ${(g.deploy_notes||[]).length ? `<span class="dim" style="color:var(--muted);font-size:11px"> — ${g.deploy_notes.join("; ")}</span>` : ""}
+        </div>` : ""}
       ${g.leadership_pct !== null && g.leadership_pct !== undefined ? `
         <div><span class="dim" style="color:var(--muted)">Leadership</span>
           <span class="mono ${g.leadership_pct >= (g.lead_min||40) ? 'pos' : 'neg'}"> ${g.leadership_pct}%</span>
@@ -1130,6 +1136,7 @@ function viewScreen(d){
         <div>Regime <span class="${regCls}" style="font-weight:700">${g.status||"—"}</span>
           <span class="dim mono" style="color:var(--muted);font-size:11.5px"> score ${g.score ?? "—"}</span></div>
         ${g.leadership_pct!==null&&g.leadership_pct!==undefined?`<div><span class="dim" style="color:var(--muted)">Leadership</span> <span class="mono">${g.leadership_pct}%</span></div>`:""}
+        ${g.deploy_pct!==null&&g.deploy_pct!==undefined?`<div><span class="dim" style="color:var(--muted)">Suggested exposure</span> <span class="mono ${g.deploy_pct>=75?'pos':g.deploy_pct<=25?'neg':''}" style="font-weight:700">${g.deploy_pct}%</span></div>`:""}
       </div>
       <div class="dim" style="color:var(--muted);font-size:11.5px">
         These lists rank what is <b>currently</b> strong or weak — relative strength vs SPY,

@@ -1087,6 +1087,36 @@ def build_macro_structure(conn, breadth_pct200, breadth_pct50=None, breadth_regi
                     "weight": r.get("weight"), "weighted_score": r.get("weighted_score")}
                    for r in ratios]})
 
+    # ---- DEPLOYMENT GUIDE ----------------------------------------------------
+    # The board described conditions but never connected them to a position size,
+    # so a reading changed what you knew and not what you did. This maps regime to
+    # a suggested exposure band.
+    #
+    # THESE NUMBERS ARE A POLICY YOU SET, NOT A MODEL OUTPUT. Nothing in the
+    # testing supports a specific percentage -- the IC analysis found no forward
+    # predictive power in the components. What the history DOES support is the
+    # ordering: risk-off periods sat on real drawdowns, so being smaller then is
+    # consistent with a drawdown-first mandate. Override via env to match your own
+    # risk tolerance; the defaults are deliberately conservative.
+    DEPLOY_MAP = {
+        "Full Risk-On":     float(os.environ.get("DEPLOY_FULL_ON",  "100")),
+        "Moderate Risk-On": float(os.environ.get("DEPLOY_MOD_ON",   "75")),
+        "Neutral / Choppy": float(os.environ.get("DEPLOY_NEUTRAL",  "50")),
+        "Full Risk-Off":    float(os.environ.get("DEPLOY_OFF",      "25")),
+    }
+    deploy_pct = DEPLOY_MAP.get(status, 50.0)
+    deploy_notes = []
+    if dwell_held:
+        deploy_notes.append("held defensive by the dwell floor")
+    if price_override:
+        deploy_notes.append("risk-off released on price recovery, not on conditions")
+    if exit_unconfirmed:
+        deploy_notes.append("exit not confirmed by cross-asset signals")
+    if leadership is not None and leadership < LEAD_MIN:
+        deploy_notes.append(f"leadership thin ({leadership}% of themes beating SPY)")
+    if ratio_component is not None and ratio_component < 0 and total > 0:
+        deploy_notes.append("score carried by trend/breadth; cross-asset negative")
+
     return {
         "updated_at": _dt.datetime.now(_dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "system_health": {"data_status": "stale" if stale else "ok", "last_close": last_d},
@@ -1095,6 +1125,7 @@ def build_macro_structure(conn, breadth_pct200, breadth_pct50=None, breadth_regi
                           "min": -11, "max": 10,
                           "breadth_engine_regime": breadth_regime,
                           "exit_unconfirmed": exit_unconfirmed,
+                          "deploy_pct": deploy_pct, "deploy_notes": deploy_notes,
                           "components": {"intermarket": ratio_component, "vix": vix_score,
                                          "trend": trend_score, "breadth": breadth_score},
                           "bands": {"full_on": B_FULL_ON, "moderate_on": B_MOD_ON, "full_off": B_FULL_OFF, "hysteresis": HYST},

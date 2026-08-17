@@ -5335,7 +5335,7 @@
     }
   },
   "macro_structure": {
-    "updated_at": "2026-08-17T04:33:31Z",
+    "updated_at": "2026-08-17T04:40:32Z",
     "system_health": {
       "data_status": "ok",
       "last_close": "2026-08-14"
@@ -5353,6 +5353,8 @@
       "max": 10,
       "breadth_engine_regime": "RISK-ON",
       "exit_unconfirmed": false,
+      "deploy_pct": 50.0,
+      "deploy_notes": [],
       "components": {
         "intermarket": 0.31,
         "vix": 0,
@@ -24197,8 +24199,8 @@
       },
       {
         "ticker": "BTC-USD",
-        "spread_1m": -6.358,
-        "spread_3m": -7.525
+        "spread_1m": -6.327,
+        "spread_3m": -7.494
       }
     ]
   },
