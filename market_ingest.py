@@ -75,15 +75,15 @@ MACRO_STRUCT_SYMS = [s for s, _ in MACRO_STRUCT_EXTRA]
 # needs a paid feed. This narrows the gap at zero cost.
 BREADTH_EXTRA = [
     # staples / household
-    "KO","PEP","PG","CL","KMB","GIS","K","HSY","SYY","KR","STZ","MNST","CHD","MKC",
+    "KO","PEP","PG","CL","KMB","GIS","HSY","SYY","KR","STZ","MNST","CHD","MKC",
     "CAG","CPB","HRL","TAP","EL","TSN","ADM","MDLZ","PM","MO",
     # healthcare beyond the theme lists
     "UNH","ELV","CI","HUM","CNC","MCK","COR","CAH","ZBH","BAX","BDX","STE","RMD",
-    "WST","HOLX","DGX","LH","IQV","A","MTD","WAT","PKI",
+    "WST","DGX","LH","IQV","A","MTD","WAT",
     # financials / insurance
-    "BRK-B","PGR","TRV","ALL","MET","PRU","AFL","AIG","HIG","CB","MMC","AON","AJG",
+    "BRK-B","PGR","TRV","ALL","MET","PRU","AFL","AIG","HIG","CB","AON","AJG",
     "BRO","WTW","SPGI","MCO","MSCI","ICE","CME","NDAQ","CBOE","TROW","BEN","IVZ",
-    "STT","NTRS","BK","RF","KEY","CFG","HBAN","FITB","MTB","ZION","CMA",
+    "STT","NTRS","RF","KEY","CFG","HBAN","FITB","MTB","ZION",
     # industrials / transport
     "HON","LMT","GD","NOC","EMR","ROK","DOV","IR","XYL","AME","ROP","FTV","PNR",
     "SWK","MAS","ALLE","JCI","CARR","OTIS","TT","LII","GWW","FAST","URI","PCAR",
@@ -99,13 +99,19 @@ BREADTH_EXTRA = [
     "BXP","KIM","REG","FRT","HST",
     # materials / energy beyond the theme lists
     "SHW","ECL","PPG","DD","DOW","LYB","IFF","ALB","MLM","VMC","NUE","STLD","CLF",
-    "X","AA","MOS","CF","IP","PKG","WRK","AVY","SEE","BALL",
-    "PXD","HES","APA","MRO","CTRA","EQT","AR","RRC","SWN","OKE","TRGP","LNG",
+    "AA","MOS","CF","IP","PKG","AVY","BALL",
+    "APA","EQT","AR","RRC","OKE","TRGP","LNG",
     "BKR","NOV","FTI","RIG","VAL",
     # communication / media
-    "DIS","CMCSA","CHTR","WBD","PARA","FOXA","OMC","IPG","EA","TTWO","RBLX","LYV",
+    "DIS","CMCSA","CHTR","WBD","PARA","FOXA","OMC","EA","TTWO","RBLX","LYV",
     "T","VZ","TMUS","LUMN",
 ]
+# swapped in for delisted/renamed names found on the first 7y backfill:
+# BK CMA CTRA HES HOLX IPG K MMC MRO PKI PXD SEE SWN WRK X
+# IT solutions / value-added resellers -- a coherent peer group and a sector the
+# list otherwise missed entirely (NSIT, CDW, PLUS, CNXN).
+BREADTH_EXTRA += ["NSIT", "CDW", "PLUS", "CNXN"]
+BREADTH_EXTRA += ['WAL', 'DVN', 'OXY', 'ALGN', 'NYT', 'KHC', 'AIZ', 'FANG', 'TECH', 'CIVI', 'AMCR', 'CHRD', 'SW', 'CMC']
 BREADTH_EXTRA = sorted(set(BREADTH_EXTRA))
 
 NON_MEMBERS = set(INDEX_SYMS) | set(SECTOR_SYMS) | set(MACRO_SYMS) | set(MACRO_STRUCT_SYMS)
