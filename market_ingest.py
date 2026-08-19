@@ -270,6 +270,29 @@ def fetch_stooq(ticker):
 
 def ingest(conn, period):
     tickers = universe()
+
+    # SELF-HEALING BACKFILL. The nightly run pulls only ~10 days. Any ticker newly
+    # added to the universe therefore lands with ~10 bars -- far short of the 200
+    # needed for a 200-DMA -- so it is silently dropped from breadth. Adding 250
+    # names and watching the Action publish 255 tickers instead of 487, every
+    # night, is exactly this.
+    #
+    # Fetch full history for anything that is short, regardless of the run mode.
+    if period != BACKFILL_PERIOD:
+        try:
+            have = dict(conn.execute(
+                "SELECT ticker, COUNT(*) FROM prices GROUP BY ticker").fetchall())
+            thin = [t for t in tickers if have.get(t, 0) < 220]
+            if thin:
+                print(f"[ingest] {len(thin)} ticker(s) short on history — "
+                      f"backfilling those: {thin[:12]}{'...' if len(thin) > 12 else ''}")
+                deep = fetch_yf(thin, BACKFILL_PERIOD)
+                for t, df in deep.items():
+                    upsert(conn, t, df)
+                conn.commit()
+        except Exception as e:
+            print(f"[ingest] short-history backfill skipped: {e}")
+
     frames = fetch_yf(tickers, period)
     missing = [t for t in tickers if t not in frames]
     for t in missing:                       # Stooq fallback for anything Yahoo dropped
