@@ -981,58 +981,98 @@ function viewMacroStructure(d){
   const sc  = v => v>0?`<span class="pos">+${Number(v).toFixed(2).replace(/\.00$/,'')}</span>`:v<0?`<span class="neg">${Number(v).toFixed(2).replace(/\.00$/,'')}</span>`:`<span class="flat">0</span>`;
   const spd = v => v===null||v===undefined ? '<span class="flat">—</span>' : `<span class="${v>0?'pos':v<0?'neg':'flat'}">${v>0?'+':''}${Number(v).toFixed(2)}%</span>`;
 
+  // ---- SCORE GAUGE ------------------------------------------------------
+  // Replaces the sparkline. A 60-day line of a score that mostly lives between
+  // -3 and +5, drawn on a -11..+10 axis, is flat by construction -- it looked
+  // like a heartbeat monitor on a calm patient. What actually matters is WHERE
+  // the score sits relative to the thresholds that change the label, and which
+  // way it is moving. This shows position within the bands, plus a ghost marker
+  // for 5 sessions ago.
+  const gauge = (() => {
+    const B = g.bands || {full_on:5, moderate_on:3.5, full_off:-3};
+    const lo = g.min ?? -11, hi = g.max ?? 10;
+    const W = 300, H = 46, PT = 14, BH = 12;
+    const X = v => ((Math.max(lo, Math.min(hi, v)) - lo) / (hi - lo)) * W;
+    const prev = (g.score !== undefined && g.slope_5d !== undefined && g.slope_5d !== null)
+                 ? g.score - g.slope_5d : null;
+    return `<svg viewBox="0 0 ${W} ${H}" style="width:300px;max-width:100%;height:auto">
+      <rect x="0" y="${PT}" width="${X(B.full_off)}" height="${BH}" fill="var(--neg,#ff5c57)" opacity=".28"/>
+      <rect x="${X(B.full_off)}" y="${PT}" width="${X(B.moderate_on)-X(B.full_off)}" height="${BH}" fill="var(--muted)" opacity=".16"/>
+      <rect x="${X(B.moderate_on)}" y="${PT}" width="${X(B.full_on)-X(B.moderate_on)}" height="${BH}" fill="var(--pos,#3ddc84)" opacity=".2"/>
+      <rect x="${X(B.full_on)}" y="${PT}" width="${W-X(B.full_on)}" height="${BH}" fill="var(--pos,#3ddc84)" opacity=".38"/>
+      <line x1="${X(0)}" y1="${PT-2}" x2="${X(0)}" y2="${PT+BH+2}" stroke="var(--line)" stroke-width="1"/>
+      ${prev !== null ? `<circle cx="${X(prev).toFixed(1)}" cy="${PT+BH/2}" r="3" fill="var(--muted)" opacity=".55"/>
+        <line x1="${X(prev).toFixed(1)}" y1="${PT+BH/2}" x2="${X(g.score).toFixed(1)}" y2="${PT+BH/2}" stroke="var(--muted)" stroke-width="1" opacity=".5"/>` : ""}
+      <polygon points="${X(g.score).toFixed(1)},${PT-4} ${(X(g.score)-4).toFixed(1)},${PT-11} ${(X(g.score)+4).toFixed(1)},${PT-11}"
+               fill="${regCls==='pos'?'var(--pos,#3ddc84)':regCls==='neg'?'var(--neg,#ff5c57)':'var(--ink,#e8eaed)'}"/>
+      <text x="${X(B.full_off).toFixed(1)}" y="${PT+BH+11}" text-anchor="middle" font-size="8.5" fill="var(--muted)">${B.full_off}</text>
+      <text x="${X(B.moderate_on).toFixed(1)}" y="${PT+BH+11}" text-anchor="middle" font-size="8.5" fill="var(--muted)">${B.moderate_on}</text>
+      <text x="${X(B.full_on).toFixed(1)}" y="${PT+BH+11}" text-anchor="middle" font-size="8.5" fill="var(--muted)">${B.full_on}</text>
+    </svg>`;
+  })();
+
+  // ---- driver cells -------------------------------------------------------
+  // trend and breadth previously appeared TWICE on the same row -- once as a
+  // measurement chip and again in the Drivers list -- which read as five terms
+  // summing to the score when there are only four. Each component appears once,
+  // with its underlying measurement beneath it.
+  const cell = (label, value, sub, tone) => `
+    <div style="min-width:118px">
+      <div class="dim" style="color:var(--label,var(--muted));font-size:10px;letter-spacing:.5px;text-transform:uppercase">${label}</div>
+      <div class="mono ${tone||''}" style="font-size:15px;font-weight:600;line-height:1.35">${value}</div>
+      <div class="dim" style="color:var(--muted);font-size:10.5px">${sub||"&nbsp;"}</div>
+    </div>`;
+
+  const c = g.components || {};
+  const at = ms.absolute_trend || {};
+  const vol = ms.volatility || {};
+  const sum4 = ["intermarket","vix","trend","breadth"]
+    .reduce((a,k) => a + (typeof c[k] === "number" ? c[k] : 0), 0);
+
   const banner = `
   <section class="panel">
-    <div class="phead">Global Macro Regime <span class="r">${health.data_status === "stale" ? '<span class="neg">DATA STALE</span> · ' : ''}AS OF ${ms.updated_at}</span></div>
-    <div class="pbody" style="display:flex;align-items:center;gap:18px;flex-wrap:wrap">
-      <div class="big ${regCls}" style="font-size:26px;font-weight:800">${g.status}</div>
-      ${g.neutral_dir && g.neutral_dir !== "flat" ? `
-        <div style="font-size:12.5px;padding:3px 8px;border:1px solid var(--line);border-radius:6px"
-             title="direction of the composite score over ~5 sessions; not part of the regime label">
-          <span class="${g.neutral_dir==='improving'?'pos':'neg'}">
-            ${g.neutral_dir==='improving'?'▲':'▼'} ${g.neutral_dir}</span>
-          <span class="dim mono" style="color:var(--muted);font-size:11px"> 5d ${g.slope_5d>0?'+':''}${g.slope_5d}</span>
-        </div>` : ""}
-      <div style="font-size:15px" class="mono">score ${g.score > 0 ? "+" + g.score : g.score}
-        ${g.delta_1d ? `<span class="${g.delta_1d>0?'pos':'neg'}" style="font-size:12px">(${g.delta_1d>0?'+':''}${g.delta_1d} 1D)</span>` : ""}
+    <div class="phead">Global Macro Regime
+      <span class="r">${health.data_status === "stale" ? '<span class="neg">DATA STALE</span> · ' : ''}AS OF ${ms.updated_at}</span></div>
 
-        <span class="dim" style="color:var(--muted);font-size:12px">${g.bands ? `(risk-on ≥ ${g.bands.moderate_on}, full ≥ ${g.bands.full_on}; risk-off ≤ ${g.bands.full_off})` : ""}</span></div>
-      <div style="font-size:13px" class="mono">VIX ${vol.vix_close ?? "—"}${vol.vix3m_close ? ` / 3M ${vol.vix3m_close}` : ""}
-        ${vol.curve && vol.curve !== "contango" ? `<span class="neg" style="font-weight:700"> ${vol.curve.toUpperCase()}</span>` : vol.curve === "contango" ? '<span class="pos"> contango</span>' : ""} → ${sc(vol.score)}</div>
-      ${sparkline(ms.score_history, g.min, g.max)}
-    </div>
-    <div class="pbody" style="border-top:1px solid var(--line);display:flex;gap:22px;flex-wrap:wrap;font-size:12.5px">
-      ${ms.absolute_trend ? `
-        <div><span class="dim" style="color:var(--muted)">SPY vs 200SMA</span>
-          <span class="mono ${ms.absolute_trend.trend_score>0?'pos':'neg'}"> ${ms.absolute_trend.spy_vs_200sma_pct>0?'+':''}${ms.absolute_trend.spy_vs_200sma_pct ?? '—'}%</span>
-          ${sc(ms.absolute_trend.trend_score)}</div>
-        <div><span class="dim" style="color:var(--muted)">Breadth &gt;200DMA</span>
-          <span class="mono ${ms.absolute_trend.breadth_score>0?'pos':'neg'}"> ${ms.absolute_trend.breadth_pct200 ?? '—'}%</span>
-          ${sc(ms.absolute_trend.breadth_score)}</div>` : ""}
-      ${g.components ? `
-        <div><span class="dim" style="color:var(--muted)">Drivers</span>
-          <span class="mono" style="font-size:11.5px"> intermarket ${sc(g.components.intermarket)} · vix ${sc(g.components.vix)} · trend ${sc(g.components.trend)} · breadth ${sc(g.components.breadth)}</span></div>` : ""}
-      ${g.dwell_held ? `
-        <div><span class="warn" style="color:var(--pill-warn-ink,#f5c451);font-weight:700">⏱ DWELL HOLD</span>
-          <span class="dim" style="color:var(--muted);font-size:11.5px"> — risk-off held ${g.prev_run_days}/${g.min_dwell_off} sessions; score alone would have exited</span></div>` : ""}
-      ${g.exit_unconfirmed ? `
-        <div><span class="neg" style="font-weight:700">⚠ EXIT UNCONFIRMED</span>
-          <span class="dim" style="color:var(--muted);font-size:11.5px"> — left risk-off while cross-asset signals kept falling</span></div>` : ""}
+    <div class="pbody" style="display:flex;align-items:center;gap:26px;flex-wrap:wrap">
+      <div>
+        <div class="big ${regCls}" style="font-size:27px;font-weight:800;line-height:1.1">${g.status}</div>
+        <div class="mono" style="font-size:13px;margin-top:3px">score ${g.score > 0 ? "+" : ""}${g.score}
+          ${g.delta_1d ? `<span class="${g.delta_1d>0?'pos':'neg'}" style="font-size:11.5px">(${g.delta_1d>0?'+':''}${g.delta_1d} 1D)</span>` : ""}
+          ${g.slope_5d !== null && g.slope_5d !== undefined ? `<span class="dim" style="color:var(--muted);font-size:11px">· 5d ${g.slope_5d>0?'+':''}${g.slope_5d}</span>` : ""}
+        </div>
+      </div>
+      ${gauge}
       ${g.deploy_pct !== null && g.deploy_pct !== undefined ? `
-        <div title="A policy mapping you set, not a model output — nothing in testing supports a specific number. Override via env vars.">
-          <span class="dim" style="color:var(--muted)">Suggested exposure</span>
-          <span class="mono ${g.deploy_pct>=75?'pos':g.deploy_pct<=25?'neg':''}" style="font-weight:700"> ${g.deploy_pct}%</span>
-          ${(g.deploy_notes||[]).length ? `<span class="dim" style="color:var(--muted);font-size:11px"> — ${g.deploy_notes.join("; ")}</span>` : ""}
+        <div style="margin-left:auto;text-align:right">
+          <div class="dim" style="color:var(--label,var(--muted));font-size:10px;letter-spacing:.5px;text-transform:uppercase">Suggested exposure</div>
+          <div class="mono ${g.deploy_pct>=75?'pos':g.deploy_pct<=25?'neg':''}" style="font-size:22px;font-weight:800">${g.deploy_pct}%</div>
         </div>` : ""}
-      ${g.leadership_pct !== null && g.leadership_pct !== undefined ? `
-        <div><span class="dim" style="color:var(--muted)">Leadership</span>
-          <span class="mono ${g.leadership_pct >= (g.lead_min||40) ? 'pos' : 'neg'}"> ${g.leadership_pct}%</span>
-          <span class="dim" style="color:var(--muted);font-size:11px"> of themes beating SPY (21d; full risk-on needs ≥${g.lead_min||40}%)</span></div>` : ""}
-      ${g.breadth_engine_regime ? `
-        <div><span class="dim" style="color:var(--muted)">Breadth engine</span>
-          <span class="mono"> ${g.breadth_engine_regime}</span>
-          ${g.agrees === false ? '<span class="neg" style="font-weight:700"> ⚠ DIVERGENCE</span>' : g.agrees === true ? '<span class="pos"> agree</span>' : ""}</div>` : ""}
     </div>
+
+    <div class="pbody" style="border-top:1px solid var(--line);display:flex;gap:26px;flex-wrap:wrap">
+      ${cell("Intermarket", sc(c.intermarket ?? 0), "7 cross-asset ratios")}
+      ${cell("Volatility", sc(c.vix ?? 0),
+             `VIX ${vol.vix_close ?? "—"} / 3M ${vol.vix3m_close ?? "—"} ${vol.curve==="contango"?'<span class="pos">contango</span>':`<span class="neg">${vol.curve||""}</span>`}`)}
+      ${cell("Trend", sc(c.trend ?? 0), `SPY ${at.spy_vs_200sma_pct>0?"+":""}${at.spy_vs_200sma_pct ?? "—"}% vs 200SMA`)}
+      ${cell("Breadth", sc(c.breadth ?? 0), `${at.breadth_pct200 ?? "—"}% above 200DMA`)}
+      <div style="border-left:1px solid var(--line);padding-left:26px">
+        ${cell("Composite", `${sum4>0?"+":""}${Math.round(sum4*100)/100}`, "sum of the four")}
+      </div>
+      ${cell("Leadership", `${g.leadership_pct ?? "—"}%`,
+             `themes beating SPY · gate ≥${g.lead_min ?? 40}%`,
+             (g.leadership_pct ?? 0) >= (g.lead_min ?? 40) ? "pos" : "neg")}
+      ${cell("2nd engine", g.breadth_engine_regime || "—",
+             g.agrees === false ? '<span class="neg">⚠ divergence</span>' : g.agrees ? '<span class="pos">agrees</span>' : "",
+             g.agrees === false ? "neg" : "")}
+    </div>
+
+    ${(g.deploy_notes||[]).length || g.dwell_held || g.exit_unconfirmed ? `
+    <div class="pbody" style="border-top:1px solid var(--line);font-size:11.5px;color:var(--muted)">
+      ${g.dwell_held ? `<span class="warn" style="color:var(--pill-warn-ink,#f5c451);font-weight:700">⏱ DWELL HOLD</span> risk-off held ${g.prev_run_days}/${g.min_dwell_off} sessions · ` : ""}
+      ${g.exit_unconfirmed ? `<span class="neg" style="font-weight:700">⚠ EXIT UNCONFIRMED</span> · ` : ""}
+      ${(g.deploy_notes||[]).join(" · ")}
+    </div>` : ""}
   </section>`;
 
   const cards = `
