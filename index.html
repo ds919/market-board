@@ -1025,7 +1025,7 @@ function viewMacroStructure(d){
 
   const c = g.components || {};
   const at = ms.absolute_trend || {};
-  const vol = ms.volatility || {};
+  const volx = vol || {};        // vol is already declared above; do not redeclare
   const sum4 = ["intermarket","vix","trend","breadth"]
     .reduce((a,k) => a + (typeof c[k] === "number" ? c[k] : 0), 0);
 
@@ -1053,7 +1053,7 @@ function viewMacroStructure(d){
     <div class="pbody" style="border-top:1px solid var(--line);display:flex;gap:26px;flex-wrap:wrap">
       ${cell("Intermarket", sc(c.intermarket ?? 0), "7 cross-asset ratios")}
       ${cell("Volatility", sc(c.vix ?? 0),
-             `VIX ${vol.vix_close ?? "—"} / 3M ${vol.vix3m_close ?? "—"} ${vol.curve==="contango"?'<span class="pos">contango</span>':`<span class="neg">${vol.curve||""}</span>`}`)}
+             `VIX ${volx.vix_close ?? "—"} / 3M ${volx.vix3m_close ?? "—"} ${volx.curve==="contango"?'<span class="pos">contango</span>':`<span class="neg">${volx.curve||""}</span>`}`)}
       ${cell("Trend", sc(c.trend ?? 0), `SPY ${at.spy_vs_200sma_pct>0?"+":""}${at.spy_vs_200sma_pct ?? "—"}% vs 200SMA`)}
       ${cell("Breadth", sc(c.breadth ?? 0), `${at.breadth_pct200 ?? "—"}% above 200DMA`)}
       <div style="border-left:1px solid var(--line);padding-left:26px">
