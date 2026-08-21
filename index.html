@@ -1045,10 +1045,9 @@ function viewMacroStructure(d){
 
   const banner = `
   <section class="panel">
-    <div class="phead">Global Macro Regime
-      <span class="r">${health.data_status === "stale" ? '<span class="neg">DATA STALE</span> · ' : ''}AS OF ${ms.updated_at}</span></div>
-
-    <div class="pbody" style="display:flex;align-items:center;gap:26px;flex-wrap:wrap">
+    <div class="pbody" style="display:flex;align-items:center;gap:26px;flex-wrap:wrap;position:relative">
+      <div class="dim" style="position:absolute;top:6px;right:14px;color:var(--muted);font-size:10px;letter-spacing:.5px">
+        ${health.data_status === "stale" ? '<span class="neg">DATA STALE</span> · ' : ''}AS OF ${ms.updated_at}</div>
       <div>
         <div class="big ${regCls}" style="font-size:27px;font-weight:800;line-height:1.1">${g.status}</div>
         <div class="mono" style="font-size:13px;margin-top:3px">score ${g.score > 0 ? "+" : ""}${g.score}
@@ -1236,7 +1235,7 @@ function render(){
   const d = DATA;
   const el = document.getElementById("metaline");
   el.style.color = "";
-  el.textContent = `${d.date} · ${d.tickers} TICKERS · ${d.universe}`;
+  el.textContent = `${d.date} · ${d.tickers} TICKERS`;
 
   document.querySelectorAll("nav a").forEach(a=>{
     a.classList.toggle("active", a.dataset.tab === activeTab);
