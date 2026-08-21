@@ -816,7 +816,22 @@ def build_macro_structure(conn, breadth_pct200, breadth_pct50=None, breadth_regi
     # suggested -1.7, but that was derived from a 14-month BULL sample where deep
     # negatives are rare, and adopting it would flag full risk-off on ordinary
     # pullbacks. -3.0 fired on 5% of days and caught the genuine stress episodes.
-    B_FULL_ON, B_MOD_ON, B_FULL_OFF = 5.0, 3.5, -3.0
+    # SYMMETRIC FIVE-BAND STRUCTURE (env-overridable for A/B).
+    # The old scheme had TWO bullish states and only ONE bearish state, which for a
+    # drawdown-first mandate is backwards -- granularity matters more on the
+    # downside. Mirroring gives uniformity AND a "reduce" step before "defend".
+    #
+    # Thresholds are now symmetric because the old ones were not asymmetric for any
+    # principled reason: +5.0 was data-derived, -3.0 was judgment, +3.5 sat just
+    # above the +2 floor the absolute components contribute in any non-bear tape.
+    #
+    # NOTE the SCORE RANGE stays -11..+10 and that asymmetry IS principled:
+    # volatility can contribute -2 (curve broadly backwardated) but at most +1.
+    # Stress grades by severity; calm does not. Observed range is -9.84 to +7.98.
+    B_FULL_ON  = float(os.environ.get("B_FULL_ON",  "5.0"))
+    B_MOD_ON   = float(os.environ.get("B_MOD_ON",   "3.0"))
+    B_MOD_OFF  = float(os.environ.get("B_MOD_OFF",  "-3.0"))
+    B_FULL_OFF = float(os.environ.get("B_FULL_OFF", "-5.0"))
 
     # SMOOTHED REGIME. The raw score flips across a band boundary on decimal noise,
     # which made the daily label alternate green/yellow day to day (visible as
@@ -867,7 +882,8 @@ def build_macro_structure(conn, breadth_pct200, breadth_pct50=None, breadth_regi
     # narrow buffer produced repeated Full<->Moderate flips (July 2025 flipped 4x
     # in 3 weeks). A wider buffer at the top band kills that churn; the risk-off
     # boundary keeps a narrow buffer so defensive signals stay responsive.
-    HYST = {"Full Risk-On": 0.8, "Moderate Risk-On": 0.4, "Full Risk-Off": 0.3}
+    HYST = {"Full Risk-On": 0.8, "Moderate Risk-On": 0.4,
+            "Moderate Risk-Off": 0.4, "Full Risk-Off": 0.3}
     hyst = HYST["Moderate Risk-On"]   # reported default
     prev_lab = None
     prev_run = 0            # consecutive sessions the previous label has held
@@ -893,7 +909,8 @@ def build_macro_structure(conn, breadth_pct200, breadth_pct50=None, breadth_regi
     def _band(x, entering_from=None):
         if x >= B_FULL_ON:    return "Full Risk-On"
         if x >= B_MOD_ON:     return "Moderate Risk-On"
-        if x > B_FULL_OFF:    return "Neutral / Choppy"
+        if x > B_MOD_OFF:     return "Neutral / Choppy"
+        if x > B_FULL_OFF:    return "Moderate Risk-Off"
         return "Full Risk-Off"
 
     # MINIMUM DWELL. 2022 exposed the real failure mode: in a grinding decline the
@@ -938,8 +955,8 @@ def build_macro_structure(conn, breadth_pct200, breadth_pct50=None, breadth_regi
         raw_status = "Moderate Risk-On"
     status = raw_status
     dwell_held = False
-    if str(prev_lab) == "Full Risk-Off" and raw_status != "Full Risk-Off" and prev_run < MIN_DWELL_OFF:
-        status = "Full Risk-Off"
+    if str(prev_lab).endswith("Risk-Off") and not raw_status.endswith("Risk-Off") and prev_run < MIN_DWELL_OFF:
+        status = prev_lab
         dwell_held = True
 
     # ---- PRICE RECOVERY OVERRIDE (LATCHED) ---------------------------------
@@ -982,7 +999,7 @@ def build_macro_structure(conn, breadth_pct200, breadth_pct50=None, breadth_regi
                 _trig_low = float(_ov.get("low", _low))
                 if _now < _trig_low:
                     _ov = None                      # price undercut the low -> latch broken
-                elif raw_status == "Full Risk-Off":
+                elif raw_status.endswith("Risk-Off"):
                     status = "Neutral / Choppy"     # keep holding the release
                     price_override = True
                     dwell_held = False
@@ -990,7 +1007,7 @@ def build_macro_structure(conn, breadth_pct200, breadth_pct50=None, breadth_regi
                     _ov = None                      # composite recovered on its own
 
             # ---- not latched: can we release? ----
-            elif (str(prev_lab) == "Full Risk-Off" and status == "Full Risk-Off"
+            elif (str(prev_lab).endswith("Risk-Off") and status.endswith("Risk-Off")
                   and recovery_pct is not None and recovery_pct >= PRICE_RECOVERY_PCT
                   and _bars_since_low >= 3 and vix_score > -2):
                 status = "Neutral / Choppy"
@@ -1020,10 +1037,11 @@ def build_macro_structure(conn, breadth_pct200, breadth_pct50=None, breadth_regi
             elif total < B_MOD_ON + h_mod:
                 status = prev_lab
         elif raw_status == "Full Risk-Off"    and total > B_FULL_OFF - h_off: status = prev_lab
+        elif raw_status == "Moderate Risk-Off" and total > B_MOD_OFF - HYST["Moderate Risk-Off"]: status = prev_lab
         elif raw_status == "Neutral / Choppy":
             if prev_lab in ("Full Risk-On", "Moderate Risk-On") and total > B_MOD_ON - h_mod:
                 status = prev_lab
-            elif prev_lab == "Full Risk-Off" and total < B_FULL_OFF + h_off:
+            elif prev_lab in ("Full Risk-Off", "Moderate Risk-Off") and total < B_MOD_OFF + h_off:
                 status = prev_lab
 
     # Slope is reported as a SEPARATE readout, never folded into the label.
@@ -1242,7 +1260,7 @@ def build_macro_structure(conn, breadth_pct200, breadth_pct50=None, breadth_regi
             "SELECT status, raw FROM macro_hist WHERE d < ? ORDER BY d DESC LIMIT 1",
             ((pd.Timestamp(as_of).date().isoformat() if as_of else _session_date(conn)),)
         ).fetchone()
-        if prow and prow[0] == "Full Risk-Off" and status != "Full Risk-Off":
+        if prow and str(prow[0]).endswith("Risk-Off") and not status.endswith("Risk-Off"):
             prev_im = conn.execute(
                 "SELECT intermarket FROM macro_components WHERE d < ? ORDER BY d DESC LIMIT 1",
                 ((pd.Timestamp(as_of).date().isoformat() if as_of else _session_date(conn)),)
@@ -1293,7 +1311,8 @@ def build_macro_structure(conn, breadth_pct200, breadth_pct50=None, breadth_regi
         "Full Risk-On":     float(os.environ.get("DEPLOY_FULL_ON",  "100")),
         "Moderate Risk-On": float(os.environ.get("DEPLOY_MOD_ON",   "75")),
         "Neutral / Choppy": float(os.environ.get("DEPLOY_NEUTRAL",  "50")),
-        "Full Risk-Off":    float(os.environ.get("DEPLOY_OFF",      "25")),
+        "Moderate Risk-Off": float(os.environ.get("DEPLOY_MOD_OFF", "35")),
+        "Full Risk-Off":    float(os.environ.get("DEPLOY_OFF",      "15")),
     }
     deploy_pct = DEPLOY_MAP.get(status, 50.0)
     deploy_notes = []
@@ -1319,7 +1338,9 @@ def build_macro_structure(conn, breadth_pct200, breadth_pct50=None, breadth_regi
                           "deploy_pct": deploy_pct, "deploy_notes": deploy_notes,
                           "components": {"intermarket": ratio_component, "vix": vix_score,
                                          "trend": trend_score, "breadth": breadth_score},
-                          "bands": {"full_on": B_FULL_ON, "moderate_on": B_MOD_ON, "full_off": B_FULL_OFF, "hysteresis": HYST},
+                          "bands": {"full_on": B_FULL_ON, "moderate_on": B_MOD_ON,
+                                    "moderate_off": B_MOD_OFF, "full_off": B_FULL_OFF,
+                                    "hysteresis": HYST},
                           "raw_status": raw_status, "dwell_held": dwell_held,
                           "leadership_pct": leadership, "lead_min": LEAD_MIN,
                           "price_override": price_override, "recovery_pct": recovery_pct,
@@ -1972,6 +1993,67 @@ def band_forward_test(conn, split="2024-01-01"):
     print("       the level is not the problem and switching would add complexity")
     print("       for nothing.")
 
+
+def divergence_sweep(conn, split="2024-01-01"):
+    """Would a SHORTER window have caught the fast V-shaped dips?
+
+    The live flag uses a 10-session window and |price| >= 2%. That is built for
+    slow deterioration. On a sharp 2-4 day dip price falls and recovers INSIDE
+    the window, so the net 10-day change is near zero and nothing fires -- which
+    is why several obvious reversal points carry no arrow.
+
+    This sweeps window length and price threshold, reporting for each combination
+    how many bullish flags fire and the mean forward return from them, split
+    in-sample / out-of-sample, against the all-days base rate.
+
+    READ IT FOR TWO THINGS AT ONCE: does a shorter window beat the base rate, and
+    does it fire so often that it stops meaning anything. A rule that flags 30% of
+    days is a description of the market, not a signal.
+    """
+    try:
+        rows = conn.execute("SELECT d, j FROM macro_detail ORDER BY d").fetchall()
+    except Exception:
+        print("[sweep] no detail -- run --replay first"); return
+    recs = {}
+    for d_, j in rows:
+        try:
+            o = json.loads(j)
+        except Exception:
+            continue
+        if o.get("score") is not None and o.get("spx") is not None:
+            recs[pd.Timestamp(d_)] = {"score": o["score"], "spx": o["spx"]}
+    df = pd.DataFrame.from_dict(recs, orient="index").sort_index()
+    if len(df) < 300:
+        print(f"[sweep] only {len(df)} usable days"); return
+    for h in (5, 21, 63):
+        df[f"fwd{h}"] = (df["spx"].shift(-h) / df["spx"] - 1) * 100
+    cut = pd.Timestamp(split)
+    ins, oos = df[df.index < cut], df[df.index >= cut]
+    n = len(df)
+
+    print(f"\n[sweep] BULLISH divergence: price DOWN >= X% over W sessions while the")
+    print(f"        score held flat or rose.   {n} days total\n")
+    print(f"        {'BASE RATE (all days)':<22}{'flags':>7}{'%days':>7}"
+          + "".join(f"{('IS'+str(h)):>9}{('OOS'+str(h)):>10}" for h in (5,21,63)))
+    print(f"        {'':<22}{n:>7}{'100%':>7}"
+          + "".join(f"{ins[f'fwd{h}'].mean():>9.2f}{oos[f'fwd{h}'].mean():>10.2f}" for h in (5,21,63)))
+    print("        " + "-"*78)
+    for win in (3, 5, 10):
+        for thr in (1.5, 2.0, 3.0):
+            px_chg = (df["spx"] / df["spx"].shift(win) - 1) * 100
+            sc_chg = df["score"] - df["score"].shift(win)
+            mask = (px_chg <= -thr) & (sc_chg >= 0)
+            a, b = df[mask & (df.index < cut)], df[mask & (df.index >= cut)]
+            tot = int(mask.sum())
+            line = f"        win={win:<2} thr={thr:<4}{'':<11}{tot:>7}{100.0*tot/n:>6.0f}%"
+            for h in (5, 21, 63):
+                x = a[f"fwd{h}"].mean() if len(a) > 8 else None
+                y = b[f"fwd{h}"].mean() if len(b) > 8 else None
+                line += (f"{x:>9.2f}{y:>10.2f}") if x is not None and y is not None else f"{'-':>9}{'-':>10}"
+            print(line)
+    print("\n        A window that fires on >15-20% of days is describing the tape, not")
+    print("        flagging anything. Effective independent obs at 21d is ~flags/21.")
+
 def dispatch_webhook(prev_status, new_status, payload):
     """POST a regime-shift alert to WEBHOOK_URL if set. Never crashes the run."""
     url = os.environ.get("WEBHOOK_URL", "").strip()
@@ -2404,6 +2486,8 @@ def main():
     ap.add_argument("--selftest", action="store_true", help="synthetic data, no network")
     ap.add_argument("--verify", nargs="+", metavar="TICKER",
                     help="audit calc chain for given tickers vs the DB (read-only)")
+    ap.add_argument("--divsweep", action="store_true",
+                    help="sweep divergence window/threshold vs forward returns")
     ap.add_argument("--bandtest", action="store_true",
                     help="mean forward SPX return by score band")
     ap.add_argument("--divtest", action="store_true",
@@ -2437,6 +2521,12 @@ def main():
 
     if args.verify:
         verify(args.verify)
+        return
+
+    if args.divsweep:
+        conn = sqlite3.connect(DB_PATH)
+        divergence_sweep(conn, args.ic_split)
+        conn.close()
         return
 
     if args.bandtest:
