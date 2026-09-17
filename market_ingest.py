@@ -129,10 +129,10 @@ def _bs(sector, syms):
         BREADTH_SECTOR[t] = sector
 
 _bs("Aerospace & Defense", ['AVAV', 'AXON', 'BA', 'BAH', 'CACI', 'CW', 'GD', 'GE', 'HEI', 'HII', 'HWM', 'KTOS', 'LDOS', 'LHX', 'LMT', 'MOG-A', 'NOC', 'OSK', 'RKLB', 'RTX', 'SAIC', 'TDG', 'TXT', 'WWD'])
-_bs("Biotech Broad", ['ALNY', 'AMGN', 'APLS', 'ARWR', 'AXSM', 'BEAM', 'BIIB', 'BMRN', 'CRSP', 'CYTK', 'DNA', 'EDIT', 'EXAS', 'FOLD', 'GILD', 'ILMN', 'INCY', 'INSM', 'IONQ', 'IOVA', 'MDGL', 'MRNA', 'NBIX', 'NTLA', 'PACB', 'PTCT', 'RARE', 'REGN', 'RXRX', 'RYTM', 'SGMO', 'SRPT', 'SWTX', 'TWST', 'UTHR', 'VCYT', 'VERV', 'VKTX', 'VRTX', 'XENE', 'ZLAB'])
+_bs("Biotech Broad", ['ALNY', 'AMGN', 'ARWR', 'AXSM', 'BEAM', 'BIIB', 'BMRN', 'CRSP', 'CYTK', 'DNA', 'EDIT', 'GILD', 'ILMN', 'INCY', 'INSM', 'IONQ', 'IOVA', 'MDGL', 'MRNA', 'NBIX', 'NTLA', 'PACB', 'PTCT', 'RARE', 'REGN', 'RXRX', 'RYTM', 'SRPT', 'TWST', 'UTHR', 'VCYT', 'VKTX', 'VRTX', 'XENE', 'ZLAB'])
 _bs("China Broad", ['BABA', 'BEKE', 'BIDU', 'BILI', 'FUTU', 'IQ', 'JD', 'LI', 'NIO', 'NTES', 'PDD', 'TCEHY', 'TCOM', 'TIGR', 'TME', 'VIPS', 'XPEV', 'YUMC', 'ZTO'])
 _bs("Consumer Staples", ['ADM', 'BF-B', 'CAG', 'CHD', 'CL', 'CLX', 'COST', 'CPB', 'DLTR', 'EL', 'GIS', 'HRL', 'HSY', 'KHC', 'KMB', 'KO', 'KR', 'LW', 'MDLZ', 'MKC', 'MNST', 'MO', 'PEP', 'PG', 'PM', 'SJM', 'STZ', 'SYY', 'TAP', 'TGT', 'TSN', 'WMT'])
-_bs("Financials Broad", ['ACGL', 'AMP', 'APO', 'ARES', 'AXP', 'BAC', 'BLK', 'BRK-B', 'BX', 'C', 'CINF', 'COF', 'EG', 'FI', 'FIS', 'GL', 'GPN', 'GS', 'JPM', 'KKR', 'L', 'LNC', 'MA', 'MS', 'MTB', 'PFG', 'PNC', 'PYPL', 'RJF', 'SCHW', 'SYF', 'TFC', 'UNM', 'USB', 'V', 'WFC', 'WRB'])
+_bs("Financials Broad", ['ACGL', 'AMP', 'APO', 'ARES', 'AXP', 'BAC', 'BLK', 'BRK-B', 'BX', 'C', 'CINF', 'COF', 'EG', 'FIS', 'GL', 'GPN', 'GS', 'JPM', 'KKR', 'L', 'LNC', 'MA', 'MS', 'MTB', 'PFG', 'PNC', 'PYPL', 'RJF', 'SCHW', 'SYF', 'TFC', 'UNM', 'USB', 'V', 'WFC', 'WRB'])
 _bs("Healthcare Broad", ['BMY', 'A', 'ABBV', 'ABT', 'ALGN', 'BAX', 'BDX', 'BSX', 'CAH', 'CI', 'COR', 'CRL', 'CVS', 'DHR', 'DXCM', 'ELV', 'EW', 'HCA', 'IDXX', 'IQV', 'ISRG', 'JNJ', 'LLY', 'MCK', 'MDT', 'MRK', 'MTD', 'OGN', 'PFE', 'PODD', 'RMD', 'STE', 'SYK', 'TECH', 'TMO', 'UNH', 'VTRS', 'WAT', 'ZBH', 'ZTS'])
 _bs("Industrials & Machinery", ['ADP', 'ALLE', 'AME', 'BLDR', 'CARR', 'CAT', 'CMI', 'CSX', 'DE', 'DOV', 'EFX', 'EMR', 'ETN', 'FAST', 'FDX', 'GWW', 'HON', 'IR', 'ITW', 'JCI', 'LII', 'MAS', 'MMM', 'NSC', 'ODFL', 'OTIS', 'PCAR', 'PH', 'PWR', 'ROK', 'SNA', 'SWK', 'TT', 'UBER', 'UNP', 'UPS', 'URI', 'VRSK', 'WM', 'XYL'])
 _bs("Materials & Chemicals", ['AA', 'ALB', 'AMCR', 'APD', 'AVY', 'BALL', 'CE', 'CF', 'CLF', 'CTVA', 'DD', 'DOW', 'ECL', 'EMN', 'FCX', 'IFF', 'IP', 'LIN', 'LYB', 'MLM', 'MOS', 'NEM', 'NUE', 'PKG', 'PPG', 'SHW', 'STLD', 'SW', 'VMC'])
@@ -141,7 +141,7 @@ _bs("Oil & Gas", ['APA', 'AROC', 'BKR', 'CHRD', 'COP', 'CVX', 'DVN', 'EOG', 'EQT
 _bs("Real Estate", ['AMT', 'ARE', 'AVB', 'BXP', 'CCI', 'CPT', 'DLR', 'DOC', 'EQIX', 'EQR', 'ESS', 'EXR', 'FRT', 'HST', 'INVH', 'IRM', 'KIM', 'MAA', 'O', 'PLD', 'PSA', 'REG', 'SBAC', 'SPG', 'UDR', 'VTR', 'WELL', 'WY'])
 _bs("Retail & Consumer", ['ABNB', 'AMZN', 'APTV', 'AZO', 'BBY', 'BKNG', 'BWA', 'CCL', 'CMG', 'DECK', 'DG', 'DHI', 'DPZ', 'DRI', 'EBAY', 'ETSY', 'F', 'GM', 'GPC', 'GRMN', 'HD', 'HLT', 'KMX', 'LEN', 'LKQ', 'LOW', 'LULU', 'LVS', 'MAR', 'MCD', 'MGM', 'NCLH', 'NKE', 'NVR', 'ORLY', 'PHM', 'POOL', 'RCL', 'RL', 'ROST', 'SBUX', 'TJX', 'TPR', 'TSCO', 'TSLA', 'ULTA', 'WSM', 'WYNN', 'YUM'])
 _bs("Semis Broad", ['ADI', 'ALGM', 'AMAT', 'AMD', 'AMKR', 'ARM', 'ASML', 'ASX', 'AVGO', 'CDNS', 'ENTG', 'GFS', 'INTC', 'KLAC', 'LRCX', 'MCHP', 'MRVL', 'MU', 'NVDA', 'NXPI', 'ON', 'QRVO', 'SNPS', 'STM', 'SWKS', 'TER', 'TSM', 'TXN', 'UMC', 'WOLF'])
-_bs("Solar & Clean Energy", ['ARRY', 'CSIQ', 'DQ', 'ENPH', 'FSLR', 'JKS', 'MAXN', 'NOVA', 'NXT', 'RUN', 'SEDG', 'SHLS'])
+_bs("Solar & Clean Energy", ['ARRY', 'CSIQ', 'DQ', 'ENPH', 'FSLR', 'JKS', 'NXT', 'RUN', 'SEDG', 'SHLS'])
 _bs("Technology", ['AAPL', 'ACN', 'ADBE', 'ANET', 'APH', 'CRM', 'CRWD', 'CSCO', 'CTSH', 'DELL', 'EPAM', 'FTNT', 'GDDY', 'GLW', 'HPQ', 'IBM', 'INFY', 'INTU', 'IT', 'KEYS', 'MSFT', 'MSI', 'NOW', 'NTAP', 'ORCL', 'PANW', 'PLTR', 'QCOM', 'STX', 'TEL', 'WDC', 'ZBRA'])
 _bs("Uranium & Nuclear", ['ASPI', 'BOE', 'CCJ', 'DNN', 'EU', 'LEU', 'LTBR', 'NXE', 'OKLO', 'SMR', 'UEC', 'URG', 'UUUU'])
 _bs("Utilities", ['AEE', 'AEP', 'AES', 'ATO', 'AWK', 'CEG', 'CMS', 'CNP', 'D', 'DTE', 'DUK', 'ED', 'EIX', 'ES', 'EVRG', 'EXC', 'FE', 'LNT', 'NEE', 'NI', 'NRG', 'PCG', 'PEG', 'PPL', 'SO', 'SRE', 'TLN', 'VST', 'WEC', 'XEL'])
@@ -150,7 +150,10 @@ _bs("IT Solutions & Resellers", ["NSIT","CDW","PLUS","CNXN"])
 # Verified against live listings before backfilling. Removed: DFS (acquired by
 # COF), KRTX (acquired by BMY), SPR (acquired by BA), RE (renamed EG, already
 # present), NVTA and SPWR (Chapter 11), DIDIY (OTC-only ADR), PDN (ASX primary),
-# EMEIS (Euronext primary). BF-B and MOG-A are KEPT in hyphen form: the exchange
+# EMEIS (Euronext primary).
+# Second pruning round after the first 7y backfill: MAXN, EXAS, APLS, FOLD,
+# SGMO, VERV, NOVA, SWTX, FI all returned no data. EA/AVB/EQR failed only the
+# 10-day pull and have full history, so those are transient and self-heal. BF-B and MOG-A are KEPT in hyphen form: the exchange
 # prints BF.B / MOG.A but Yahoo — which is what the ingest queries — uses hyphens.
 BREADTH_EXTRA += sorted(set(BREADTH_SECTOR) - set(BREADTH_EXTRA))
 BREADTH_EXTRA = sorted(t for t in set(BREADTH_EXTRA) if t not in {'BK','CMA','CTRA','HES','HOLX','IPG','K','MMC','MRO','PKI','PXD','SEE','SWN','WRK','X','CIVI'})
