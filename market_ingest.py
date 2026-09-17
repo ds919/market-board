@@ -111,8 +111,60 @@ BREADTH_EXTRA = [
 # IT solutions / value-added resellers -- a coherent peer group and a sector the
 # list otherwise missed entirely (NSIT, CDW, PLUS, CNXN).
 BREADTH_EXTRA += ["NSIT", "CDW", "PLUS", "CNXN"]
+# ITA top holdings not otherwise covered, so the defense basket is complete
+BREADTH_EXTRA += ["GE", "HWM", "TDG", "LHX", "AXON", "BA"]
 BREADTH_EXTRA += ['WAL', 'DVN', 'OXY', 'ALGN', 'NYT', 'KHC', 'AIZ', 'FANG', 'TECH', 'CIVI', 'AMCR', 'CHRD', 'SW', 'CMC']
-BREADTH_EXTRA = sorted(set(BREADTH_EXTRA))
+
+
+# Sector labels for the breadth-extension names. Without these they were
+# BREADTH-ONLY -- counted in the percentages but invisible to the Screen,
+# Momentum, RVOL and Extension tabs, because those require a theme. That hid
+# ~253 names, including defense primes like NOC and GD, from the one tool built
+# to find candidates. Labeling them costs nothing and makes the whole universe
+# screenable; the curated THEMES still drive theme SCORING and the rotation
+# quadrant, so the thematic read is unaffected.
+BREADTH_SECTOR = {}
+def _bs(sector, syms):
+    for t in syms:
+        BREADTH_SECTOR[t] = sector
+
+_bs("Aerospace & Defense", ['AVAV', 'AXON', 'BA', 'BAH', 'CACI', 'CW', 'GD', 'GE', 'HEI', 'HII', 'HWM', 'KTOS', 'LDOS', 'LHX', 'LMT', 'MOG-A', 'NOC', 'OSK', 'RKLB', 'RTX', 'SAIC', 'TDG', 'TXT', 'WWD'])
+_bs("Biotech Broad", ['ALNY', 'AMGN', 'APLS', 'ARWR', 'AXSM', 'BEAM', 'BIIB', 'BMRN', 'CRSP', 'CYTK', 'DNA', 'EDIT', 'EXAS', 'FOLD', 'GILD', 'ILMN', 'INCY', 'INSM', 'IONQ', 'IOVA', 'MDGL', 'MRNA', 'NBIX', 'NTLA', 'PACB', 'PTCT', 'RARE', 'REGN', 'RXRX', 'RYTM', 'SGMO', 'SRPT', 'SWTX', 'TWST', 'UTHR', 'VCYT', 'VERV', 'VKTX', 'VRTX', 'XENE', 'ZLAB'])
+_bs("China Broad", ['BABA', 'BEKE', 'BIDU', 'BILI', 'FUTU', 'IQ', 'JD', 'LI', 'NIO', 'NTES', 'PDD', 'TCEHY', 'TCOM', 'TIGR', 'TME', 'VIPS', 'XPEV', 'YUMC', 'ZTO'])
+_bs("Consumer Staples", ['ADM', 'BF-B', 'CAG', 'CHD', 'CL', 'CLX', 'COST', 'CPB', 'DLTR', 'EL', 'GIS', 'HRL', 'HSY', 'KHC', 'KMB', 'KO', 'KR', 'LW', 'MDLZ', 'MKC', 'MNST', 'MO', 'PEP', 'PG', 'PM', 'SJM', 'STZ', 'SYY', 'TAP', 'TGT', 'TSN', 'WMT'])
+_bs("Financials Broad", ['ACGL', 'AMP', 'APO', 'ARES', 'AXP', 'BAC', 'BLK', 'BRK-B', 'BX', 'C', 'CINF', 'COF', 'EG', 'FI', 'FIS', 'GL', 'GPN', 'GS', 'JPM', 'KKR', 'L', 'LNC', 'MA', 'MS', 'MTB', 'PFG', 'PNC', 'PYPL', 'RJF', 'SCHW', 'SYF', 'TFC', 'UNM', 'USB', 'V', 'WFC', 'WRB'])
+_bs("Healthcare Broad", ['BMY', 'A', 'ABBV', 'ABT', 'ALGN', 'BAX', 'BDX', 'BSX', 'CAH', 'CI', 'COR', 'CRL', 'CVS', 'DHR', 'DXCM', 'ELV', 'EW', 'HCA', 'IDXX', 'IQV', 'ISRG', 'JNJ', 'LLY', 'MCK', 'MDT', 'MRK', 'MTD', 'OGN', 'PFE', 'PODD', 'RMD', 'STE', 'SYK', 'TECH', 'TMO', 'UNH', 'VTRS', 'WAT', 'ZBH', 'ZTS'])
+_bs("Industrials & Machinery", ['ADP', 'ALLE', 'AME', 'BLDR', 'CARR', 'CAT', 'CMI', 'CSX', 'DE', 'DOV', 'EFX', 'EMR', 'ETN', 'FAST', 'FDX', 'GWW', 'HON', 'IR', 'ITW', 'JCI', 'LII', 'MAS', 'MMM', 'NSC', 'ODFL', 'OTIS', 'PCAR', 'PH', 'PWR', 'ROK', 'SNA', 'SWK', 'TT', 'UBER', 'UNP', 'UPS', 'URI', 'VRSK', 'WM', 'XYL'])
+_bs("Materials & Chemicals", ['AA', 'ALB', 'AMCR', 'APD', 'AVY', 'BALL', 'CE', 'CF', 'CLF', 'CTVA', 'DD', 'DOW', 'ECL', 'EMN', 'FCX', 'IFF', 'IP', 'LIN', 'LYB', 'MLM', 'MOS', 'NEM', 'NUE', 'PKG', 'PPG', 'SHW', 'STLD', 'SW', 'VMC'])
+_bs("Media & Telecom", ['CHTR', 'CMCSA', 'DIS', 'EA', 'FOXA', 'GOOGL', 'LYV', 'META', 'MTCH', 'NFLX', 'NWSA', 'NYT', 'OMC', 'PARA', 'PINS', 'RBLX', 'SNAP', 'SPOT', 'T', 'TMUS', 'TTD', 'TTWO', 'VZ', 'WBD'])
+_bs("Oil & Gas", ['APA', 'AROC', 'BKR', 'CHRD', 'COP', 'CVX', 'DVN', 'EOG', 'EQT', 'FANG', 'HAL', 'KMI', 'MPC', 'MTDR', 'MUR', 'OKE', 'OVV', 'OXY', 'PR', 'PSX', 'SLB', 'SM', 'TRGP', 'VLO', 'WMB', 'XOM'])
+_bs("Real Estate", ['AMT', 'ARE', 'AVB', 'BXP', 'CCI', 'CPT', 'DLR', 'DOC', 'EQIX', 'EQR', 'ESS', 'EXR', 'FRT', 'HST', 'INVH', 'IRM', 'KIM', 'MAA', 'O', 'PLD', 'PSA', 'REG', 'SBAC', 'SPG', 'UDR', 'VTR', 'WELL', 'WY'])
+_bs("Retail & Consumer", ['ABNB', 'AMZN', 'APTV', 'AZO', 'BBY', 'BKNG', 'BWA', 'CCL', 'CMG', 'DECK', 'DG', 'DHI', 'DPZ', 'DRI', 'EBAY', 'ETSY', 'F', 'GM', 'GPC', 'GRMN', 'HD', 'HLT', 'KMX', 'LEN', 'LKQ', 'LOW', 'LULU', 'LVS', 'MAR', 'MCD', 'MGM', 'NCLH', 'NKE', 'NVR', 'ORLY', 'PHM', 'POOL', 'RCL', 'RL', 'ROST', 'SBUX', 'TJX', 'TPR', 'TSCO', 'TSLA', 'ULTA', 'WSM', 'WYNN', 'YUM'])
+_bs("Semis Broad", ['ADI', 'ALGM', 'AMAT', 'AMD', 'AMKR', 'ARM', 'ASML', 'ASX', 'AVGO', 'CDNS', 'ENTG', 'GFS', 'INTC', 'KLAC', 'LRCX', 'MCHP', 'MRVL', 'MU', 'NVDA', 'NXPI', 'ON', 'QRVO', 'SNPS', 'STM', 'SWKS', 'TER', 'TSM', 'TXN', 'UMC', 'WOLF'])
+_bs("Solar & Clean Energy", ['ARRY', 'CSIQ', 'DQ', 'ENPH', 'FSLR', 'JKS', 'MAXN', 'NOVA', 'NXT', 'RUN', 'SEDG', 'SHLS'])
+_bs("Technology", ['AAPL', 'ACN', 'ADBE', 'ANET', 'APH', 'CRM', 'CRWD', 'CSCO', 'CTSH', 'DELL', 'EPAM', 'FTNT', 'GDDY', 'GLW', 'HPQ', 'IBM', 'INFY', 'INTU', 'IT', 'KEYS', 'MSFT', 'MSI', 'NOW', 'NTAP', 'ORCL', 'PANW', 'PLTR', 'QCOM', 'STX', 'TEL', 'WDC', 'ZBRA'])
+_bs("Uranium & Nuclear", ['ASPI', 'BOE', 'CCJ', 'DNN', 'EU', 'LEU', 'LTBR', 'NXE', 'OKLO', 'SMR', 'UEC', 'URG', 'UUUU'])
+_bs("Utilities", ['AEE', 'AEP', 'AES', 'ATO', 'AWK', 'CEG', 'CMS', 'CNP', 'D', 'DTE', 'DUK', 'ED', 'EIX', 'ES', 'EVRG', 'EXC', 'FE', 'LNT', 'NEE', 'NI', 'NRG', 'PCG', 'PEG', 'PPL', 'SO', 'SRE', 'TLN', 'VST', 'WEC', 'XEL'])
+_bs("IT Solutions & Resellers", ["NSIT","CDW","PLUS","CNXN"])
+
+# Verified against live listings before backfilling. Removed: DFS (acquired by
+# COF), KRTX (acquired by BMY), SPR (acquired by BA), RE (renamed EG, already
+# present), NVTA and SPWR (Chapter 11), DIDIY (OTC-only ADR), PDN (ASX primary),
+# EMEIS (Euronext primary). BF-B and MOG-A are KEPT in hyphen form: the exchange
+# prints BF.B / MOG.A but Yahoo — which is what the ingest queries — uses hyphens.
+BREADTH_EXTRA += sorted(set(BREADTH_SECTOR) - set(BREADTH_EXTRA))
+BREADTH_EXTRA = sorted(t for t in set(BREADTH_EXTRA) if t not in {'BK','CMA','CTRA','HES','HOLX','IPG','K','MMC','MRO','PKI','PXD','SEE','SWN','WRK','X','CIVI'})
+
+# ETF-HOLDINGS BUILD-OUT. Boundary rule: if an ETF is on the ETF Grid, its major
+# holdings should be screenable -- otherwise "XBI looks strong" cannot be drilled
+# into. Everything above comes from the top holdings of the 18 grid ETFs, deduped
+# against the curated THEMES, with known-delisted names excluded.
+#
+# NOTE these lists are built from knowledge, not a live holdings feed, so expect
+# a pruning round after the first backfill (the previous pass had 15 dead names
+# out of 253). The curated THEMES still drive theme SCORING; these labels only
+# make the names rankable.
+
 
 NON_MEMBERS = set(INDEX_SYMS) | set(SECTOR_SYMS) | set(MACRO_SYMS) | set(MACRO_STRUCT_SYMS)
 
@@ -2143,7 +2195,8 @@ def compute_and_emit(conn):
     names = [(t, m) for t, m in metrics.items() if m and t not in NON_MEMBERS]
     # screen/momentum/rvol operate on THEMED names only; the breadth-extension
     # tickers have no theme and would show "—" in every row
-    themed = [(t, m) for t, m in names if t in t2theme]
+    # sector label is the fallback, so breadth-extension names are screenable too
+    themed = [(t, m) for t, m in names if t in t2theme or t in BREADTH_SECTOR]
 
     macro = []
     for sym, desc in MACRO_ETFS:
@@ -2160,7 +2213,7 @@ def compute_and_emit(conn):
                          "d21": rnd(m["ret21"]), "d50": rnd(m["dist50"], 1), "atr": rnd(m["atr_ext"], 1)})
 
     def row(t, m, extra):
-        base = {"tk": t, "theme": t2theme.get(t, "—"), "d1": rnd(m["ret1"])}
+        base = {"tk": t, "theme": t2theme.get(t) or BREADTH_SECTOR.get(t, "—"), "d1": rnd(m["ret1"])}
         base.update(extra)
         return base
 
@@ -2220,7 +2273,7 @@ def compute_and_emit(conn):
     for t, m in themed:
         if not _v(m.get("ret21")) or not _v(m.get("atr_ext")):
             continue
-        th = t2theme.get(t, "—")
+        th = t2theme.get(t) or BREADTH_SECTOR.get(t, "—")
         th_score = _theme_rank.get(th)
         rs = m["ret21"] - (spy_ret21 or 0.0)          # relative strength vs SPY
         ext = m["atr_ext"]
