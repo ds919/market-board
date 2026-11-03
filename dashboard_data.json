@@ -1023,7 +1023,7 @@
         "dist50": 5.7,
         "rvol": 2.03,
         "above200": true,
-        "earnings_7d": true,
+        "earnings_7d": false,
         "basis_atr": 1.65,
         "sig_state": "up",
         "sig_buy_conv": 3,
@@ -1333,7 +1333,7 @@
         "dist50": -25.5,
         "rvol": 2.6,
         "above200": false,
-        "earnings_7d": true,
+        "earnings_7d": false,
         "basis_atr": -2.32,
         "sig_state": "down",
         "sig_buy_conv": 2,
@@ -1707,7 +1707,7 @@
         "dist50": -6.1,
         "rvol": 1.22,
         "above200": false,
-        "earnings_7d": true,
+        "earnings_7d": false,
         "basis_atr": -1.25,
         "sig_state": "down",
         "sig_buy_conv": 1,
@@ -1863,7 +1863,7 @@
         "dist50": 25.2,
         "rvol": 3.09,
         "above200": true,
-        "earnings_7d": true,
+        "earnings_7d": false,
         "basis_atr": 4.75,
         "sig_state": "up",
         "sig_buy_conv": 3,
@@ -1973,7 +1973,7 @@
         "dist50": 15.2,
         "rvol": 1.74,
         "above200": true,
-        "earnings_7d": true,
+        "earnings_7d": false,
         "basis_atr": 2.76,
         "sig_state": "up",
         "sig_buy_conv": 2,
@@ -2217,7 +2217,7 @@
         "dist50": -25.8,
         "rvol": 2.51,
         "above200": false,
-        "earnings_7d": true,
+        "earnings_7d": false,
         "basis_atr": -2.5,
         "sig_state": "up",
         "sig_buy_conv": 3,
@@ -11665,7 +11665,7 @@
     }
   },
   "macro_structure": {
-    "updated_at": "2026-11-02T22:28:56Z",
+    "updated_at": "2026-11-03T01:13:00Z",
     "system_health": {
       "data_status": "ok",
       "last_close": "2026-11-02"
@@ -36334,8 +36334,8 @@
       },
       {
         "ticker": "BTC-USD",
-        "spread_1m": -3.852,
-        "spread_3m": 0.203
+        "spread_1m": -4.968,
+        "spread_3m": 2.067
       }
     ]
   },
@@ -36598,171 +36598,6 @@
     ]
   },
   "earnings": [
-    {
-      "tk": "AAPL",
-      "theme": "Mega-cap Platforms",
-      "date": "2026-11-02"
-    },
-    {
-      "tk": "AROC",
-      "theme": "\u2014",
-      "date": "2026-11-02"
-    },
-    {
-      "tk": "AXSM",
-      "theme": "\u2014",
-      "date": "2026-11-02"
-    },
-    {
-      "tk": "BMRN",
-      "theme": "Biotech",
-      "date": "2026-11-02"
-    },
-    {
-      "tk": "BWXT",
-      "theme": "AI Power & Datacenter",
-      "date": "2026-11-02"
-    },
-    {
-      "tk": "CE",
-      "theme": "\u2014",
-      "date": "2026-11-02"
-    },
-    {
-      "tk": "CHKP",
-      "theme": "Cybersecurity",
-      "date": "2026-11-02"
-    },
-    {
-      "tk": "CLX",
-      "theme": "\u2014",
-      "date": "2026-11-02"
-    },
-    {
-      "tk": "DOC",
-      "theme": "\u2014",
-      "date": "2026-11-02"
-    },
-    {
-      "tk": "EL",
-      "theme": "\u2014",
-      "date": "2026-11-02"
-    },
-    {
-      "tk": "FANG",
-      "theme": "Energy",
-      "date": "2026-11-02"
-    },
-    {
-      "tk": "FN",
-      "theme": "Optics & Photonics",
-      "date": "2026-11-02"
-    },
-    {
-      "tk": "FOXA",
-      "theme": "\u2014",
-      "date": "2026-11-02"
-    },
-    {
-      "tk": "IDXX",
-      "theme": "\u2014",
-      "date": "2026-11-02"
-    },
-    {
-      "tk": "L",
-      "theme": "\u2014",
-      "date": "2026-11-02"
-    },
-    {
-      "tk": "LITE",
-      "theme": "Optics & Photonics",
-      "date": "2026-11-02"
-    },
-    {
-      "tk": "LTBR",
-      "theme": "\u2014",
-      "date": "2026-11-02"
-    },
-    {
-      "tk": "MAR",
-      "theme": "\u2014",
-      "date": "2026-11-02"
-    },
-    {
-      "tk": "MTCH",
-      "theme": "\u2014",
-      "date": "2026-11-02"
-    },
-    {
-      "tk": "NBIX",
-      "theme": "Biotech",
-      "date": "2026-11-02"
-    },
-    {
-      "tk": "O",
-      "theme": "\u2014",
-      "date": "2026-11-02"
-    },
-    {
-      "tk": "ON",
-      "theme": "Semiconductors",
-      "date": "2026-11-02"
-    },
-    {
-      "tk": "PEG",
-      "theme": "\u2014",
-      "date": "2026-11-02"
-    },
-    {
-      "tk": "PLTR",
-      "theme": "Software Infrastructure",
-      "date": "2026-11-02"
-    },
-    {
-      "tk": "RIG",
-      "theme": "\u2014",
-      "date": "2026-11-02"
-    },
-    {
-      "tk": "RXRX",
-      "theme": "AI Healthcare & Diagnostics",
-      "date": "2026-11-02"
-    },
-    {
-      "tk": "SBAC",
-      "theme": "\u2014",
-      "date": "2026-11-02"
-    },
-    {
-      "tk": "TEM",
-      "theme": "AI Healthcare & Diagnostics",
-      "date": "2026-11-02"
-    },
-    {
-      "tk": "UDR",
-      "theme": "\u2014",
-      "date": "2026-11-02"
-    },
-    {
-      "tk": "VAL",
-      "theme": "\u2014",
-      "date": "2026-11-02"
-    },
-    {
-      "tk": "VRTX",
-      "theme": "Biotech",
-      "date": "2026-11-02"
-    },
-    {
-      "tk": "WMB",
-      "theme": "Energy",
-      "date": "2026-11-02"
-    },
-    {
-      "tk": "XENE",
-      "theme": "\u2014",
-      "date": "2026-11-02"
-    },
     {
       "tk": "ADM",
       "theme": "\u2014",
@@ -37146,11 +36981,6 @@
     {
       "tk": "HUT",
       "theme": "Crypto-linked",
-      "date": "2026-11-04"
-    },
-    {
-      "tk": "IONS",
-      "theme": "Biotech",
       "date": "2026-11-04"
     },
     {
@@ -37674,13 +37504,13 @@
       "date": "2026-11-09"
     },
     {
-      "tk": "CRSP",
+      "tk": "EDIT",
       "theme": "\u2014",
       "date": "2026-11-09"
     },
     {
-      "tk": "EDIT",
-      "theme": "\u2014",
+      "tk": "IONS",
+      "theme": "Biotech",
       "date": "2026-11-09"
     },
     {
@@ -37746,6 +37576,11 @@
     {
       "tk": "WGS",
       "theme": "AI Healthcare & Diagnostics",
+      "date": "2026-11-09"
+    },
+    {
+      "tk": "XENE",
+      "theme": "\u2014",
       "date": "2026-11-09"
     },
     {
