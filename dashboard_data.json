@@ -11662,7 +11662,7 @@
     }
   },
   "macro_structure": {
-    "updated_at": "2026-11-16T23:00:43Z",
+    "updated_at": "2026-11-17T02:02:42Z",
     "system_health": {
       "data_status": "ok",
       "last_close": "2026-11-16"
@@ -37257,8 +37257,8 @@
       },
       {
         "ticker": "BTC-USD",
-        "spread_1m": -15.384,
-        "spread_3m": -12.93
+        "spread_1m": -16.852,
+        "spread_3m": -10.821
       }
     ]
   },
@@ -37521,46 +37521,6 @@
     ]
   },
   "earnings": [
-    {
-      "tk": "ASPI",
-      "theme": "\u2014",
-      "date": "2026-11-16"
-    },
-    {
-      "tk": "BEKE",
-      "theme": "China Tech",
-      "date": "2026-11-16"
-    },
-    {
-      "tk": "BIDU",
-      "theme": "China Tech",
-      "date": "2026-11-16"
-    },
-    {
-      "tk": "INFQ",
-      "theme": "Quantum",
-      "date": "2026-11-16"
-    },
-    {
-      "tk": "IQ",
-      "theme": "\u2014",
-      "date": "2026-11-16"
-    },
-    {
-      "tk": "POET",
-      "theme": "Optics & Photonics",
-      "date": "2026-11-16"
-    },
-    {
-      "tk": "TSN",
-      "theme": "\u2014",
-      "date": "2026-11-16"
-    },
-    {
-      "tk": "XPEV",
-      "theme": "EV & Autonomy",
-      "date": "2026-11-16"
-    },
     {
       "tk": "DIS",
       "theme": "\u2014",
