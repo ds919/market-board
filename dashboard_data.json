@@ -1462,7 +1462,7 @@
         "dist50": -5.2,
         "rvol": 2.28,
         "above200": false,
-        "earnings_7d": true,
+        "earnings_7d": false,
         "basis_atr": -1.98,
         "sig_state": "down",
         "sig_buy_conv": 2,
@@ -11662,7 +11662,7 @@
     }
   },
   "macro_structure": {
-    "updated_at": "2026-11-17T21:53:59Z",
+    "updated_at": "2026-11-18T01:15:04Z",
     "system_health": {
       "data_status": "ok",
       "last_close": "2026-11-17"
@@ -37348,8 +37348,8 @@
       },
       {
         "ticker": "BTC-USD",
-        "spread_1m": -16.103,
-        "spread_3m": -10.326
+        "spread_1m": -16.129,
+        "spread_3m": -10.471
       }
     ]
   },
@@ -37612,36 +37612,6 @@
     ]
   },
   "earnings": [
-    {
-      "tk": "DIS",
-      "theme": "\u2014",
-      "date": "2026-11-17"
-    },
-    {
-      "tk": "HD",
-      "theme": "\u2014",
-      "date": "2026-11-17"
-    },
-    {
-      "tk": "JD",
-      "theme": "China Tech",
-      "date": "2026-11-17"
-    },
-    {
-      "tk": "NVDA",
-      "theme": "Mega-cap Platforms",
-      "date": "2026-11-17"
-    },
-    {
-      "tk": "TME",
-      "theme": "China Tech",
-      "date": "2026-11-17"
-    },
-    {
-      "tk": "ZTO",
-      "theme": "\u2014",
-      "date": "2026-11-17"
-    },
     {
       "tk": "LOW",
       "theme": "\u2014",
