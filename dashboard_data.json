@@ -11664,7 +11664,7 @@
     }
   },
   "macro_structure": {
-    "updated_at": "2026-11-25T22:42:37Z",
+    "updated_at": "2026-11-26T01:57:03Z",
     "system_health": {
       "data_status": "ok",
       "last_close": "2026-11-25"
@@ -37902,8 +37902,8 @@
       },
       {
         "ticker": "BTC-USD",
-        "spread_1m": -18.32,
-        "spread_3m": -21.672
+        "spread_1m": -13.025,
+        "spread_3m": -20.859
       }
     ]
   },
@@ -38166,16 +38166,6 @@
     ]
   },
   "earnings": [
-    {
-      "tk": "DE",
-      "theme": "Industrials",
-      "date": "2026-11-25"
-    },
-    {
-      "tk": "LI",
-      "theme": "EV & Autonomy",
-      "date": "2026-11-25"
-    },
     {
       "tk": "NNE",
       "theme": "AI Power & Datacenter",
