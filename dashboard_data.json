@@ -11661,7 +11661,7 @@
     }
   },
   "macro_structure": {
-    "updated_at": "2026-11-27T22:18:21Z",
+    "updated_at": "2026-11-28T01:38:40Z",
     "system_health": {
       "data_status": "ok",
       "last_close": "2026-11-27"
@@ -37955,8 +37955,8 @@
       },
       {
         "ticker": "BTC",
-        "score": "0/3",
-        "n": 0,
+        "score": "1/3",
+        "n": 1,
         "checks": [
           {
             "label": "Close > 21d EMA",
@@ -37964,7 +37964,7 @@
           },
           {
             "label": "Vol contained (ATR/px < 5%)",
-            "pass": false
+            "pass": true
           },
           {
             "label": "CPER/GLD 5>21 EMA",
@@ -37991,8 +37991,8 @@
       },
       {
         "ticker": "BTC-USD",
-        "spread_1m": -15.586,
-        "spread_3m": -23.713
+        "spread_1m": -14.906,
+        "spread_3m": -23.414
       }
     ]
   },
